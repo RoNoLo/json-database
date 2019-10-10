@@ -1,0 +1,72 @@
+<?php
+
+namespace RoNoLo\Flydb;
+
+use RoNoLo\JsonQuery\JsonQuery;
+
+/**
+ * Query
+ *
+ * Builds an executes a query whichs searches and sorts documents from a
+ * repository.
+ *
+ * @todo turn the limit and order by arrays into value objects
+ */
+class Query
+{
+    protected $repo;
+
+    protected $conditions;
+
+    protected static $rulesMap = [
+        'eq' => 'equal',
+        'seq' => 'strictEqual',
+        'neq' => 'notEqual',
+        'sneq' => 'strictNotEqual',
+        'gt' => 'greaterThan',
+        'lt' => 'lessThan',
+        'gte' => 'greaterThanOrEqual',
+        'lte' => 'lessThanOrEqual',
+        'in'    => 'in',
+        'notin' => 'notIn',
+        'null' => 'isNull',
+        'notnull' => 'isNotNull',
+        'sw' => 'startWith',
+        'ew' => 'endWith',
+        'contains' => 'contains',
+    ];
+
+    public function __construct(Repository $repository)
+    {
+        $this->repo = $repository;
+    }
+
+    public function find(array $conditions)
+    {
+        $this->conditions = $conditions;
+
+        return $this;
+    }
+
+    public function execute()
+    {
+        return $this->repo->find($this);
+    }
+
+    public function match($json)
+    {
+        $q = JsonQuery::fromJson($json);
+
+        foreach ($this->conditions as $field => $conditions) {
+            foreach ($conditions as $op => $asserts) {
+                $method = self::$rulesMap[$op];
+                $value = $q->getNestedProperty($field);
+                if (!Condition::$method($value, $asserts)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}

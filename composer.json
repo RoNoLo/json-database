@@ -1,0 +1,38 @@
+{
+    "name": "ronolo/flyfire",
+    "description": "A lightweight, flat-file, document database",
+    "keywords": ["flat", "file", "db", "document"],
+    "homepage": "http://github.com/RoNoLo/flyfire",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ronald Locke"
+        }
+    ],
+    "require": {
+        "php": ">= 7.2",
+        "ext-json": "*",
+        "league/flysystem": "^1.0",
+        "ramsey/uuid": "^3.8",
+        "ronolo/jsonquery": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "RoNoLo\\Flyfire\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RoNoLo\\Flyfire\\": "tests/src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/RoNoLo/jsonquery.git"
+        }
+    ]
+}
