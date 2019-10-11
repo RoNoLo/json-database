@@ -28,12 +28,17 @@ class Query
         'gte' => 'greaterThanOrEqual',
         'lte' => 'lessThanOrEqual',
         'in'    => 'in',
-        'notin' => 'notIn',
+        'nin' => 'notIn',
         'null' => 'isNull',
+        'n' => 'isNull',
         'notnull' => 'isNotNull',
+        'nn' => 'isNotNull',
         'sw' => 'startWith',
         'ew' => 'endWith',
         'contains' => 'contains',
+        'c' => 'contains',
+        'ne' => 'isNotEmpty',
+        'e' => 'isEmpty'
     ];
 
     public function __construct(Repository $repository)

@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use Exception;
 use IteratorAggregate;
+use RoNoLo\Flydb\Exception\DocumentNotFoundException;
 
 /**
  * Result
@@ -18,20 +19,23 @@ use IteratorAggregate;
  */
 class Result implements IteratorAggregate, ArrayAccess, Countable
 {
-    protected $documents;
+    protected $repo;
+
+    protected $id;
+
     protected $total;
 
     /**
      * Constructor
      *
-     * @param array $documents An array of Documents
-     * @param integer $total If this result only represents a small slice of
-     *                           the total (when using limit), this parameter
-     *                           represents the total number of documents.
+     * @param Repository $repo
+     * @param array $ids
+     * @param int $total
      */
-    public function __construct($documents, $total)
+    public function __construct(Repository $repo, array $id, int $total)
     {
-        $this->documents = array_values($documents);
+        $this->repo = $repo;
+        $this->id = $id;
         $this->total = $total;
     }
 
@@ -42,7 +46,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      */
     public function count()
     {
-        return count($this->documents);
+        return count($this->id);
     }
 
     /**
@@ -56,12 +60,9 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
         return $this->total;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getIterator()
     {
-        return new ArrayIterator($this->documents);
+        return new DocumentIterator($this->repo, $this->id);
     }
 
     /**
@@ -69,7 +70,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      */
     public function offsetSet($offset, $value)
     {
-        throw new Exception('Cannot set values on Flywheel\Result');
+        throw new Exception('Cannot set values on Flydb\Result');
     }
 
     /**
@@ -77,7 +78,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      */
     public function offsetExists($offset)
     {
-        return isset($this->documents[$offset]);
+        return isset($this->id[$offset]);
     }
 
     /**
@@ -85,7 +86,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      */
     public function offsetUnset($offset)
     {
-        throw new Exception('Cannot unset values on Flywheel\Result');
+        throw new Exception('Cannot unset values on Flydb\Result');
     }
 
     /**
@@ -93,85 +94,30 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      */
     public function offsetGet($offset)
     {
-        return isset($this->documents[$offset]) ? $this->documents[$offset] : null;
+        return isset($this->id[$offset]) ? $this->repo->read($this->id[$offset]) : null;
     }
 
     /**
      * Gets the first document from the result.
      *
      * @return mixed The first document, or false if the result is empty.
+     * @throws DocumentNotFoundException
+     * @throws \ReflectionException
      */
     public function first()
     {
-        return !empty($this->documents) ? $this->documents[0] : false;
+        return !empty($this->id) && isset($this->id[0]) ? $this->repo->read($this->id[0]) : false;
     }
 
     /**
      * Gets the last document from the results.
      *
      * @return mixed The last document, or false if the result is empty.
+     * @throws DocumentNotFoundException
+     * @throws \ReflectionException
      */
     public function last()
     {
-        return !empty($this->documents) ? $this->documents[count($this->documents) - 1] : false;
-    }
-
-    /**
-     * Get the  value specified by $key of the first object in the result.
-     *
-     * @return mixed The value, or false if there are no documents or the key
-     *               doesnt exist.
-     */
-    public function value($key)
-    {
-        $first = $this->first();
-
-        if (!$first) {
-            return false;
-        }
-
-        return isset($first->{$key}) ? $first->{$key} : false;
-    }
-
-    /**
-     * Returns an array where each value is a single property from each
-     * document. If the property doesnt exist on the document then it won't
-     * be in the returned array.
-     *
-     * @param string $field The name of the field to pick.
-     *
-     * @return array The array of values, one from each document.
-     */
-    public function pick($field)
-    {
-        $result = [];
-
-        foreach ($this->documents as $document) {
-            if (isset($document->{$field})) {
-                $result[] = $document->{$field};
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns an assoiative array (a hash), where for each document the
-     * value of one property is the key, and another property is the value.
-     *
-     * @param string $keyField The name of the property to use for the key.
-     * @param string $valueField Name of the property to use for the value.
-     *
-     * @return array An associative array.
-     */
-    public function hash($keyField, $valueField)
-    {
-        $result = [];
-
-        foreach ($this->documents as $document) {
-            $result[$document->{$keyField}] = $document->{$valueField};
-        }
-
-        return $result;
+        return !empty($this->id) && isset($this->id[count($this->id) - 1]) ? $this->repo->read($this->id[count($this->id) - 1]) : false;
     }
 }

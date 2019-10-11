@@ -2,47 +2,182 @@
 
 namespace RoNoLo\Flydb;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+
 class QueryTest extends TestBase
 {
-    public function testPredicate()
+    /** @var Filesystem */
+    private $flysystem;
+
+    private $datastoreAdapter;
+
+    private $repoTestPath = 'query';
+
+    protected function setUp(): void
     {
-        $path = __DIR__ . '/fixtures/datastore/querytest';
-        $config = new Config($path . '/');
-        $repo = new Repository('countries', $config);
-        $query = new Query($repo);
-        $query->where('cca2', '==', 'GB');
+        $adapter = new Local($this->datastorePath);
 
-        $predicate = new Predicate();
-        $predicate->where('cca2', '==', 'GB');
+        $this->flysystem = new Filesystem($adapter);
+        $this->flysystem->createDir($this->repoTestPath);
 
-        $this->assertAttributeEquals($predicate, 'predicate', $query);
+        $this->datastoreAdapter = new Local($this->datastorePath . '/' . $this->repoTestPath);
     }
 
-    public function testLimit()
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsVerySimple()
     {
-        $path = __DIR__ . '/fixtures/datastore/querytest';
-        $config = new Config($path . '/');
-        $repo = new Repository('countries', $config);
-        $query = new Query($repo);
-        $query->limit('10');
-        $this->assertAttributeEquals([10, 0], 'limit', $query);
-        $query->limit(5, 10);
-        $this->assertAttributeEquals([5, 10], 'limit', $query);
-        $query->limit(9, '11');
-        $this->assertAttributeEquals([9, 11], 'limit', $query);
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "age" => 20,
+            ])
+            ->execute()
+        ;
+
+        // $this->assertEquals(2, count($ids));
     }
 
-    public function testOrderBy()
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsSimple()
     {
-        $path = __DIR__ . '/fixtures/datastore/querytest';
-        $config = new Config($path . '/');
-        $repo = new Repository('countries', $config);
-        $query = new Query($repo);
-        $query->orderBy('age ASC');
-        $this->assertAttributeEquals(['age ASC'], 'orderBy', $query);
-        $query->orderBy(['surname DESC', 'age DESC']);
-        $this->assertAttributeEquals(['surname DESC', 'age DESC'], 'orderBy', $query);
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "age" => [
+                    "gt" => 20,
+                    "lt" => 40,
+                ],
+                "phone" => [
+                    "ne" => true
+                ],
+            ])
+            ->execute()
+        ;
+
+        // $this->assertEquals(2, count($ids));
+    }
+
+    public function testRequestingDocumentsWithFields()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "selector" => [
+                    [
+                        "age" => [
+                            "gt" => 10,
+                            "lt" => 40,
+                        ],
+                        "phone" => [
+                            "ne" => true
+                        ],
+                    ]
+                ],
+                "fields" => [
+                    "picture", "age", "name"
+                ],
+                "sort" => [
+                    "age" => "asc"
+                ],
+                "limit" => 5,
+                "skip" => 5,
+            ])
+            ->execute()
+        ;
+
+        $this->assertEquals(2, count($ids));
+    }
+
+    public function testRequestingDocumentsWithSelectorSyntax()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "selector" => [
+                    [
+                        "age" => [
+                            "gt" => 10,
+                            "lt" => 40,
+                        ],
+                        "phone" => [
+                            "ne" => true
+                        ],
+                    ]
+                ],
+            ])
+            ->execute()
+        ;
+
+        $this->assertEquals(2, count($result));
+    }
+
+    public function testRequestingDocumentsWithOrQuery()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "selector" => [
+                    [
+                        "or" => [
+                            [
+                                "age" => [
+                                    "gt" => 10,
+                                    "lt" => 20,
+                                ],
+                                "phone" => [
+                                    "ne" => true
+                                ],
+                            ],
+                            [
+                                "age" => [
+                                    "gt" => 60
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
+            ])
+            ->execute()
+        ;
+
+        $this->assertEquals(2, count($result));
+    }
+
+    protected function tearDown(): void
+    {
+        $this->flysystem->deleteDir($this->repoTestPath);
     }
 }

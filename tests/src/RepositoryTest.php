@@ -9,17 +9,18 @@ use League\Flysystem\Filesystem;
 
 class RespositoryTest extends TestBase
 {
+    /** @var Filesystem */
     private $flysystem;
 
     private $datastoreAdapter;
 
-    private $repoTestPath = 'bernd';
+    private $repoTestPath = 'repo';
 
     protected function setUp(): void
     {
         $adapter = new Local($this->datastorePath);
-        $this->flysystem = new Filesystem($adapter);
 
+        $this->flysystem = new Filesystem($adapter);
         $this->flysystem->createDir($this->repoTestPath);
 
         $this->datastoreAdapter = new Local($this->datastorePath . '/' . $this->repoTestPath);
@@ -111,47 +112,6 @@ class RespositoryTest extends TestBase
         $result = $repo->delete($id);
 
         $this->assertTrue($result);
-    }
-
-    public function testFindDocuments()
-    {
-        $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
-
-        $dataList = [
-            [
-                'slug' => 123,
-                'body' => 'Ronald Katja'
-            ],
-            [
-                'slug' => 435234,
-                'body' => 'Peter Robert'
-            ],
-            [
-                'slug' => 546456,
-                'body' => 'Lydia Hanna'
-            ],
-            [
-                'slug' => 6757,
-                'body' => 'Berta Charlotte'
-            ],
-            [
-                'slug' => 3454,
-                'body' => 'Jim Tim Tom'
-            ],
-        ];
-
-        $repo->storeManyData($dataList);
-        $query = $repo->query();
-        $ids = $query
-            ->find([
-                'slug' => ['gt' => 2000, 'lt' => 10000],
-                'body' => ['sw' => 'Ber']
-            ])
-            ->execute()
-        ;
-
-        $this->assertEquals(2, count($ids));
     }
 
     public function validNameProvider()
