@@ -31,6 +31,30 @@ class QueryTest extends TestBase
      *
      * @throws Exception\JsonCollectionImportException
      */
+    public function testRequestingDocumentsVerySimple()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $result = $query
+            ->find([
+                "age" => 20,
+            ])
+            ->execute()
+        ;
+
+        // $this->assertEquals(2, count($ids));
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
     public function testRequestingDocumentsSimple()
     {
         $config = new Config();
