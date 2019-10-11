@@ -139,7 +139,7 @@ class Repository
         return $documents;
     }
 
-    public function storeData(array $data): Document
+    public function storeData($data): Document
     {
         $document = new $this->documentClass($data);
 

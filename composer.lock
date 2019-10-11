@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9339d1aadd0f465d488e9699484e68b",
+    "content-hash": "01e36a395f3e5853d21444d3d9f8f96e",
     "packages": [
         {
             "name": "league/flysystem",
@@ -89,53 +89,6 @@
                 "storage"
             ],
             "time": "2019-08-24T11:17:19+00:00"
-        },
-        {
-            "name": "nahid/jsonq",
-            "version": "v5.2.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nahid/jsonq.git",
-                "reference": "b225c52587f08774df06eb66fd7e646241a88b4c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nahid/jsonq/zipball/b225c52587f08774df06eb66fd7e646241a88b4c",
-                "reference": "b225c52587f08774df06eb66fd7e646241a88b4c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.0"
-            },
-            "require-dev": {
-                "graham-campbell/testbench": "^3.1",
-                "phpunit/phpunit": "^4.8 || ^5.0",
-                "symfony/var-dumper": "^3.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Nahid\\JsonQ\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "CC0-1.0"
-            ],
-            "authors": [
-                {
-                    "name": "Nahid Bin Azhar",
-                    "email": "nahid.dns@gmail.com"
-                }
-            ],
-            "description": "JsonQ is a PHP based json data query library",
-            "homepage": "https://github.com/nahid/jsonq",
-            "keywords": [
-                "json",
-                "jsonq",
-                "query"
-            ],
-            "time": "2018-10-11T09:37:07+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -266,16 +219,16 @@
         },
         {
             "name": "ronolo/jsonquery",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RoNoLo/jsonquery.git",
-                "reference": "5c8e9944f98a396dc71c42838a8ef8b7183e388c"
+                "reference": "097f381e9a0812a4b5180875aa44023665cc43cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/5c8e9944f98a396dc71c42838a8ef8b7183e388c",
-                "reference": "5c8e9944f98a396dc71c42838a8ef8b7183e388c",
+                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/097f381e9a0812a4b5180875aa44023665cc43cd",
+                "reference": "097f381e9a0812a4b5180875aa44023665cc43cd",
                 "shasum": ""
             },
             "require": {
@@ -288,20 +241,21 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "RoNoLo\\JsonQuery\\": [
-                        "src/"
-                    ]
+                    "RoNoLo\\JsonQuery\\": "src/"
                 }
             },
             "autoload-dev": {
                 "psr-4": {
-                    "RoNoLo\\JsonQuery\\": [
-                        "tests/src/"
-                    ]
+                    "RoNoLo\\JsonQuery\\": "tests/src/"
                 }
             },
             "license": [
                 "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ronald Locke"
+                }
             ],
             "description": "A json data parser",
             "homepage": "https://github.com/RoNoLo/jsonquery",
@@ -312,10 +266,10 @@
                 "query"
             ],
             "support": {
-                "source": "https://github.com/RoNoLo/jsonquery/tree/master",
+                "source": "https://github.com/RoNoLo/jsonquery/tree/1.0.1",
                 "issues": "https://github.com/RoNoLo/jsonquery/issues"
             },
-            "time": "2019-10-09T12:07:40+00:00"
+            "time": "2019-10-09T20:25:52+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -432,165 +386,6 @@
                 "instantiate"
             ],
             "time": "2019-03-17T17:37:11+00:00"
-        },
-        {
-            "name": "hamcrest/hamcrest-php",
-            "version": "v2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "776503d3a8e85d4f9a1148614f95b7a608b046ad"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/776503d3a8e85d4f9a1148614f95b7a608b046ad",
-                "reference": "776503d3a8e85d4f9a1148614f95b7a608b046ad",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3|^7.0"
-            },
-            "replace": {
-                "cordoval/hamcrest-php": "*",
-                "davedevelopment/hamcrest-php": "*",
-                "kodova/hamcrest-php": "*"
-            },
-            "require-dev": {
-                "phpunit/php-file-iterator": "1.3.3",
-                "phpunit/phpunit": "~4.0",
-                "satooshi/php-coveralls": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "hamcrest"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD"
-            ],
-            "description": "This is the PHP port of Hamcrest Matchers",
-            "keywords": [
-                "test"
-            ],
-            "time": "2016-01-20T08:20:44+00:00"
-        },
-        {
-            "name": "mikey179/vfsstream",
-            "version": "v1.6.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bovigo/vfsStream.git",
-                "reference": "2b544ac3a21bcc4dde5d90c4ae8d06f4319055fb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bovigo/vfsStream/zipball/2b544ac3a21bcc4dde5d90c4ae8d06f4319055fb",
-                "reference": "2b544ac3a21bcc4dde5d90c4ae8d06f4319055fb",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.5|^5.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.6.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "org\\bovigo\\vfs\\": "src/main/php"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Frank Kleine",
-                    "homepage": "http://frankkleine.de/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Virtual file system to mock the real file system in unit tests.",
-            "homepage": "http://vfs.bovigo.org/",
-            "time": "2019-08-01T01:38:37+00:00"
-        },
-        {
-            "name": "mockery/mockery",
-            "version": "1.2.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mockery/mockery.git",
-                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/b3453f75fd23d9fd41685f2148f4abeacabc6405",
-                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405",
-                "shasum": ""
-            },
-            "require": {
-                "hamcrest/hamcrest-php": "~2.0",
-                "lib-pcre": ">=7.0",
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~5.7.10|~6.5|~7.0|~8.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Mockery": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Pádraic Brady",
-                    "email": "padraic.brady@gmail.com",
-                    "homepage": "http://blog.astrumfutura.com"
-                },
-                {
-                    "name": "Dave Marshall",
-                    "email": "dave.marshall@atstsolutions.co.uk",
-                    "homepage": "http://davedevelopment.co.uk"
-                }
-            ],
-            "description": "Mockery is a simple yet flexible PHP mock object framework",
-            "homepage": "https://github.com/mockery/mockery",
-            "keywords": [
-                "BDD",
-                "TDD",
-                "library",
-                "mock",
-                "mock objects",
-                "mockery",
-                "stub",
-                "test",
-                "test double",
-                "testing"
-            ],
-            "time": "2019-09-30T08:30:27+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -1904,65 +1699,6 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v4.3.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "41e16350a2a1c7383c4735aa2f9fce74cf3d1178"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/41e16350a2a1c7383c4735aa2f9fce74cf3d1178",
-                "reference": "41e16350a2a1c7383c4735aa2f9fce74cf3d1178",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3",
-                "symfony/polyfill-ctype": "~1.8"
-            },
-            "conflict": {
-                "symfony/console": "<3.4"
-            },
-            "require-dev": {
-                "symfony/console": "~3.4|~4.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "https://symfony.com",
-            "time": "2019-09-11T15:41:19+00:00"
         },
         {
             "name": "theseer/tokenizer",

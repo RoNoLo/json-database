@@ -60,6 +60,11 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
         return $this->total;
     }
 
+    public function getIds()
+    {
+        return $this->id;
+    }
+
     public function getIterator()
     {
         return new DocumentIterator($this->repo, $this->id);

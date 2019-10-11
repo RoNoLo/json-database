@@ -38,14 +38,54 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $result = $query
+        $conditions = $query
             ->find([
                 "age" => 20,
             ])
-            ->execute()
+            ->getConditions()
         ;
 
-        // $this->assertEquals(2, count($ids));
+        $expected = [
+            Query::LOGIC_AND => [
+                ['$eq' => ['age' => 20]]
+            ]
+        ];
+
+        $this->assertEquals($expected, $conditions);
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsVerySimpleArray()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $conditions = $query
+            ->find([
+                "age" => 20,
+                "phone" => "1234567",
+                "name" => "Thomas"
+            ])
+            ->getConditions()
+        ;
+
+        $expected = [
+            Query::LOGIC_AND => [
+                ['$eq' => ['age' => 20]],
+                ['$eq' => ['phone' => "1234567"]],
+                ['$eq' => ['name' => "Thomas"]],
+            ]
+        ];
+
+        $this->assertEquals($expected, $conditions);
     }
 
     /**
@@ -62,20 +102,119 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $result = $query
+        $conditions = $query
             ->find([
                 "age" => [
-                    "gt" => 20,
-                    "lt" => 40,
+                    '$gt' => 20,
+                    '$lt' => 40,
                 ],
                 "phone" => [
-                    "ne" => true
+                    '$ne' => true
                 ],
             ])
-            ->execute()
+            ->getConditions()
         ;
 
-        // $this->assertEquals(2, count($ids));
+        $expected = [
+            Query::LOGIC_AND => [
+                ['$gt' => ['age' => 20]],
+                ['$lt' => ['age' => 40]],
+                ['$ne' => ['phone' => true]]
+            ]
+        ];
+
+        $this->assertEquals($expected, $conditions);
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsSimpleDeepOr()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $conditions = $query
+            ->find([
+                "name" => [
+                    '$eq' => "Thomas"
+                ],
+                '$or' => [
+                    [
+                        "age" => [
+                            '$eq' => 20,
+                        ]
+                    ],
+                    [
+                        "age" => [
+                            '$eq' => 40
+                        ]
+                    ]
+                ]
+            ])
+            ->getConditions()
+        ;
+
+        $expected = [
+            Query::LOGIC_AND => [
+                [Query::LOGIC_AND => [['$eq' => ['name' => "Thomas"]]]],
+                [Query::LOGIC_OR => [
+                    [Query::LOGIC_AND => [['$eq' => ['age' => 20]]]],
+                    [Query::LOGIC_AND => [['$eq' => ['age' => 40]]]],
+                ]]
+            ]
+        ];
+
+        $this->assertEquals($expected, $conditions);
+    }
+
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsSimpleDeepAnd()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $conditions = $query
+            ->find([
+                '$and' => [
+                    [
+                        "age" => [
+                            '$gt' => 20,
+                        ]
+                    ],
+                    [
+                        "age" => [
+                            '$lt' => 40
+                        ]
+                    ]
+                ],
+            ])
+            ->getConditions()
+        ;
+
+        $expected = [
+            Query::LOGIC_AND => [
+                [Query::LOGIC_AND => [['$gt' => ['age' => 20]]]],
+                [Query::LOGIC_AND => [['$lt' => ['age' => 40]]]],
+            ]
+        ];
+
+        $this->assertEquals($expected, $conditions);
     }
 
     public function testRequestingDocumentsWithFields()
@@ -87,7 +226,7 @@ class QueryTest extends TestBase
         $query = $repo->query();
         $result = $query
             ->find([
-                "selector" => [
+                "conditions" => [
                     [
                         "age" => [
                             "gt" => 10,

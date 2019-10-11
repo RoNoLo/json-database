@@ -38,7 +38,7 @@ class Document implements DocumentInterface
         return $this->id;
     }
 
-    public function getPayload(): array
+    public function getPayload()
     {
         return $this->data;
     }

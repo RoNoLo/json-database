@@ -21,7 +21,7 @@ interface DocumentInterface
      */
     public function getId(): ?string;
 
-    public function getPayload(): array;
+    public function getPayload();
 
     public function asArray(): array;
 }

@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "RoNoLo\\Flyfire\\": "src/"
+            "RoNoLo\\Flydb\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RoNoLo\\Flyfire\\": "tests/src/"
+            "RoNoLo\\Flydb\\": "tests/src/"
         }
     },
     "repositories": [
