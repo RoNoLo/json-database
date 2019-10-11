@@ -7,9 +7,9 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use Ramsey\Uuid\Uuid;
-use RoNoLo\Flyfire\Exception\DocumentNotFoundException;
-use RoNoLo\Flyfire\Exception\DocumentNotStoredException;
-use RoNoLo\Flyfire\Formatter\FormatInterface;
+use RoNoLo\Flydb\Exception\DocumentNotFoundException;
+use RoNoLo\Flydb\Exception\DocumentNotStoredException;
+use RoNoLo\Flydb\Exception\JsonCollectionImportException;
 use RoNoLo\JsonQuery\JsonQuery;
 
 /**
@@ -156,15 +156,37 @@ class Repository
         return $documents;
     }
 
+    public function storeManyDataFromJsonFile($filePath): DocumentCollection
+    {
+        $dataList = json_decode(file_get_contents($filePath));
+
+        if (!is_array($dataList)) {
+            throw new JsonCollectionImportException("The JSON decoded file was not a readable collection");
+        }
+
+        if (!count($dataList)) {
+            throw new JsonCollectionImportException("The JSON decoded file had an empty collection");
+        }
+
+        $documents = DocumentCollection::create();
+        foreach ($dataList as $data) {
+            $documents->add($this->storeData($data));
+        }
+
+        return $documents;
+    }
+
     /**
      * Store a Document in the repository.
      *
-     * @param Document $document The document to store
+     * @param DocumentInterface $document The document to store
      *
      * @return Document if stored, otherwise false
-     * @throws Exception
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \ReflectionException
+     * @throws DocumentNotStoredException
      */
-    public function storeDocument(DocumentInterface $document)
+    public function storeDocument(DocumentInterface $document): DocumentInterface
     {
         $id = $document->getId();
 

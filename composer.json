@@ -1,6 +1,6 @@
 {
-    "name": "ronolo/flyfire",
-    "description": "A lightweight, flat-file, document database",
+    "name": "ronolo/flydb",
+    "description": "A lightweight, document database",
     "keywords": ["flat", "file", "db", "document"],
     "homepage": "http://github.com/RoNoLo/flyfire",
     "license": "MIT",
