@@ -134,7 +134,7 @@ class QueryTest extends TestBase
 
         $expected = 30;
 
-        $this->assertEquals($expected, $conditions);
+        $this->assertEquals($expected, $result->count());
     }
 
     /**
@@ -172,50 +172,9 @@ class QueryTest extends TestBase
             ->execute()
         ;
 
-        $this->assertEquals($expected, $conditions);
-    }
+        $expected = 10;
 
-
-    /**
-     * This will test, if a simple returning of full documents works.
-     * Notice, that the find() has no "selector" key. Just a _simple_ condition
-     * query for all documents.
-     *
-     * @throws Exception\JsonCollectionImportException
-     */
-    public function testRequestingDocumentsSimpleDeepAnd()
-    {
-        $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
-
-        $query = $repo->query();
-        $conditions = $query
-            ->find([
-                '$and' => [
-                    [
-                        "age" => [
-                            '$gt' => 20,
-                        ]
-                    ],
-                    [
-                        "age" => [
-                            '$lt' => 40
-                        ]
-                    ]
-                ],
-            ])
-            ->getConditions()
-        ;
-
-        $expected = [
-            Query::LOGIC_AND => [
-                [Query::LOGIC_AND => [['$gt' => ['age' => 20]]]],
-                [Query::LOGIC_AND => [['$lt' => ['age' => 40]]]],
-            ]
-        ];
-
-        $this->assertEquals($expected, $conditions);
+        $this->assertEquals($expected, $result->count());
     }
 
     public function testRequestingDocumentsWithFields()
@@ -250,7 +209,9 @@ class QueryTest extends TestBase
             ->execute()
         ;
 
-        $this->assertEquals(2, count($ids));
+        $expected = 10;
+
+        $this->assertEquals($expected, $result->count());
     }
 
     public function testRequestingDocumentsWithSelectorSyntax()
@@ -277,43 +238,9 @@ class QueryTest extends TestBase
             ->execute()
         ;
 
-        $this->assertEquals(2, count($result));
-    }
+        $expected = 10;
 
-    public function testRequestingDocumentsWithOrQuery()
-    {
-        $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
-
-        $query = $repo->query();
-        $result = $query
-            ->find([
-                "selector" => [
-                    [
-                        "or" => [
-                            [
-                                "age" => [
-                                    "gt" => 10,
-                                    "lt" => 20,
-                                ],
-                                "phone" => [
-                                    "ne" => true
-                                ],
-                            ],
-                            [
-                                "age" => [
-                                    "gt" => 60
-                                ]
-                            ]
-                        ],
-                    ]
-                ],
-            ])
-            ->execute()
-        ;
-
-        $this->assertEquals(2, count($result));
+        $this->assertEquals($expected, $result->count());
     }
 
     protected function tearDown(): void

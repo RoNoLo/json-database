@@ -102,7 +102,7 @@ class Query
                 $value = $condition[2];
 
                 // On AND the first FALSE aborts further checks
-                if (!ConditionExecutor::$method($fieldValue, $value)) {
+                if (!$this->conditionExecutor->$method($fieldValue, $value)) {
                     return false;
                 }
             }

@@ -16,6 +16,7 @@ class ConditionExecutor
     {
         return $value == $comparable;
     }
+
     /**
      * Strict equals
      *
@@ -28,6 +29,7 @@ class ConditionExecutor
     {
         return $value === $comparable;
     }
+
     /**
      * Simple not equal
      *
@@ -40,6 +42,7 @@ class ConditionExecutor
     {
         return $value != $comparable;
     }
+
     /**
      * Strict not equal
      *
@@ -52,6 +55,7 @@ class ConditionExecutor
     {
         return $value !== $comparable;
     }
+
     /**
      * Strict greater than
      *
@@ -64,6 +68,7 @@ class ConditionExecutor
     {
         return $value > $comparable;
     }
+
     /**
      * Strict less than
      *
@@ -76,6 +81,7 @@ class ConditionExecutor
     {
         return $value < $comparable;
     }
+
     /**
      * Greater or equal
      *
@@ -88,6 +94,7 @@ class ConditionExecutor
     {
         return $value >= $comparable;
     }
+
     /**
      * Less or equal
      *
@@ -100,6 +107,7 @@ class ConditionExecutor
     {
         return $value <= $comparable;
     }
+
     /**
      * In array
      *
@@ -112,6 +120,7 @@ class ConditionExecutor
     {
         return (is_array($comparable) && in_array($value, $comparable));
     }
+
     /**
      * Not in array
      *
@@ -124,6 +133,7 @@ class ConditionExecutor
     {
         return (is_array($comparable) && !in_array($value, $comparable));
     }
+
     /**
      * Is null equal
      *
@@ -135,6 +145,7 @@ class ConditionExecutor
     {
         return is_null($value);
     }
+
     /**
      * Is not null equal
      *
@@ -146,6 +157,21 @@ class ConditionExecutor
     {
         return !is_null($value);
     }
+
+    /**
+     * Is not null equal
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function isNotEmpty($value, $comparable)
+    {
+        $value = (string) $value;
+
+        return trim($value) === '';
+    }
+
     /**
      * Start With
      *
@@ -165,6 +191,7 @@ class ConditionExecutor
         }
         return false;
     }
+
     /**
      * End with
      *
@@ -184,6 +211,7 @@ class ConditionExecutor
         }
         return false;
     }
+
     /**
      * Match with pattern
      *
@@ -204,6 +232,7 @@ class ConditionExecutor
         }
         return false;
     }
+
     /**
      * Contains substring in string
      *
@@ -216,6 +245,7 @@ class ConditionExecutor
     {
         return (strpos($value, $comparable) !== false);
     }
+
     /**
      * Dates equal
      *
@@ -229,6 +259,7 @@ class ConditionExecutor
         $date = date($format, strtotime($value));
         return $date == $comparable;
     }
+
     /**
      * Months equal
      *
@@ -242,6 +273,7 @@ class ConditionExecutor
         $month = date('m', strtotime($value));
         return $month == $comparable;
     }
+
     /**
      * Years equal
      *
