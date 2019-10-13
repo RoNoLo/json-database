@@ -14,9 +14,7 @@ class ConditionParserTest extends TestBase
         ]);
 
         $expected = [
-            Query::LOGIC_AND => [
-                ['$eq' => ['age' => 20]]
-            ]
+            ['$eq', 'age', 20]
         ];
 
         $this->assertEquals($expected, $conditions);
@@ -31,11 +29,9 @@ class ConditionParserTest extends TestBase
         ]);
 
         $expected = [
-            Query::LOGIC_AND => [
-                ['$eq' => ['age' => 20]],
-                ['$eq' => ['phone' => "1234567"]],
-                ['$eq' => ['name' => "Thomas"]],
-            ]
+            ['$eq', 'age', 20],
+            ['$eq', 'phone', "1234567"],
+            ['$eq', 'name', "Thomas"],
         ];
 
         $this->assertEquals($expected, $conditions);
@@ -54,11 +50,44 @@ class ConditionParserTest extends TestBase
         ]);
 
         $expected = [
-            Query::LOGIC_AND => [
-                ['$gt' => ['age' => 20]],
-                ['$lt' => ['age' => 40]],
-                ['$ne' => ['phone' => true]]
+            ['$gt', 'age', 20],
+            ['$lt', 'age', 40],
+            ['$ne', 'phone', true]
+        ];
+
+        $this->assertEquals($expected, $conditions);
+    }
+
+    public function testRequestingDocumentsSimpleOnlyOr()
+    {
+        $conditions = (new ConditionParser())->parse([
+            '$or' => [
+                [
+                    "age" => [
+                        '$eq' => 20,
+                    ],
+                    "phone" => [
+                        '$eq' => "12345",
+                    ]
+                ],
+                [
+                    "age" => [
+                        '$eq' => 40
+                    ]
+                ]
             ]
+        ]);
+
+        $expected = [
+            [Query::LOGIC_OR => [
+                [
+                    ['$eq', 'age', 20],
+                    ['$eq', 'phone', '12345']
+                ],
+                [
+                    ['$eq', 'age', 40]
+                ],
+            ]]
         ];
 
         $this->assertEquals($expected, $conditions);
@@ -85,44 +114,42 @@ class ConditionParserTest extends TestBase
         ]);
 
         $expected = [
-            Query::LOGIC_AND => [
-                [Query::LOGIC_AND => [['$eq' => ['name' => "Thomas"]]]],
-                [Query::LOGIC_OR => [
-                    [Query::LOGIC_AND => [['$eq' => ['age' => 20]]]],
-                    [Query::LOGIC_AND => [['$eq' => ['age' => 40]]]],
-                ]]
-            ]
+            ['$eq', 'name', "Thomas"],
+            [Query::LOGIC_OR => [
+                [['$eq', 'age', 20]],
+                [['$eq', 'age', 40]],
+            ]]
         ];
 
         $this->assertEquals($expected, $conditions);
     }
 
-    public function testRequestingDocumentsSimpleDeepAnd()
-    {
-        $conditions = (new ConditionParser())->parse([
-            '$and' => [
-                [
-                    "age" => [
-                        '$gt' => 20,
-                    ]
-                ],
-                [
-                    "age" => [
-                        '$lt' => 40
-                    ]
-                ]
-            ],
-        ]);
-
-        $expected = [
-            Query::LOGIC_AND => [
-                [Query::LOGIC_AND => [['$gt' => ['age' => 20]]]],
-                [Query::LOGIC_AND => [['$lt' => ['age' => 40]]]],
-            ]
-        ];
-
-        $this->assertEquals($expected, $conditions);
-    }
+//    public function testRequestingDocumentsSimpleDeepAnd()
+//    {
+//        $conditions = (new ConditionParser())->parse([
+//            '$and' => [
+//                [
+//                    "age" => [
+//                        '$gt' => 20,
+//                    ]
+//                ],
+//                [
+//                    "age" => [
+//                        '$lt' => 40
+//                    ]
+//                ]
+//            ],
+//        ]);
+//
+//        $expected = [
+//            Query::LOGIC_AND => [
+//                ['$gt', 'age', 20],
+//                ['$lt', 'age', 40],
+//            ]
+//        ];
+//
+//        $this->assertEquals($expected, $conditions);
+//    }
 
 //    public function testRequestingDocumentsWithOrQuery()
 //    {

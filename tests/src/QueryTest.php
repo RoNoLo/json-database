@@ -38,20 +38,16 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $conditions = $query
+        $result = $query
             ->find([
                 "age" => 20,
             ])
-            ->getConditions()
+            ->execute()
         ;
 
-        $expected = [
-            Query::LOGIC_AND => [
-                ['$eq' => ['age' => 20]]
-            ]
-        ];
+        $expected = 37;
 
-        $this->assertEquals($expected, $conditions);
+        $this->assertEquals($expected, $result->count());
     }
 
     /**
@@ -68,24 +64,45 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $conditions = $query
+        $result = $query
+            ->find([
+                "age" => 20,
+                "gender" => "female"
+            ])
+            ->execute()
+        ;
+
+        $expected = 14;
+
+        $this->assertEquals($expected, $result->count());
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     *
+     * @throws Exception\JsonCollectionImportException
+     */
+    public function testRequestingDocumentsVerySimpleArrayEmptyResult()
+    {
+        $config = new Config();
+        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+
+        $query = $repo->query();
+        $result = $query
             ->find([
                 "age" => 20,
                 "phone" => "1234567",
                 "name" => "Thomas"
             ])
-            ->getConditions()
+            ->execute()
         ;
 
-        $expected = [
-            Query::LOGIC_AND => [
-                ['$eq' => ['age' => 20]],
-                ['$eq' => ['phone' => "1234567"]],
-                ['$eq' => ['name' => "Thomas"]],
-            ]
-        ];
+        $expected = 0;
 
-        $this->assertEquals($expected, $conditions);
+        $this->assertEquals($expected, $result->count());
     }
 
     /**
@@ -102,26 +119,20 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $conditions = $query
+        $result = $query
             ->find([
                 "age" => [
                     '$gt' => 20,
-                    '$lt' => 40,
+                    '$lt' => 30,
                 ],
                 "phone" => [
                     '$ne' => true
                 ],
             ])
-            ->getConditions()
+            ->execute()
         ;
 
-        $expected = [
-            Query::LOGIC_AND => [
-                ['$gt' => ['age' => 20]],
-                ['$lt' => ['age' => 40]],
-                ['$ne' => ['phone' => true]]
-            ]
-        ];
+        $expected = 30;
 
         $this->assertEquals($expected, $conditions);
     }
@@ -140,15 +151,15 @@ class QueryTest extends TestBase
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
-        $conditions = $query
+        $result = $query
             ->find([
-                "name" => [
-                    '$eq' => "Thomas"
-                ],
                 '$or' => [
                     [
                         "age" => [
                             '$eq' => 20,
+                        ],
+                        "phone" => [
+                            '$eq' => "12345",
                         ]
                     ],
                     [
@@ -158,18 +169,8 @@ class QueryTest extends TestBase
                     ]
                 ]
             ])
-            ->getConditions()
+            ->execute()
         ;
-
-        $expected = [
-            Query::LOGIC_AND => [
-                [Query::LOGIC_AND => [['$eq' => ['name' => "Thomas"]]]],
-                [Query::LOGIC_OR => [
-                    [Query::LOGIC_AND => [['$eq' => ['age' => 20]]]],
-                    [Query::LOGIC_AND => [['$eq' => ['age' => 40]]]],
-                ]]
-            ]
-        ];
 
         $this->assertEquals($expected, $conditions);
     }

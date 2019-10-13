@@ -97,7 +97,7 @@ class Repository
             }
         }
 
-        return $ids;
+        return new Result($this, $ids, count($ids));
     }
 
     /**

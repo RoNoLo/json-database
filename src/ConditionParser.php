@@ -14,31 +14,26 @@ class ConditionParser
         return $this->parseSelectors($input);
     }
 
-    private function rewriteToEqualSyntax(array &$input)
-    {
-        $list = [];
-        foreach ($input as $field => $value) {
-            $list[] = ['$eq' => [$field => $value]];
-        }
-
-        return $list;
-    }
-
-    private function parseSelectors(array &$input)
+    private function parseSelectors(array &$input, $deep = 0, $context = Query::LOGIC_AND)
     {
         $list = [];
         foreach ($input as $key => $value) {
-            if (in_array($key, ['$and', '$or'])) {
+            if ($key === '$or') {
+                $tmpList = [];
                 foreach ($value as $i => $subCondition) {
-                    $list[self::$logic[$key]][] = $this->parseSelectors($subCondition);
+                    $tmpList[] = $this->parseSelectors($subCondition, $deep + 1, self::$logic[$key]);
                 }
+
+                $list[] = [
+                    self::$logic[$key] => $tmpList
+                ];
             } else {
                 if (is_array($value)) {
                     foreach ($value as $op => $val) {
-                        $list[Query::LOGIC_AND][] = [$op => [$key => $val]];
+                        $list[] = [$op, $key, $val];
                     }
                 } else {
-                    $list[Query::LOGIC_AND][] = ['$eq' => [$key => $value]];
+                    $list[] = ['$eq', $key, $value];
                 }
             }
         }
