@@ -37,6 +37,31 @@ class ConditionParserTest extends TestBase
         $this->assertEquals($expected, $conditions);
     }
 
+    public function testRequestingDocumentsSimpleWithNot()
+    {
+        $conditions = (new ConditionParser())->parse([
+            '$not' => [
+                "age" => [
+                    '$gt' => 20,
+                    '$lt' => 40,
+                ],
+                "phone" => [
+                    '$ne' => true
+                ],
+            ]
+        ]);
+
+        $expected = [
+            [Query::LOGIC_NOT => [
+                ['$gt', 'age', 20],
+                ['$lt', 'age', 40],
+                ['$ne', 'phone', true]
+            ]]
+        ];
+
+        $this->assertEquals($expected, $conditions);
+    }
+
     public function testRequestingDocumentsSimple()
     {
         $conditions = (new ConditionParser())->parse([
