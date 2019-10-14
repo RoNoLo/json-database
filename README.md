@@ -8,7 +8,19 @@ memory (aka not loading all documents into memory to process them).
 
 There are two usages possible. First as a repository and secondly as a database.
 
-## Motivation
+## Goals
+
+- No real database needed like SqlLite, Mysql, MongoDB, CouchDB ...)
+- PHP 7.2+
+- Document Store aka NoSQL
+- JSON as format of storage
+- (very) low memory usage even for huge results
+- NoSQL like query syntax (CouchDB style)
+- Caching via APC
+- Repository and database (document relations) usage options
+- Exports
+- Imports
+- Abstract data location via https://flysystem.thephpleague.com/
 
 ## Inspiration
 

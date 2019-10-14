@@ -39,6 +39,11 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
         $this->total = $total;
     }
 
+    public function export()
+    {
+        return new ExporterFactory($this->repo);
+    }
+
     /**
      * Returns the number of documents in this result
      *

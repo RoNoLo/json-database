@@ -85,11 +85,6 @@ class Repository
         return new ImporterFactory($this);
     }
 
-    public function export()
-    {
-        return new ExporterFactory($this);
-    }
-
     public function find(Query $query)
     {
         $files = $this->flysystem->listContents('', true);
