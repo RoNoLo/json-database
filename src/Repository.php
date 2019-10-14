@@ -80,6 +80,16 @@ class Repository
         return new $className($this);
     }
 
+    public function import()
+    {
+        return new ImporterFactory($this);
+    }
+
+    public function export()
+    {
+        return new ExporterFactory($this);
+    }
+
     public function find(Query $query)
     {
         $files = $this->flysystem->listContents('', true);

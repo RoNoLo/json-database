@@ -16,6 +16,7 @@ class Query
 {
     const LOGIC_AND = 'AND';
     const LOGIC_OR = 'OR';
+    const LOGIC_NOT = 'NOT';
 
     protected $repo;
 

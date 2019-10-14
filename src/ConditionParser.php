@@ -7,6 +7,7 @@ class ConditionParser
     protected static $logic = [
         '$or' => Query::LOGIC_OR,
         '$and' => Query::LOGIC_AND,
+        '$not' => Query::LOGIC_NOT,
     ];
 
     public function parse(array $input)

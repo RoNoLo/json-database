@@ -2,7 +2,7 @@
     "name": "ronolo/flydb",
     "description": "A lightweight, document database",
     "keywords": ["flat", "file", "db", "document"],
-    "homepage": "http://github.com/RoNoLo/flyfire",
+    "homepage": "http://github.com/RoNoLo/flydb",
     "license": "MIT",
     "authors": [
         {
@@ -18,6 +18,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^8.4"
+    },
+    "suggest": {
+        "league/flysystem-ziparchive": "Allows to have a single ZIP file as database"
     },
     "autoload": {
         "psr-4": {
