@@ -18,7 +18,7 @@ use RoNoLo\JsonQuery\JsonQuery;
  * Analageous to a table in a traditional RDBMS, a repository is a siloed
  * collection where documents live.
  */
-class Repository
+class Repository implements RepositoryInterface
 {
     /** @var string */
     protected $name;
@@ -133,6 +133,11 @@ class Repository
         }
     }
 
+    public function remove(DocumentInterface $document)
+    {
+
+    }
+
     public function readMultiple(array $ids): DocumentCollection
     {
         $documents = DocumentCollection::create();
@@ -225,7 +230,7 @@ class Repository
      *
      * @param mixed $id The ID of the document (or the document itself) to delete
      *
-     * @return boolean True if deleted, false if not.
+     * @return bool True if deleted, false if not.
      * @throws Exception
      */
     public function delete($id): bool
@@ -246,7 +251,7 @@ class Repository
      *
      * @return string The full filesystem path of the document.
      */
-    private function getPathForDocument(string $id): string
+    protected function getPathForDocument(string $id): string
     {
         return substr($id, 0, 1) . '/' . substr($id, 0, 2) . '/' . $id . '.json';
     }
