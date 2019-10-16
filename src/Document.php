@@ -43,6 +43,16 @@ class Document implements DocumentInterface
         return $this->data;
     }
 
+    public function set($field, $value)
+    {
+
+    }
+
+    public function unset($field)
+    {
+        // TODO: Implement unset() method.
+    }
+
     public function asArray(): array
     {
         return [

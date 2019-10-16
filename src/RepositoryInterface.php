@@ -4,11 +4,11 @@ namespace RoNoLo\Flydb;
 
 interface RepositoryInterface
 {
-    public function add(Document $document);
+    public function store($document): DocumentInterface;
 
     public function read($id): DocumentInterface;
 
-    public function remove(DocumentInterface $document);
+    public function remove($document);
 
     public function find(Query $query);
 }

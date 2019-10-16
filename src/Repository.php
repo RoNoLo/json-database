@@ -80,7 +80,7 @@ class Repository implements RepositoryInterface
         return new $className($this);
     }
 
-    public function import()
+    public function getImportFactory()
     {
         return new ImporterFactory($this);
     }
@@ -196,7 +196,7 @@ class Repository implements RepositoryInterface
      * @throws \ReflectionException
      * @throws DocumentNotStoredException
      */
-    public function storeDocument(DocumentInterface $document): DocumentInterface
+    public function store(DocumentInterface $document): DocumentInterface
     {
         $id = $document->getId();
 

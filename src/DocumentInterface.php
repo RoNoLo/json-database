@@ -24,4 +24,10 @@ interface DocumentInterface
     public function getPayload();
 
     public function asArray(): array;
+
+    public function save(): bool;
+
+    public function set($field, $value);
+
+    public function unset($field);
 }
