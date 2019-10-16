@@ -25,8 +25,12 @@ class TestBase extends TestCase
         parent::__construct($name, $data, $dataName);
     }
 
-    public function normalizeLineendings($content)
+    protected function fillStore(StoreInterface $store, $filePath)
     {
-        return str_replace("\r\n", "\n", $content);
+        $data = json_decode(file_get_contents($filePath));
+
+        foreach ($data as $item) {
+            $store->store($item);
+        }
     }
 }

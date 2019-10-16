@@ -42,7 +42,7 @@ class DocumentIterator implements \Iterator
      */
     public function key()
     {
-        return $this->index;
+        return $this->id[$this->index];
     }
 
     /**

@@ -8,7 +8,7 @@ use RoNoLo\Flydb\Exception\DocumentNotStoredException;
 interface StoreInterface
 {
     /**
-     * Stores a document or data structure to the repository.
+     * Stores a document or data structure to the store.
      *
      * @param \stdClass|array $document
      * @return string
@@ -17,7 +17,7 @@ interface StoreInterface
     public function store($document): string;
 
     /**
-     * Reads a document from the repository.
+     * Reads a document from the store.
      *
      * @param string $id
      * @param bool $assoc
@@ -27,12 +27,20 @@ interface StoreInterface
     public function read(string $id, $assoc = false);
 
     /**
-     * Removes a document from the repository.
+     * Removes a document from the store.
      *
      * @param string $id
      * @return bool
      */
     public function remove(string $id);
+
+    /**
+     * Removes many documents from the store.
+     *
+     * @param array $ids
+     * @return mixed
+     */
+    public function removeMany(array $ids);
 
     /**
      * @param Query $query

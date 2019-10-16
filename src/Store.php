@@ -44,7 +44,7 @@ class Store implements StoreInterface
             $path = $this->getPathForDocument($id);
             $json = json_encode($data, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
 
-            if (!$this->flysystem->write($path, $json)) {
+            if (!$this->flysystem->put($path, $json)) {
                 throw new DocumentNotStoredException("The document could not be stored. Writing to drive failed.");
             }
 
@@ -78,8 +78,17 @@ class Store implements StoreInterface
         try {
             return $this->flysystem->delete($this->getPathForDocument($id));
         } catch (FileNotFoundException $e) {
-            ; // Fail silently, because the document is not there anyway.
+            return true; // Fail silently, because the document is not there anyway.
         }
+    }
+
+    public function removeMany(array $ids)
+    {
+        foreach ($ids as $id) {
+            $this->remove($id);
+        }
+
+        return true;
     }
 
     /** @inheritDoc */
@@ -122,6 +131,6 @@ class Store implements StoreInterface
      */
     protected function generateId()
     {
-        return uniqid('', true);
+        return strrev(str_replace('.', '', uniqid('', true)));
     }
 }
