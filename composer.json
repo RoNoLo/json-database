@@ -1,7 +1,7 @@
 {
     "name": "ronolo/flydb",
     "description": "A lightweight, document database",
-    "keywords": ["flat", "file", "db", "document"],
+    "keywords": ["flat", "file", "db", "document", "nosql"],
     "homepage": "http://github.com/RoNoLo/flydb",
     "license": "MIT",
     "authors": [
