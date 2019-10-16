@@ -53,7 +53,7 @@ class StoreTest extends TestBase
 
         $id = $repo->store($data);
 
-        $result = $repo->read($id);
+        $result = $repo->read($id, true);
 
         $this->assertEquals($data, $result);
     }

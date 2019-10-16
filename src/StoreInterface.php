@@ -20,10 +20,11 @@ interface StoreInterface
      * Reads a document from the repository.
      *
      * @param string $id
+     * @param bool $assoc
      * @return mixed
      * @throws DocumentNotFoundException
      */
-    public function read(string $id);
+    public function read(string $id, $assoc = false);
 
     /**
      * Removes a document from the repository.

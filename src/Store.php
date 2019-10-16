@@ -22,12 +22,6 @@ class Store implements StoreInterface
     /** @var Filesystem */
     protected $flysystem;
 
-    /** @var int */
-    protected $jsonEncodeOptions = 0;
-
-    /** @var Query */
-    protected $queryClass;
-
     /**
      * Constructor
      *
@@ -36,21 +30,6 @@ class Store implements StoreInterface
     public function __construct(AdapterInterface $adapter)
     {
         $this->flysystem = new Filesystem($adapter);
-    }
-
-    /**
-     * A factory method that initialises and returns an instance of a Query object.
-     *
-     * @return Query A new Query class for this repo.
-     */
-    public function query()
-    {
-        return new Query($this);
-    }
-
-    public function getImportFactory()
-    {
-        return new ImporterFactory($this);
     }
 
     /** @inheritDoc */
@@ -63,7 +42,7 @@ class Store implements StoreInterface
             }
 
             $path = $this->getPathForDocument($id);
-            $json = json_encode($data, $this->jsonEncodeOptions);
+            $json = json_encode($data, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
 
             if (!$this->flysystem->write($path, $json)) {
                 throw new DocumentNotStoredException("The document could not be stored. Writing to drive failed.");
@@ -78,13 +57,13 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function read($id)
+    public function read($id, $assoc = false)
     {
         $path = $this->getPathForDocument($id);
 
         try {
             $json = $this->flysystem->read($path);
-            $data = json_decode($json);
+            $data = json_decode($json, $assoc);
 
             return $data;
         }
