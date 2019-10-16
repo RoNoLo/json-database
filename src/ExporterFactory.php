@@ -10,9 +10,9 @@ class ExporterFactory
 
     /**
      * ExporterFactory constructor.
-     * @param Repository $repo
+     * @param Store $repo
      */
-    public function __construct(Repository $repo)
+    public function __construct(Store $repo)
     {
         $this->repo = $repo;
     }

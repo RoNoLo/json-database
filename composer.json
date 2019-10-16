@@ -13,7 +13,6 @@
         "php": ">= 7.2",
         "ext-json": "*",
         "league/flysystem": "^1.0",
-        "ramsey/uuid": "^3.8",
         "ronolo/jsonquery": "^1.0"
     },
     "require-dev": {

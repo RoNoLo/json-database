@@ -55,7 +55,7 @@ class Query
 
     protected $conditionExecutor;
 
-    public function __construct(Repository $repository)
+    public function __construct(Store $repository)
     {
         $this->repo = $repository;
         $this->conditionExecutor = new ConditionExecutor();

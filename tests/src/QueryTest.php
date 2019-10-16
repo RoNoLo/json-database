@@ -34,7 +34,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsVerySimple()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -60,7 +60,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsVerySimpleArray()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -87,7 +87,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsVerySimpleArrayEmptyResult()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -115,7 +115,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsSimple()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -147,7 +147,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsSimpleDeepOr()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -180,7 +180,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsWithFields()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();
@@ -217,7 +217,7 @@ class QueryTest extends TestBase
     public function testRequestingDocumentsWithSelectorSyntax()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         $query = $repo->query();

@@ -15,7 +15,7 @@ class DocumentIterator implements \Iterator
      * @param $repo
      * @param $id
      */
-    public function __construct(Repository $repo, array $id)
+    public function __construct(Store $repo, array $id)
     {
         $this->repo = $repo;
         $this->id = $id;

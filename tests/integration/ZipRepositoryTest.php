@@ -10,7 +10,7 @@ class ZipRepositoryTest extends TestBase
     {
         $adapter = new ZipArchiveAdapter($this->datastorePath . DIRECTORY_SEPARATOR . 'repo.zip');
         $config = new Config(['query_class' => Query::class]);
-        $repo = new Repository('bernd', $config, $adapter);
+        $repo = new Store('bernd', $config, $adapter);
 
         $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 

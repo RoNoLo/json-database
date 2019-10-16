@@ -28,11 +28,11 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
     /**
      * Constructor
      *
-     * @param Repository $repo
+     * @param Store $repo
      * @param array $ids
      * @param int $total
      */
-    public function __construct(Repository $repo, array $id, int $total)
+    public function __construct(Store $repo, array $id, int $total)
     {
         $this->repo = $repo;
         $this->id = $id;

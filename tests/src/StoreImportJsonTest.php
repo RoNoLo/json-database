@@ -8,7 +8,7 @@ use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
 use RoNoLo\Flydb\Format\JsonFormat;
 
-class RepositoryImportJsonTest extends TestBase
+class StoreImportJsonTest extends TestBase
 {
     /** @var Filesystem */
     private $flysystem;
@@ -30,7 +30,7 @@ class RepositoryImportJsonTest extends TestBase
     public function testImportJsonString()
     {
         $config = new Config();
-        $repo = new Repository('test', $config, $this->datastoreAdapter);
+        $repo = new Store('test', $config, $this->datastoreAdapter);
 
         $result = $repo
             ->getImportFactory()

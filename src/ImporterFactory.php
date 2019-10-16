@@ -14,9 +14,9 @@ class ImporterFactory
 
     /**
      * ImporterFactory constructor.
-     * @param Repository $repository
+     * @param Store $repository
      */
-    public function __construct(Repository $repository)
+    public function __construct(Store $repository)
     {
         $this->repository = $repository;
 

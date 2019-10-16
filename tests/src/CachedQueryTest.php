@@ -14,7 +14,7 @@ class CachedQueryTest extends TestBase
 
         $path = __DIR__ . '/fixtures/datastore/querytest';
         $config = new Config($path . '/');
-        $repo = new Repository('countries', $config);
+        $repo = new Store('countries', $config);
         $query = new CachedQuery($repo);
 
         $total = 0;
