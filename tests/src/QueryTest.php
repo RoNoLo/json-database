@@ -29,23 +29,22 @@ class QueryTest extends TestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * @throws Exception\JsonCollectionImportException
+     * @throws Exception\DocumentNotStoredException
      */
-    public function testRequestingDocumentsVerySimple()
+    public function testRequestingDocumentsGetAll()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
-            ->find([
-                "age" => 20,
-            ])
+            ->find([])
             ->execute()
         ;
 
-        $expected = 37;
+        $expected = 1000;
 
         $this->assertEquals($expected, $result->count());
     }
@@ -55,15 +54,41 @@ class QueryTest extends TestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * @throws Exception\JsonCollectionImportException
+     * @throws Exception\DocumentNotStoredException
+     */
+    public function testRequestingDocumentsVerySimple()
+    {
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
+
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
+        $result = $query
+            ->find([
+                "age" => 20,
+            ])
+            ->execute()
+        ;
+
+        $expected = 51;
+
+        $this->assertEquals($expected, $result->count());
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
      */
     public function testRequestingDocumentsVerySimpleArray()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
                 "age" => 20,
@@ -72,7 +97,7 @@ class QueryTest extends TestBase
             ->execute()
         ;
 
-        $expected = 14;
+        $expected = 26;
 
         $this->assertEquals($expected, $result->count());
     }
@@ -81,16 +106,15 @@ class QueryTest extends TestBase
      * This will test, if a simple returning of full documents works.
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
-     *
-     * @throws Exception\JsonCollectionImportException
      */
     public function testRequestingDocumentsVerySimpleArrayEmptyResult()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
                 "age" => 20,
@@ -109,16 +133,15 @@ class QueryTest extends TestBase
      * This will test, if a simple returning of full documents works.
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
-     *
-     * @throws Exception\JsonCollectionImportException
      */
     public function testRequestingDocumentsSimple()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
                 "age" => [
@@ -141,16 +164,15 @@ class QueryTest extends TestBase
      * This will test, if a simple returning of full documents works.
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
-     *
-     * @throws Exception\JsonCollectionImportException
      */
     public function testRequestingDocumentsSimpleDeepOr()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
                 '$or' => [
@@ -179,11 +201,12 @@ class QueryTest extends TestBase
 
     public function testRequestingDocumentsWithFields()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
                 "conditions" => [
@@ -216,14 +239,15 @@ class QueryTest extends TestBase
 
     public function testRequestingDocumentsWithSelectorSyntax()
     {
-        $config = new Config();
-        $repo = new Store('test', $config, $this->datastoreAdapter);
-        $repo->storeManyDataFromJsonFile($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
-        $query = $repo->query();
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
         $result = $query
             ->find([
-                "selector" => [
+                "conditions" => [
                     [
                         "age" => [
                             "gt" => 10,

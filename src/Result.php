@@ -112,7 +112,6 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      *
      * @return mixed The first document, or false if the result is empty.
      * @throws DocumentNotFoundException
-     * @throws \ReflectionException
      */
     public function first()
     {
@@ -124,7 +123,6 @@ class Result implements IteratorAggregate, ArrayAccess, Countable
      *
      * @return mixed The last document, or false if the result is empty.
      * @throws DocumentNotFoundException
-     * @throws \ReflectionException
      */
     public function last()
     {

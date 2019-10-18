@@ -7,6 +7,8 @@ use RoNoLo\Flydb\Exception\DocumentNotStoredException;
 
 interface StoreInterface
 {
+    public function storeMany(array $documents);
+
     /**
      * Stores a document or data structure to the store.
      *

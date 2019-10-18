@@ -2,17 +2,15 @@
 
 namespace RoNoLo\Flydb;
 
-use Exception;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use Ramsey\Uuid\Uuid;
 use RoNoLo\Flydb\Exception\DocumentNotFoundException;
 use RoNoLo\Flydb\Exception\DocumentNotStoredException;
 
 /**
- * Repository
+ * Store
  *
  * Analageous to a table in a traditional RDBMS, a repository is a siloed
  * collection where documents live.
@@ -33,16 +31,39 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function store($data, string $id = null): string
+    public function storeMany(array $documents)
     {
-        // Generate an id if none has been defined
+        // This will force an stdClass object as root
+        $documents = json_decode(json_encode($documents));
+
+        if (!is_array($documents)) {
+            throw new DocumentNotStoredException("Your data was not an array ob objects");
+        }
+
+        foreach ($documents as $document) {
+            $this->store($document);
+        }
+    }
+
+    /** @inheritDoc */
+    public function store($document): string
+    {
         try {
-            if (is_null($id)) {
+            // This will force an stdClass object as root
+            $document = json_decode(json_encode($document));
+
+            if (!is_object($document)) {
+                throw new DocumentNotStoredException("Your data was not an single object. (Maybe an array, you may use ->storeMany() instead.)");
+            }
+
+            if (!isset($document->__id)) {
                 $id = $this->generateId();
+            } else {
+                $id = $document->__id;
             }
 
             $path = $this->getPathForDocument($id);
-            $json = json_encode($data, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
+            $json = json_encode($document, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
 
             if (!$this->flysystem->put($path, $json)) {
                 throw new DocumentNotStoredException("The document could not be stored. Writing to drive failed.");
@@ -63,9 +84,10 @@ class Store implements StoreInterface
 
         try {
             $json = $this->flysystem->read($path);
-            $data = json_decode($json, $assoc);
+            $document = json_decode($json, $assoc);
+            $document->__id = $id;
 
-            return $data;
+            return $document;
         }
         catch (FileNotFoundException $e) {
             throw new DocumentNotFoundException(sprintf("Document with id `%s` not found.", $id), 0, $e);
@@ -99,6 +121,9 @@ class Store implements StoreInterface
         $ids = [];
         foreach ($files as $file) {
             if ($file['type'] != 'file') {
+                continue;
+            }
+            if ($file['extension'] != 'json') {
                 continue;
             }
 
