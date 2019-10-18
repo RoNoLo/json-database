@@ -155,7 +155,35 @@ class QueryTest extends TestBase
             ->execute()
         ;
 
-        $expected = 30;
+        $expected = 423;
+
+        $this->assertEquals($expected, $result->count());
+    }
+
+    /**
+     * This will test, if a simple returning of full documents works.
+     * Notice, that the find() has no "selector" key. Just a _simple_ condition
+     * query for all documents.
+     */
+    public function testRequestingDocumentsDateCompare()
+    {
+        $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
+
+        $store = new Store($this->datastoreAdapter);
+        $store->storeMany($collection);
+
+        $query = new Query($store);
+        $result = $query
+            ->find([
+                "registered" => [
+                    '$gt' => new \DateTime("2018-01-01T10:00:00"),
+                    '$lt' => new \DateTime("2020-01-01T10:00:00"),
+                ],
+            ])
+            ->execute()
+        ;
+
+        $expected = 305;
 
         $this->assertEquals($expected, $result->count());
     }

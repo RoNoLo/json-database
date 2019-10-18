@@ -66,7 +66,20 @@ class ConditionExecutor
      */
     public function greaterThan($value, $comparable)
     {
-        return $value > $comparable;
+        switch (true) {
+            case is_int($comparable):
+            case is_float($comparable):
+                return $value > $comparable;
+            case is_object($comparable) && $comparable instanceof \DateTime:
+                $valueDateTime = date_create($value);
+                if (!$valueDateTime) {
+                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
+                }
+                return $valueDateTime > $comparable;
+            default:
+                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
+                return false;
+        }
     }
 
     /**
@@ -79,7 +92,20 @@ class ConditionExecutor
      */
     public function lessThan($value, $comparable)
     {
-        return $value < $comparable;
+        switch (true) {
+            case is_int($comparable):
+            case is_float($comparable):
+                return $value < $comparable;
+            case is_object($comparable) && $comparable instanceof \DateTime:
+                $valueDateTime = date_create($value);
+                if (!$valueDateTime) {
+                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
+                }
+                return $valueDateTime < $comparable;
+            default:
+                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
+                return false;
+        }
     }
 
     /**
@@ -92,7 +118,20 @@ class ConditionExecutor
      */
     public function greaterThanOrEqual($value, $comparable)
     {
-        return $value >= $comparable;
+        switch (true) {
+            case is_int($comparable):
+            case is_float($comparable):
+                return $value >= $comparable;
+            case is_object($comparable) && $comparable instanceof \DateTime:
+                $valueDateTime = date_create($value);
+                if (!$valueDateTime) {
+                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
+                }
+                return $valueDateTime >= $comparable;
+            default:
+                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
+                return false;
+        }
     }
 
     /**
@@ -105,7 +144,20 @@ class ConditionExecutor
      */
     public function lessThanOrEqual($value, $comparable)
     {
-        return $value <= $comparable;
+        switch (true) {
+            case is_int($comparable):
+            case is_float($comparable):
+                return $value <= $comparable;
+            case is_object($comparable) && $comparable instanceof \DateTime:
+                $valueDateTime = date_create($value);
+                if (!$valueDateTime) {
+                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
+                }
+                return $valueDateTime <= $comparable;
+            default:
+                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
+                return false;
+        }
     }
 
     /**
@@ -169,7 +221,7 @@ class ConditionExecutor
     {
         $value = (string) $value;
 
-        return trim($value) === '';
+        return trim($value) !== '';
     }
 
     /**
@@ -189,6 +241,7 @@ class ConditionExecutor
         if (preg_match("/^$comparable/", $value)) {
             return true;
         }
+
         return false;
     }
 
@@ -209,6 +262,7 @@ class ConditionExecutor
         if (preg_match("/$comparable$/", $value)) {
             return true;
         }
+
         return false;
     }
 
@@ -244,47 +298,5 @@ class ConditionExecutor
     public function contains($value, $comparable)
     {
         return (strpos($value, $comparable) !== false);
-    }
-
-    /**
-     * Dates equal
-     *
-     * @param string $value
-     * @param string $comparable
-     *
-     * @return bool
-     */
-    public function dateEqual($value, $comparable, $format = 'Y-m-d')
-    {
-        $date = date($format, strtotime($value));
-        return $date == $comparable;
-    }
-
-    /**
-     * Months equal
-     *
-     * @param string $value
-     * @param string $comparable
-     *
-     * @return bool
-     */
-    public function monthEqual($value, $comparable)
-    {
-        $month = date('m', strtotime($value));
-        return $month == $comparable;
-    }
-
-    /**
-     * Years equal
-     *
-     * @param string $value
-     * @param string $comparable
-     *
-     * @return bool
-     */
-    public function yearEqual($value, $comparable)
-    {
-        $year = date('Y', strtotime($value));
-        return $year == $comparable;
     }
 }
