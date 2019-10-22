@@ -1,5 +1,5 @@
 {
-    "name": "ronolo/flydb",
+    "name": "ronolo/jsondatabase",
     "description": "A lightweight, document database",
     "keywords": ["flat", "file", "db", "document", "nosql", "json"],
     "homepage": "http://github.com/ronolo/flydb",
