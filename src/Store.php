@@ -31,7 +31,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function storeMany(array $documents)
+    public function putMany(array $documents)
     {
         // This will force an stdClass object as root
         $documents = json_decode(json_encode($documents));
@@ -41,12 +41,12 @@ class Store implements StoreInterface
         }
 
         foreach ($documents as $document) {
-            $this->store($document);
+            $this->put($document);
         }
     }
 
     /** @inheritDoc */
-    public function store($document): string
+    public function put($document): string
     {
         try {
             // This will force an stdClass object as root
@@ -60,6 +60,9 @@ class Store implements StoreInterface
                 $id = $this->generateId();
             } else {
                 $id = $document->__id;
+
+                // The ID is not part of the document, b/c the filename already is.
+                unset($document->__id);
             }
 
             $path = $this->getPathForDocument($id);

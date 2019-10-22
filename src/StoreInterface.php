@@ -7,7 +7,13 @@ use RoNoLo\Flydb\Exception\DocumentNotStoredException;
 
 interface StoreInterface
 {
-    public function storeMany(array $documents);
+    /**
+     * Stores many documents to the store.
+     *
+     * @param array $documents
+     * @return void
+     */
+    public function putMany(array $documents);
 
     /**
      * Stores a document or data structure to the store.
@@ -16,14 +22,14 @@ interface StoreInterface
      * @return string
      * @throws DocumentNotStoredException
      */
-    public function store($document): string;
+    public function put($document): string;
 
     /**
      * Reads a document from the store.
      *
      * @param string $id
-     * @param bool $assoc
-     * @return mixed
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     * @return \stdClass|array
      * @throws DocumentNotFoundException
      */
     public function read(string $id, $assoc = false);
@@ -40,13 +46,13 @@ interface StoreInterface
      * Removes many documents from the store.
      *
      * @param array $ids
-     * @return mixed
+     * @return void
      */
     public function removeMany(array $ids);
 
     /**
      * @param Query $query
-     * @return mixed
+     * @return Result
      */
     public function find(Query $query): Result;
 }

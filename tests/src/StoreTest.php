@@ -36,7 +36,7 @@ class StoreTest extends TestBase
                 'body' => 'THIS IS BODY TEXT'
             ];
 
-            $id = $repo->store($data);
+            $id = $repo->put($data);
 
             $this->assertTrue(is_string($id));
         }
@@ -51,7 +51,7 @@ class StoreTest extends TestBase
             'body' => 'THIS IS BODY TEXT'
         ];
 
-        $id = $repo->store($data);
+        $id = $repo->put($data);
 
         $result = $repo->read($id, true);
 
@@ -67,7 +67,7 @@ class StoreTest extends TestBase
             'body' => 'THIS IS BODY TEXT'
         ];
 
-        $id = $repo->store($data);
+        $id = $repo->put($data);
 
         $result = $repo->remove($id);
 

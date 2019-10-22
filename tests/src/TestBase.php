@@ -30,7 +30,7 @@ class TestBase extends TestCase
         $data = json_decode(file_get_contents($filePath));
 
         foreach ($data as $item) {
-            $store->store($item);
+            $store->put($item);
         }
     }
 }

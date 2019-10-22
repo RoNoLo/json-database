@@ -42,7 +42,7 @@ class LocalStoreTest extends TestBase
         foreach ($result as $id => $data) {
             $data->age = 99;
 
-            $store->store($data, $id);
+            $store->put($data, $id);
         }
 
         // Find again, but 0 results

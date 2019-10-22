@@ -36,7 +36,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -61,7 +61,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -86,7 +86,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -112,7 +112,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -139,7 +139,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -170,7 +170,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -198,7 +198,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -232,7 +232,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
@@ -270,7 +270,7 @@ class QueryTest extends TestBase
         $collection = json_decode(file_get_contents($this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json'));
 
         $store = new Store($this->datastoreAdapter);
-        $store->storeMany($collection);
+        $store->putMany($collection);
 
         $query = new Query($store);
         $result = $query
