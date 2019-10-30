@@ -68,6 +68,34 @@ class Query
         return $this;
     }
 
+    public function fields(array $fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    public function sort($field, $direction = "asc")
+    {
+        $this->sort = [$field => $direction];
+
+        return $this;
+    }
+
+    public function limit(int $limit)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function skip(int $skip)
+    {
+        $this->skip = $skip;
+
+        return $this;
+    }
+
     public function execute()
     {
         return $this->repo->find($this);

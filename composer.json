@@ -31,12 +31,10 @@
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "RoNoLo\\JsonDatabase\\": [
-                "tests/src/",
-                "tests/integration"
-            ]
-        }
+        "classmap": [
+            "tests/src/",
+            "tests/integration"
+        ]
     },
     "repositories": [
         {

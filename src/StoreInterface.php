@@ -52,7 +52,7 @@ interface StoreInterface
 
     /**
      * @param Query $query
-     * @return Result
+     * @return ListResult
      */
-    public function find(Query $query): Result;
+    public function find(Query $query): ListResult;
 }

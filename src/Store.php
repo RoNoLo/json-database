@@ -111,6 +111,7 @@ class Store implements StoreInterface
         }
     }
 
+    /** @inheritDoc */
     public function removeMany(array $ids)
     {
         foreach ($ids as $id) {
@@ -121,7 +122,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function find(Query $query): Result
+    public function find(Query $query): ListResult
     {
         $files = $this->flysystem->listContents('', true);
 
@@ -141,7 +142,7 @@ class Store implements StoreInterface
             }
         }
 
-        return new Result($this, $ids, count($ids));
+        return new ListResult($this, $ids, count($ids));
     }
 
     /**

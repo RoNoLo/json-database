@@ -9,7 +9,7 @@ memory (aka not loading all documents into memory to process them).
 ## Json Store Usage
 
 First specify the adapter which shall be used to actually store the JSON files to
-a disc/cloud/zip. See https://github.com/thephpleague/flysystem 
+a disc/cloud/memory/zip. See https://github.com/thephpleague/flysystem 
 to find the one which fits your needs. You have to init the adapter with the 
 correct parameters. 
 
@@ -20,7 +20,8 @@ $adapter = new Local('some/path/persons');
 $store = new Store($adapter);
 ```
 
-The store is now ready. We can now store, read, delete and update documents.
+The store is now ready. We can now store, read, delete and update documents. As a very
+basic usage, we can read every document back by ID.
 
 ```php
 $document = file_get_contents('file/with/json/object.json');
@@ -35,7 +36,7 @@ $store->put($document);
 $store->remove($id); 
 ```
 
-A CouchDB like query can be used to find documents in the store.
+It is also possible to query documents in a CouchDB like fashion from the store.
 
 ```php
 $query = new Query($store);
@@ -43,7 +44,7 @@ $result = $query->find([
     "name" => "Bernd"
 ]);
 
-// The $resultset will contain only document IDs, which can be acced by $result->getIds();
+// The $resultset will contain only document IDs, which can be accessed by $result->getIds();
 // An iterator can be used to fetch one by one all documents
 
 foreach ($result as $id => $document) {
@@ -51,6 +52,10 @@ foreach ($result as $id => $document) {
 }
 
 ```
+
+## Json Database Usage
+
+
 
 ## Notice
 
