@@ -2,6 +2,7 @@
 
 namespace RoNoLo\JsonDatabase;
 
+use RoNoLo\JsonDatabase\Exception\QuerySyntaxException;
 use RoNoLo\JsonQuery\JsonQuery;
 
 /**
@@ -9,8 +10,6 @@ use RoNoLo\JsonQuery\JsonQuery;
  *
  * Builds an executes a query whichs searches and sorts documents from a
  * repository.
- *
- * @todo turn the limit and order by arrays into value objects
  */
 class Query
 {
@@ -18,17 +17,17 @@ class Query
     const LOGIC_OR = 'OR';
     const LOGIC_NOT = 'NOT';
 
-    protected $repo;
+    protected $store;
 
     protected $conditions;
 
     protected $fields;
 
-    protected $skip;
+    protected $skip = 0;
 
-    protected $limit;
+    protected $limit = PHP_INT_MAX;
 
-    protected $sort;
+    protected $sort = null;
 
     protected static $rulesMap = [
         '$eq' => 'equal',
@@ -55,9 +54,9 @@ class Query
 
     protected $conditionExecutor;
 
-    public function __construct(Store $repository)
+    public function __construct(Store $store)
     {
-        $this->repo = $repository;
+        $this->store = $store;
         $this->conditionExecutor = new ConditionExecutor();
     }
 
@@ -70,27 +69,50 @@ class Query
 
     public function fields(array $fields)
     {
+        // Ensure fields() syntax
+        if (count($fields)) {
+            $fieldMode = current($fields);
+
+            foreach ($fields as $field => $mode) {
+                if ($fieldMode != $mode) {
+                    throw new QuerySyntaxException("It is not possible to mix includes and excludes of fields.");
+                }
+            }
+        }
+
         $this->fields = $fields;
 
         return $this;
     }
 
-    public function sort($field, $direction = "asc")
+    public function sort(?string $field = null, $direction = "asc")
     {
+        if (is_null($field)) {
+            return $this->sort;
+        }
+
         $this->sort = [$field => $direction];
 
         return $this;
     }
 
-    public function limit(int $limit)
+    public function limit(?int $limit = null)
     {
+        if (is_null($limit)) {
+            return $this->limit;
+        }
+
         $this->limit = $limit;
 
         return $this;
     }
 
-    public function skip(int $skip)
+    public function skip(?int $skip = null)
     {
+        if (is_null($skip)) {
+            return $this->skip;
+        }
+
         $this->skip = $skip;
 
         return $this;
@@ -98,14 +120,12 @@ class Query
 
     public function execute()
     {
-        return $this->repo->find($this);
+        return $this->store->find($this);
     }
 
-    public function match($json)
+    public function match(JsonQuery $jsonQuery)
     {
-        $q = JsonQuery::fromJson($json);
-
-        return $this->executeConditions($q, $this->conditions);
+        return $this->executeConditions($jsonQuery, $this->conditions);
     }
 
     public function getConditions()
@@ -113,13 +133,13 @@ class Query
         return $this->conditions;
     }
 
-    private function executeConditions($q, $conditions)
+    private function executeConditions($jsonQuery, $conditions)
     {
         foreach ($conditions as $condition) {
             if (is_array($condition) && isset($condition[Query::LOGIC_OR])) {
                 foreach ($condition[Query::LOGIC_OR] as $j => $orCondition) {
                     // On OR the first FALSE aborts further checks
-                    if ($this->executeConditions($q, $orCondition)) {
+                    if ($this->executeConditions($jsonQuery, $orCondition)) {
                         return true;
                     }
                 }
@@ -127,7 +147,7 @@ class Query
                 return false;
             } else {
                 $method = self::$rulesMap[$condition[0]];
-                $fieldValue = $q->getNestedProperty($condition[1]);
+                $fieldValue = $jsonQuery->getNestedProperty($condition[1]);
                 $value = $condition[2];
 
                 // On AND the first FALSE aborts further checks

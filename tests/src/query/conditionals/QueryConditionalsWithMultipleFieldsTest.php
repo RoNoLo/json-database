@@ -12,7 +12,7 @@ class QueryConditionalsWithMultipleFieldsTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      */
-    public function testRequestingDocumentsSimple()
+    public function testRequestingDocumentsMultipleConditions()
     {
         $query = new Query($this->store);
         $result = $query

@@ -8,6 +8,8 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
 use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
+use RoNoLo\JsonDatabase\Exception\QueryExecutionException;
+use RoNoLo\JsonQuery\JsonQuery;
 
 /**
  * Store
@@ -137,12 +139,52 @@ class Store implements StoreInterface
 
             $json = $this->flysystem->read($file['path']);
 
-            if ($query->match($json)) {
-                $ids[] = $file['filename'];
+            // Done here to reuse it for sorting
+            $jsonQuery = JsonQuery::fromJson($json);
+
+            if ($query->match($jsonQuery)) {
+                if (!$query->sort()) {
+                    $ids[] = $file['filename'];
+                } else {
+                    $sortField = key($query->sort());
+                    $sortValue = $jsonQuery->getNestedProperty($sortField);
+
+                    if (is_array($sortValue)) {
+                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+                    }
+
+                    $ids[$file['filename']] = $sortValue;
+                }
             }
         }
 
-        return new ListResult($this, $ids, count($ids));
+        // Check for sorting
+        if ($query->sort()) {
+            $sortDirection = strtolower(current($query->sort()));
+
+            $sortDirection == "asc" ? asort($ids) : arsort($ids);
+
+            // Remove the sort by value
+            $ids = array_keys($ids);
+        }
+
+        $total = count($ids);
+
+        // Check for 'skip'
+        if ($query->skip() > 0) {
+            if ($query->skip() > $total) {
+                return new ListResult($this);
+            } else {
+                $ids = array_slice($ids, $query->skip());
+            }
+        }
+
+        // Check for 'limit'
+        if ($query->limit() < count($ids)) {
+            $ids = array_slice($ids, 0, $query->limit());
+        }
+
+        return new ListResult($this, $ids, $total);
     }
 
     /**

@@ -13,7 +13,7 @@ class QuerySimpleEqualTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      */
-    public function testRequestingDocumentsVerySimple()
+    public function testRequestingDocumentsVerySimpleOneCondition()
     {
         $query = new Query($this->store);
         $result = $query

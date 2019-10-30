@@ -25,18 +25,22 @@ class ListResult implements ResultInterface
 
     protected $total;
 
+    protected $fields = [];
+
     /**
      * Constructor
      *
      * @param StoreInterface $store
      * @param array $ids
      * @param int $total
+     * @param array $fields
      */
-    public function __construct(StoreInterface $store, array $ids, int $total)
+    public function __construct(StoreInterface $store, array $ids = [], int $total = 0, array $fields = [])
     {
         $this->store = $store;
         $this->ids = $ids;
         $this->total = $total;
+        $this->fields = $fields;
     }
 
     /**
@@ -58,11 +62,13 @@ class ListResult implements ResultInterface
     /**
      * @inheritDoc
      */
-    public function data()
+    public function data(?int $from = null, ?int $to = null)
     {
-        $count = $this->count();
-        for ($i = 0; $i < $count; $i++) {
-            yield $this->store->read($this->ids[$i]);
+        // Requesting a single document?
+        if (is_int($from) && is_int($to) && $from >= 0 && $from == $to && $from < $this->count()) {
+            return $this->store->read($this->ids[$from]);
         }
+
+        return new DocumentIterator($this->store, $this->ids, $this->fields);
     }
 }
