@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use Exception;
 

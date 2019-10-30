@@ -2,31 +2,14 @@
 
 namespace RoNoLo\JsonDatabase;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 
-class LocalStoreTest extends TestBase
+class MemoryStoreTest extends TestBase
 {
-    /** @var Filesystem */
-    private $flysystem;
-
-    private $datastoreAdapter;
-
-    private $repoTestPath = 'repo';
-
-    protected function setUp(): void
+    public function testAddingWritingFindingWithMemoryStore()
     {
-        $adapter = new Local($this->datastorePath);
+        $store = new Store(new MemoryAdapter());
 
-        $this->flysystem = new Filesystem($adapter);
-        $this->flysystem->createDir($this->repoTestPath);
-
-        $this->datastoreAdapter = new Local($this->datastorePath . '/' . $this->repoTestPath);
-    }
-
-    public function testAddingWritingFindingWithLocalAdapter()
-    {
-        $store = new Store($this->datastoreAdapter);
         $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
 
         // Find stuff
@@ -65,11 +48,6 @@ class LocalStoreTest extends TestBase
         ])->execute();
 
         $this->assertEquals(0, $result->count());
-    }
-
-    protected function tearDown(): void
-    {
-        $this->flysystem->deleteDir($this->repoTestPath);
     }
 }
 

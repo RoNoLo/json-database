@@ -1,10 +1,10 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use PHPUnit\Framework\TestCase;
 
-class TestBase extends TestCase
+abstract class TestBase extends TestCase
 {
     protected $testsRoot;
 

@@ -1,5 +1,5 @@
 <?php
 
-namespace RoNoLo\Flydb\Exception;
+namespace RoNoLo\JsonDatabase\Exception;
 
 class JsonCollectionImportException extends \Exception {}

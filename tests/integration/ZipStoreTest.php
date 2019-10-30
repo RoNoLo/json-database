@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
@@ -35,7 +35,7 @@ class ZipStoreTest extends TestBase
         foreach ($result as $id => $data) {
             $data->age = 99;
 
-            $store->put($data, $id);
+            $store->put($data);
         }
 
         // Find again, but 0 results

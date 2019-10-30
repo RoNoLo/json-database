@@ -1,13 +1,13 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use RoNoLo\Flydb\Exception\DocumentNotFoundException;
-use RoNoLo\Flydb\Exception\DocumentNotStoredException;
+use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
+use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
 
 /**
  * Store
@@ -88,7 +88,11 @@ class Store implements StoreInterface
         try {
             $json = $this->flysystem->read($path);
             $document = json_decode($json, $assoc);
-            $document->__id = $id;
+            if ($assoc) {
+                $document['__id'] = $id;
+            } else {
+                $document->__id = $id;
+            }
 
             return $document;
         }

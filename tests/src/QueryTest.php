@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;

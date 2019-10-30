@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use Exception;
 use League\Flysystem\Adapter\Local;
@@ -55,7 +55,10 @@ class StoreTest extends TestBase
 
         $result = $repo->read($id, true);
 
-        $this->assertEquals($data, $result);
+        $expected = $data;
+        $expected['__id'] = $id;
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testDeletingDocument()

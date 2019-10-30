@@ -2,7 +2,7 @@
     "name": "ronolo/jsondatabase",
     "description": "A lightweight, document database",
     "keywords": ["flat", "file", "db", "document", "nosql", "json"],
-    "homepage": "http://github.com/ronolo/flydb",
+    "homepage": "http://github.com/ronolo/jsondatabase",
     "license": "MIT",
     "authors": [
         {
@@ -17,19 +17,22 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^8.4",
-        "league/flysystem-ziparchive": "^1.0"
+        "league/flysystem-ziparchive": "^1.0",
+        "league/flysystem-memory": "^1.0"
     },
     "suggest": {
-        "league/flysystem-ziparchive": "Allows to have a single ZIP file as database"
+        "league/flysystem-ziparchive": "Allows to have a single ZIP file as database",
+        "league/flysystem-memory": "Allows to have a database in memory",
+        "league/flysystem-cached-adapter": "Allows to have a memory/persistent cache like database"
     },
     "autoload": {
         "psr-4": {
-            "RoNoLo\\Flydb\\": "src/"
+            "RoNoLo\\JsonDatabase\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RoNoLo\\Flydb\\": [
+            "RoNoLo\\JsonDatabase\\": [
                 "tests/src/",
                 "tests/integration"
             ]

@@ -1,5 +1,5 @@
 <?php
 
-namespace RoNoLo\Flydb\Exception;
+namespace RoNoLo\JsonDatabase\Exception;
 
 class DocumentNotStoredException extends \Exception {}

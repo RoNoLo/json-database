@@ -1,13 +1,13 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use Exception;
 use IteratorAggregate;
-use RoNoLo\Flydb\Exception\DocumentNotFoundException;
+use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
 
 /**
  * Result

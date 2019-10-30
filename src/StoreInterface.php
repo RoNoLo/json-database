@@ -1,9 +1,9 @@
 <?php
 
-namespace RoNoLo\Flydb;
+namespace RoNoLo\JsonDatabase;
 
-use RoNoLo\Flydb\Exception\DocumentNotFoundException;
-use RoNoLo\Flydb\Exception\DocumentNotStoredException;
+use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
+use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
 
 interface StoreInterface
 {
