@@ -44,14 +44,14 @@ $result = $query->find([
     "name" => "Bernd"
 ]);
 
-// The $resultset will contain only document IDs, which can be accessed by $result->getIds();
 // An iterator can be used to fetch one by one all documents
 
-foreach ($result as $id => $document) {
+foreach ($result->data() as $id => $document) {
     ; // do something with the document
 }
-
 ```
+
+
 
 ## Json Database Usage
 
