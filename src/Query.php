@@ -67,6 +67,27 @@ class Query
         return $this;
     }
 
+    /**
+     * Modifies the document on the fly.
+     *
+     * There are a few syntax options. You can say, which data to keep,
+     * which to delete and which to rewrite. The order of calling this method
+     * matters. You can call this method more then once. It will processed
+     * in that order.
+     *
+     * To KEEP key/values:
+     * ->fields(["foo.bar", "boo", "abc.2.join"]); // Same as:
+     * ->fields(["foo.bar" => 1, "boo" => 1, "abc.2.join" => 1]);
+     * To REMOVE key/values:
+     * ->fields(["foo" => 0, "hoo" => 0]);
+     * To COPY key/values:
+     * ->fields(["to" => "from.here", "bernd" => "foo.moo.boo"]);
+     *
+     * @param array $fields
+     *
+     * @return $this
+     * @throws QuerySyntaxException
+     */
     public function fields(array $fields)
     {
         // Ensure fields() syntax
@@ -80,7 +101,7 @@ class Query
             }
         }
 
-        $this->fields = $fields;
+        $this->fields[] = $fields;
 
         return $this;
     }
