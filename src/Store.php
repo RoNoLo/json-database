@@ -203,9 +203,22 @@ class Store implements StoreInterface
      * Generates a random, unique ID for a document.
      *
      * @return string The generated ID.
+     * @throws DocumentNotStoredException
      */
     protected function generateId()
     {
-        return strrev(str_replace('.', '', uniqid('', true)));
+        $breaker = 10;
+        while ($breaker) {
+            $id = strrev(str_replace('.', '', uniqid('', true)));
+            $path = $this->getPathForDocument($id);
+
+            if (!$this->flysystem->has($path)) {
+                return $id;
+            }
+
+            $breaker--;
+        }
+
+        throw new DocumentNotStoredException("It was not possible to generate a unique ID for the document (tried 10 times).");
     }
 }
