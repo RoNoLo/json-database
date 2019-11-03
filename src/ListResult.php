@@ -27,20 +27,27 @@ class ListResult implements ResultInterface
 
     protected $fields = [];
 
+    /** @var Query */
+    protected $query;
+
+    protected $assoc = false;
+
     /**
      * Constructor
      *
      * @param StoreInterface $store
      * @param array $ids
      * @param int $total
-     * @param array $fields
+     * @param Query $query
+     * @param bool $assoc
      */
-    public function __construct(StoreInterface $store, array $ids = [], int $total = 0, array $fields = [])
+    public function __construct(StoreInterface $store, Query $query, array $ids = [], int $total = 0,  bool $assoc = false)
     {
         $this->store = $store;
         $this->ids = $ids;
         $this->total = $total;
-        $this->fields = $fields;
+        $this->query = $query;
+        $this->assoc = $assoc;
     }
 
     /**
@@ -62,13 +69,14 @@ class ListResult implements ResultInterface
     /**
      * @inheritDoc
      */
-    public function data(?int $from = null, ?int $to = null)
+    public function data(?int $idx = null)
     {
         // Requesting a single document?
-        if (is_int($from) && is_int($to) && $from >= 0 && $from == $to && $from < $this->count()) {
-            return $this->store->read($this->ids[$from]);
+        if (is_int($idx) && $idx >= 0 && $idx < $this->count()) {
+            $id = [$this->ids[$idx]];
+            return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
         }
 
-        return new DocumentIterator($this->store, $this->ids, $this->fields);
+        return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
     }
 }

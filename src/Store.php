@@ -124,7 +124,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function find(Query $query): ListResult
+    public function find(Query $query, $assoc = false): ListResult
     {
         $files = $this->flysystem->listContents('', true);
 
@@ -184,7 +184,7 @@ class Store implements StoreInterface
             $ids = array_slice($ids, 0, $query->limit());
         }
 
-        return new ListResult($this, $ids, $total);
+        return new ListResult($this, $query, $ids, $total, $assoc);
     }
 
     /**

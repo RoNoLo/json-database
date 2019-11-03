@@ -12,13 +12,20 @@ class QueryModifierFieldsTest extends QueryTestBase
         $query = new Query($this->store);
         $result = $query
             ->find([])
-            ->fields(["picture" => 1, "age" => 1, "name" => 1])
+            ->fields(["picture", "age", "name"])
+            ->sort("index", "asc")
             ->execute()
         ;
 
-        $expected = 423;
+        $actually = $result->data(0);
 
-        $this->assertEquals($expected, $result->count());
+        $expected = (object) [
+            "picture" => "http://placehold.it/32x32",
+            "age" => 29,
+            "name" => "Bentley Bentley",
+        ];
+
+        $this->assertEquals($expected, $actually);
     }
 
     public function testRequestingDocumentsWithFieldsToExclude()
@@ -26,12 +33,19 @@ class QueryModifierFieldsTest extends QueryTestBase
         $query = new Query($this->store);
         $result = $query
             ->find([])
-            ->fields(["picture" => 0, "age" => 0])
+            ->fields(["image" => "picture", "years" => "age", "fullname" => "name"])
+            ->sort("index", "asc")
             ->execute()
         ;
 
-        $expected = 423;
+        $actually = $result->data(0);
 
-        $this->assertEquals($expected, $result->count());
+        $expected = (object) [
+            "image" => "http://placehold.it/32x32",
+            "years" => 29,
+            "fullname" => "Bentley Bentley",
+        ];
+
+        $this->assertEquals($expected, $actually);
     }
 }

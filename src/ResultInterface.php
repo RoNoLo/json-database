@@ -21,9 +21,8 @@ interface ResultInterface
     /**
      * Returns all documents or a scalar.
      *
-     * @param int|null $from
-     * @param int|null $to
+     * @param int|null $idx
      * @return mixed
      */
-    public function data(?int $from = null, ?int $to = null);
+    public function data(?int $idx = null);
 }

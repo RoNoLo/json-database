@@ -75,33 +75,20 @@ class Query
      * matters. You can call this method more then once. It will processed
      * in that order.
      *
-     * To KEEP key/values:
-     * ->fields(["foo.bar", "boo", "abc.2.join"]); // Same as:
-     * ->fields(["foo.bar" => 1, "boo" => 1, "abc.2.join" => 1]);
-     * To REMOVE key/values:
-     * ->fields(["foo" => 0, "hoo" => 0]);
      * To COPY key/values:
      * ->fields(["to" => "from.here", "bernd" => "foo.moo.boo"]);
      *
      * @param array $fields
      *
-     * @return $this
-     * @throws QuerySyntaxException
+     * @return $this|array
      */
-    public function fields(array $fields)
+    public function fields(array $fields = null)
     {
-        // Ensure fields() syntax
-        if (count($fields)) {
-            $fieldMode = current($fields);
-
-            foreach ($fields as $field => $mode) {
-                if ($fieldMode != $mode) {
-                    throw new QuerySyntaxException("It is not possible to mix includes and excludes of fields.");
-                }
-            }
+        if (is_null($fields)) {
+            return $this->fields;
         }
 
-        $this->fields[] = $fields;
+        $this->fields = $fields;
 
         return $this;
     }
