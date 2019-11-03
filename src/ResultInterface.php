@@ -22,7 +22,7 @@ interface ResultInterface
      * Returns all documents or a scalar.
      *
      * @param int|null $idx
-     * @return mixed
+     * @return DocumentIterator|array|\stdClass
      */
     public function data(?int $idx = null);
 }
