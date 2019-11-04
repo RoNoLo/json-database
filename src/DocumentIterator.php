@@ -10,7 +10,7 @@ class DocumentIterator implements \Iterator
 
     private $ids;
 
-    private $index = 0;
+    private $idx = 0;
 
     /** @var array */
     private $fields;
@@ -38,7 +38,7 @@ class DocumentIterator implements \Iterator
      */
     public function current()
     {
-        $document = $this->store->read($this->ids[$this->index]);
+        $document = $this->store->read($this->ids[$this->idx]);
 
         if (!count($this->fields)) {
             return $this->assoc ? json_decode(json_encode($document), true) : $document;
@@ -52,7 +52,7 @@ class DocumentIterator implements \Iterator
                 $to = $from;
             }
 
-            $doc[$to] = $jsonQuery->getNestedProperty($from);
+            $doc[$to] = $jsonQuery->get($from);
         }
 
         return $this->assoc ? $doc : json_decode(json_encode($doc));
@@ -63,7 +63,7 @@ class DocumentIterator implements \Iterator
      */
     public function next()
     {
-        $this->index++;
+        $this->idx++;
     }
 
     /**
@@ -71,7 +71,7 @@ class DocumentIterator implements \Iterator
      */
     public function key()
     {
-        return $this->ids[$this->index];
+        return $this->ids[$this->idx];
     }
 
     /**
@@ -79,7 +79,7 @@ class DocumentIterator implements \Iterator
      */
     public function valid()
     {
-        return isset($this->ids[$this->index]);
+        return isset($this->ids[$this->idx]);
     }
 
     /**
@@ -87,6 +87,6 @@ class DocumentIterator implements \Iterator
      */
     public function rewind()
     {
-        $this->index = 0;
+        $this->idx = 0;
     }
 }

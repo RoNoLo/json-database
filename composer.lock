@@ -92,16 +92,16 @@
         },
         {
             "name": "ronolo/jsonquery",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RoNoLo/jsonquery.git",
-                "reference": "097f381e9a0812a4b5180875aa44023665cc43cd"
+                "reference": "165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/097f381e9a0812a4b5180875aa44023665cc43cd",
-                "reference": "097f381e9a0812a4b5180875aa44023665cc43cd",
+                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e",
+                "reference": "165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e",
                 "shasum": ""
             },
             "require": {
@@ -139,10 +139,10 @@
                 "query"
             ],
             "support": {
-                "source": "https://github.com/RoNoLo/jsonquery/tree/1.0.1",
+                "source": "https://github.com/RoNoLo/jsonquery/tree/1.1.0",
                 "issues": "https://github.com/RoNoLo/jsonquery/issues"
             },
-            "time": "2019-10-09T20:25:52+00:00"
+            "time": "2019-11-04T19:16:50+00:00"
         }
     ],
     "packages-dev": [

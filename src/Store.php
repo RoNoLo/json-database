@@ -147,7 +147,7 @@ class Store implements StoreInterface
                     $ids[] = $file['filename'];
                 } else {
                     $sortField = key($query->sort());
-                    $sortValue = $jsonQuery->getNestedProperty($sortField);
+                    $sortValue = $jsonQuery->get($sortField);
 
                     if (is_array($sortValue)) {
                         throw new QueryExecutionException("The field to sort by returned more than one value from a document.");

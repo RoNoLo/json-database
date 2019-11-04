@@ -155,7 +155,7 @@ class Query
                 return false;
             } else {
                 $method = self::$rulesMap[$condition[0]];
-                $fieldValue = $jsonQuery->getNestedProperty($condition[1]);
+                $fieldValue = $jsonQuery->get($condition[1]);
                 $value = $condition[2];
 
                 // On AND the first FALSE aborts further checks
