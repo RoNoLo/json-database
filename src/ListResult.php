@@ -25,8 +25,6 @@ class ListResult implements ResultInterface
 
     protected $total;
 
-    protected $fields = [];
-
     /** @var Query */
     protected $query;
 

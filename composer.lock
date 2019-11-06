@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b116e7632bf02e2b9b3a3e3931312a30",
+    "content-hash": "7b44d178a23d661a53822ae845dff13a",
     "packages": [
         {
             "name": "league/flysystem",
@@ -92,16 +92,16 @@
         },
         {
             "name": "ronolo/jsonquery",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RoNoLo/jsonquery.git",
-                "reference": "165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e"
+                "reference": "86e5b685a3e9a43f842675e468a089edaf532f33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e",
-                "reference": "165e3f6fd3cb52ccd58ec56e18c2410f8f7c925e",
+                "url": "https://api.github.com/repos/RoNoLo/jsonquery/zipball/86e5b685a3e9a43f842675e468a089edaf532f33",
+                "reference": "86e5b685a3e9a43f842675e468a089edaf532f33",
                 "shasum": ""
             },
             "require": {
@@ -139,10 +139,10 @@
                 "query"
             ],
             "support": {
-                "source": "https://github.com/RoNoLo/jsonquery/tree/1.1.0",
+                "source": "https://github.com/RoNoLo/jsonquery/tree/1.1.1",
                 "issues": "https://github.com/RoNoLo/jsonquery/issues"
             },
-            "time": "2019-11-04T19:16:50+00:00"
+            "time": "2019-11-06T08:04:28+00:00"
         }
     ],
     "packages-dev": [
