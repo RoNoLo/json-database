@@ -17,16 +17,22 @@ class Query
     const LOGIC_OR = 'OR';
     const LOGIC_NOT = 'NOT';
 
-    protected $store;
+    /** @var StoreInterface */
+    protected $store = null;
 
-    protected $conditions;
+    /** @var array */
+    protected $conditions = [];
 
-    protected $fields;
+    /** @var array */
+    protected $fields = [];
 
+    /** @var int */
     protected $skip = 0;
 
+    /** @var int */
     protected $limit = PHP_INT_MAX;
 
+    /** @var null */
     protected $sort = null;
 
     protected static $rulesMap = [
@@ -82,7 +88,7 @@ class Query
      *
      * @return $this|array
      */
-    public function fields(array $fields = null)
+    public function fields(?array $fields = null)
     {
         if (is_null($fields)) {
             return $this->fields;
