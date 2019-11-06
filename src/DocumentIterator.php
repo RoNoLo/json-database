@@ -6,10 +6,13 @@ use RoNoLo\JsonQuery\JsonQuery;
 
 class DocumentIterator implements \Iterator
 {
+    /** @var StoreInterface */
     private $store;
 
+    /** @var array */
     private $ids;
 
+    /** @var int */
     private $idx = 0;
 
     /** @var array */
@@ -20,6 +23,7 @@ class DocumentIterator implements \Iterator
 
     /**
      * DocumentIterator constructor.
+     *
      * @param StoreInterface $store
      * @param array $ids
      * @param array $fields
@@ -59,7 +63,7 @@ class DocumentIterator implements \Iterator
     }
 
     /**
-     * Move forward to next element
+     * Move forward to next element.
      */
     public function next()
     {
@@ -67,7 +71,7 @@ class DocumentIterator implements \Iterator
     }
 
     /**
-     * Return the key of the current element
+     * Return the key of the current element.
      */
     public function key()
     {
@@ -75,7 +79,7 @@ class DocumentIterator implements \Iterator
     }
 
     /**
-     * Checks if current position is valid
+     * Checks if current position is valid.
      */
     public function valid()
     {
@@ -83,7 +87,7 @@ class DocumentIterator implements \Iterator
     }
 
     /**
-     * Rewind the Iterator to the first element
+     * Rewind the Iterator to the first element.
      */
     public function rewind()
     {

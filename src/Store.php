@@ -143,7 +143,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function find(Query $query, $assoc = false): ResultInterface
+    public function find(Query $query, $assoc = false): Result
     {
         $files = $this->flysystem->listContents('', true);
 

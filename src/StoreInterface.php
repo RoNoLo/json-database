@@ -64,7 +64,7 @@ interface StoreInterface
 
     /**
      * @param Query $query
-     * @return ResultInterface
+     * @return Result
      */
-    public function find(Query $query): ResultInterface;
+    public function find(Query $query): Result;
 }
