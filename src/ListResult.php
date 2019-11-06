@@ -48,27 +48,53 @@ class ListResult implements ResultInterface
         $this->assoc = $assoc;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function count(): int
     {
         return count($this->ids);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function total(): int
     {
         return $this->total;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
+    public function first()
+    {
+        if (!count($this->ids)) {
+            throw new DocumentNotFoundException("The result set had no documents.");
+        }
+
+        $id = [$this->ids[0]];
+        return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+    }
+
+    /** @inheritDoc */
+    public function document($id)
+    {
+        if (!in_array($id, $this->ids)) {
+            throw new DocumentNotFoundException("No documentwith ID " . $id . " was found in result set.");
+        }
+
+        $id = [$id];
+        return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+    }
+
+    /** @inheritDoc */
+    public function all()
+    {
+        return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
+    }
+
+    /** @inheritDoc */
     public function data(?int $idx = null)
     {
+        if (!isset($this->ids[$idx])) {
+            throw new DocumentNotFoundException("No document at index " . $idx . " was found.");
+        }
+
         // Requesting a single document?
         if (is_int($idx) && $idx >= 0 && $idx < $this->count()) {
             $id = [$this->ids[$idx]];

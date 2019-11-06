@@ -2,6 +2,8 @@
 
 namespace RoNoLo\JsonDatabase;
 
+use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
+
 interface ResultInterface
 {
     /**
@@ -19,10 +21,25 @@ interface ResultInterface
     public function total(): int;
 
     /**
-     * Returns all documents or a scalar.
+     * Returns the first or the only one document.
      *
-     * @param int|null $idx
-     * @return DocumentIterator|array|\stdClass
+     * @return array|\stdClass
      */
-    public function data(?int $idx = null);
+    public function first();
+
+    /**
+     * Returns an document with an ID from the result set.
+     *
+     * @param string $id
+     * @return array|\stdClass
+     * @throws DocumentNotFoundException
+     */
+    public function document($id);
+
+    /**
+     * Returns all documents.
+     *
+     * @return DocumentIterator
+     */
+    public function all();
 }

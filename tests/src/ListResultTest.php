@@ -4,7 +4,7 @@ namespace RoNoLo\JsonDatabase;
 
 use Exception;
 
-class ResultTest extends TestBase
+class ListResultTest extends TestBase
 {
 
 }

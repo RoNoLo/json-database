@@ -11,12 +11,14 @@ interface StoreInterface
      * Stores many documents to the store.
      *
      * @param array $documents
-     * @return void
+     * @return array Of IDs
      */
-    public function putMany(array $documents);
+    public function putMany(array $documents): array;
 
     /**
      * Stores a document or data structure to the store.
+     *
+     * It has to be a single document i.e. a \stdClass after converting it via json_encode().
      *
      * @param \stdClass|array $document
      * @return string
@@ -33,6 +35,16 @@ interface StoreInterface
      * @throws DocumentNotFoundException
      */
     public function read(string $id, $assoc = false);
+
+    /**
+     * Reads documents from the store.
+     *
+     * @param array $ids
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     * @param bool $check If false, no documents exists check will be executed in advance, just the Iterator will be created.
+     * @return DocumentIterator
+     */
+    public function readMany(array $ids, $assoc = false, $check = true);
 
     /**
      * Removes a document from the store.
@@ -52,7 +64,7 @@ interface StoreInterface
 
     /**
      * @param Query $query
-     * @return ListResult
+     * @return ResultInterface
      */
-    public function find(Query $query): ListResult;
+    public function find(Query $query): ResultInterface;
 }

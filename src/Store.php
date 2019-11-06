@@ -33,53 +33,53 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function putMany(array $documents)
+    public function putMany(array $documents): array
     {
-        // This will force an stdClass object as root
+        // This will force an array as root
         $documents = json_decode(json_encode($documents));
 
         if (!is_array($documents)) {
-            throw new DocumentNotStoredException("Your data was not an array ob objects");
+            throw new DocumentNotStoredException("Your data was not an array of objects. (To store objects use ->put() instead.)");
         }
 
+        $ids = [];
         foreach ($documents as $document) {
-            $this->put($document);
+            $ids[] = $this->put($document);
         }
+
+        return $ids;
     }
 
     /** @inheritDoc */
     public function put($document): string
     {
-        try {
-            // This will force an stdClass object as root
-            $document = json_decode(json_encode($document));
+        // This will force an stdClass object as root
+        $document = json_decode(json_encode($document));
 
-            if (!is_object($document)) {
-                throw new DocumentNotStoredException("Your data was not an single object. (Maybe an array, you may use ->storeMany() instead.)");
-            }
-
-            if (!isset($document->__id)) {
-                $id = $this->generateId();
-            } else {
-                $id = $document->__id;
-
-                // The ID is not part of the document, b/c the filename already is.
-                unset($document->__id);
-            }
-
-            $path = $this->getPathForDocument($id);
-            $json = json_encode($document, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
-
-            if (!$this->flysystem->put($path, $json)) {
-                throw new DocumentNotStoredException("The document could not be stored. Writing to drive failed.");
-            }
-
-            return $id;
-        } catch (FileExistsException $e) {
-            throw new DocumentNotStoredException("The document could not be stored.");
-        } catch (\ReflectionException $e) {
-            throw new DocumentNotStoredException("It was not possible to set the document ID.");
+        if (!is_object($document)) {
+            throw new DocumentNotStoredException("Your data was not an single object. (Maybe an array, you may use ->putMany() instead.)");
         }
+
+        if (!isset($document->__id)) {
+            $id = $this->generateId();
+            $document->__id = $id;
+        } else {
+            $id = $document->__id;
+        }
+
+        $path = $this->getPathForDocument($id);
+        $json = json_encode($document, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
+
+        if (!$this->flysystem->put($path, $json)) {
+            throw new DocumentNotStoredException(
+                sprintf(
+                    "The document could not be stored. Writing to flysystem-adapter `%s` failed.",
+                    get_class($this->flysystem->getAdapter())
+                )
+            );
+        }
+
+        return $id;
     }
 
     /** @inheritDoc */
@@ -104,6 +104,25 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
+    public function readMany(array $ids, $assoc = false, $check = true)
+    {
+        if (!$check) {
+            return new DocumentIterator($this, $ids, [], $assoc);
+        }
+
+        $exists = [];
+        foreach ($ids as $id) {
+            $path = $this->getPathForDocument($id);
+
+            if ($this->flysystem->has($path)) {
+                $exists[] = $id;
+            }
+        }
+
+        return new DocumentIterator($this, $exists, [], $assoc);
+    }
+
+    /** @inheritDoc */
     public function remove(string $id)
     {
         try {
@@ -124,7 +143,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function find(Query $query, $assoc = false): ListResult
+    public function find(Query $query, $assoc = false): ResultInterface
     {
         $files = $this->flysystem->listContents('', true);
 
@@ -144,7 +163,7 @@ class Store implements StoreInterface
 
             if ($query->match($jsonQuery)) {
                 if (!$query->sort()) {
-                    $ids[] = $file['filename'];
+                    $ids[$file['filename']] = 1;
                 } else {
                     $sortField = key($query->sort());
                     $sortValue = $jsonQuery->get($sortField);
