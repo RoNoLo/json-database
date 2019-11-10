@@ -44,8 +44,8 @@ class QueryConditionalsWithMultipleFieldsTest extends QueryTestBase
         $result = $query
             ->find([
                 "registered" => [
-                    '$gt' => new \DateTime("2018-01-01T10:00:00"),
-                    '$lt' => new \DateTime("2020-01-01T10:00:00"),
+                    '$gt' => '$DateTime:2018-01-01T10:00:00',
+                    '$lt' => '$DateTime:2020-01-01T10:00:00',
                 ],
             ])
             ->execute()
