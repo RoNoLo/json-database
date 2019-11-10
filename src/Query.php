@@ -20,7 +20,7 @@ class Query
     /** @var StoreInterface */
     protected $store = null;
 
-    /** @var array */
+    /** @var \Closure */
     protected $conditions = [];
 
     /** @var array */
@@ -139,7 +139,7 @@ class Query
 
     public function match(JsonQuery $jsonQuery)
     {
-        return $this->executeConditions($jsonQuery, $this->conditions);
+        return ($this->conditions)($jsonQuery);
     }
 
     public function getConditions()
@@ -147,50 +147,14 @@ class Query
         return $this->conditions;
     }
 
-    private function executeConditions($jsonQuery, $conditions)
-    {
-        foreach ($conditions as $condition) {
-            if (is_array($condition) && isset($condition[Query::LOGIC_OR])) {
-                foreach ($condition[Query::LOGIC_OR] as $j => $orCondition) {
-                    // On OR the first FALSE aborts further checks
-                    if ($this->executeConditions($jsonQuery, $orCondition)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            } else {
-                $method = self::$rulesMap[$condition[0]];
-                $fieldValue = $jsonQuery->get($condition[1]);
-                $value = $condition[2];
-
-                // On AND the first FALSE aborts further checks
-                if (!$this->conditionExecutor->$method($fieldValue, $value)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     /**
      * Parsing the given JSON like query into conditions and
      * postprocessing.
      *
-     * @param array $input
+     * @param array $conditions
      */
-    private function parseInput(array $input)
+    private function parseInput(array $conditions)
     {
-        // Check if we have a very basic query
-        if (isset($input["conditions"])) {
-            $this->conditions = (new ConditionParser())->parse($input["conditions"]);
-            $this->fields = isset($input["fields"]) ? $input["fields"] : null;
-            $this->skip = isset($input["skip"]) ? $input["skip"] : null;
-            $this->sort = isset($input["sort"]) ? $input["sort"] : null;
-            $this->limit = isset($input["limit"]) ? $input["limit"] : null;
-        } else {
-            $this->conditions = (new ConditionParser())->parse($input);
-        }
+        $this->conditions = (new QueryExecuter())->parse($conditions);
     }
 }

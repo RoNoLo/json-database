@@ -3,13 +3,14 @@
 namespace RoNoLo\JsonDatabase;
 
 use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
+use RoNoLo\JsonDatabase\Exception\ResultSetException;
 
 /**
  * Result
  *
  * A collection of Documents returned from a Query.
  */
-abstract class Result
+class Result implements \IteratorAggregate, \ArrayAccess
 {
     protected $store;
 
@@ -21,6 +22,8 @@ abstract class Result
     protected $query;
 
     protected $assoc = false;
+
+    protected $idx = 0;
 
     /**
      * Constructor
@@ -85,5 +88,32 @@ abstract class Result
     public function all()
     {
         return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
+    }
+
+    /** @return DocumentIterator */
+    public function getIterator()
+    {
+        return $this->all();
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->ids[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        $id = [$this->ids[$offset]];
+        return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        throw new ResultSetException("It is not possible to write to the result set.");
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->ids[$offset]);
     }
 }

@@ -182,17 +182,16 @@ class Store implements StoreInterface
             $sortDirection = strtolower(current($query->sort()));
 
             $sortDirection == "asc" ? asort($ids) : arsort($ids);
-
-            // Remove the sort by value
-            $ids = array_keys($ids);
         }
+
+        $ids = array_keys($ids);
 
         $total = count($ids);
 
         // Check for 'skip'
         if ($query->skip() > 0) {
             if ($query->skip() > $total) {
-                return new ListResult($this);
+                return new Result($this);
             } else {
                 $ids = array_slice($ids, $query->skip());
             }
@@ -203,7 +202,7 @@ class Store implements StoreInterface
             $ids = array_slice($ids, 0, $query->limit());
         }
 
-        return new ListResult($this, $query, $ids, $total, $assoc);
+        return new Result($this, $query, $ids, $total, $assoc);
     }
 
     /**
