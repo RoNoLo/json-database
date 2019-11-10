@@ -84,7 +84,8 @@ class ConditionProvider
                 case is_float($comparable):
                     return $value > $comparable;
 
-                case is_object($comparable) && $comparable instanceof \DateTime:
+                case is_string($comparable):
+                    // TODO: Check for a String like '$DateTime:...'
                     $valueDateTime = date_create($value);
                     if (!$valueDateTime) {
                         trigger_error(sprintf(
