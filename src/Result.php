@@ -80,20 +80,10 @@ class Result implements \IteratorAggregate, \ArrayAccess
         return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
     }
 
-    /**
-     * Returns all documents.
-     *
-     * @return DocumentIterator
-     */
-    public function all()
-    {
-        return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
-    }
-
     /** @return DocumentIterator */
     public function getIterator()
     {
-        return $this->all();
+        return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
     }
 
     public function offsetExists($offset)

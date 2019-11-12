@@ -11,6 +11,8 @@ class QueryConditionalsWithMultipleFieldsTest extends QueryTestBase
      * This will test, if a simple returning of full documents works.
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
+     *
+     * SELECT * FROM store WHERE age > 20 AND age < 30 AND phone != '';
      */
     public function testRequestingDocumentsMultipleConditions()
     {
@@ -37,6 +39,8 @@ class QueryConditionalsWithMultipleFieldsTest extends QueryTestBase
      * This will test, if a simple returning of full documents works.
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
+     *
+     * SELECT * FROM store WHERE registered > '2018-01-01T10:00:00' AND registered < '2020-01-01T10:00:00';
      */
     public function testRequestingDocumentsDateCompare()
     {

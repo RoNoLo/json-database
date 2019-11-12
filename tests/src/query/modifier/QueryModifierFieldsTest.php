@@ -7,6 +7,9 @@ use League\Flysystem\Filesystem;
 
 class QueryModifierFieldsTest extends QueryTestBase
 {
+    /**
+     * SELECT picture, age, name FROM store ORDER BY index ASC;
+     */
     public function testRequestingDocumentsWithFieldsToInclude()
     {
         $query = new Query($this->store);
@@ -17,7 +20,7 @@ class QueryModifierFieldsTest extends QueryTestBase
             ->execute()
         ;
 
-        $actually = $result->data(0);
+        $actually = $result[0];
 
         $expected = (object) [
             "picture" => "http://placehold.it/32x32",
@@ -28,6 +31,9 @@ class QueryModifierFieldsTest extends QueryTestBase
         $this->assertEquals($expected, $actually);
     }
 
+    /**
+     * SELECT picture AS image, age AS years, name AS fullname FROM store ORDER BY index ASC;
+     */
     public function testRequestingDocumentsWithFieldsToExclude()
     {
         $query = new Query($this->store);
@@ -38,7 +44,7 @@ class QueryModifierFieldsTest extends QueryTestBase
             ->execute()
         ;
 
-        $actually = $result->data(0);
+        $actually = $result[0];
 
         $expected = (object) [
             "image" => "http://placehold.it/32x32",
