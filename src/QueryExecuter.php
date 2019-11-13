@@ -4,6 +4,7 @@ namespace RoNoLo\JsonDatabase;
 
 use RoNoLo\JsonDatabase\Exception\QuerySyntaxException;
 use RoNoLo\JsonQuery\JsonQuery;
+use function foo\func;
 
 class QueryExecuter
 {
@@ -37,48 +38,11 @@ class QueryExecuter
         '$or' => 'orOperator'
     ];
 
-    /** @var \Closure */
-    private $executionTree;
-
     public function parse(array $query): \Closure
     {
         $this->queryOriginal = json_decode(json_encode($query));
 
         return $this->buildExecutionTree();
-
-        // return $this->executionTree;
-    }
-
-    public function getSelectors()
-    {
-        return $this->selectors;
-    }
-
-    private function preProcess(array $query)
-    {
-        $rewrite = [];
-
-        $isSimple = false;
-
-        // First check if the query if of type simple AND conditions
-        foreach ($query as $field => $condition) {
-            if (is_array($condition) && $isSimple) {
-                throw new QuerySyntaxException("You cannot mix the simple query syntax with condition $-op conditions");
-            }
-
-            if (is_string($field) && !is_array($condition)) {
-                // If the first field/value is a simple one, every has to be one.
-                $isSimple = true;
-
-                $rewrite[$field] = ['$eq' => $condition];
-            }
-        }
-
-        if ($isSimple) {
-            $this->selectors = ['$and' => $rewrite];
-        } else {
-            $this->selectors = $query;
-        }
     }
 
     private function buildExecutionTree()
@@ -107,14 +71,40 @@ class QueryExecuter
         return $conditions;
     }
 
+    private function parseOperator(string $operator, $selectors)
+    {
+        switch ($operator) {
+            case '$not':
+                return $this->parseNotCondition($selectors);
+
+            case '$or':
+                return $this->parseOrCondition($selectors);
+
+            case '$and':
+                return $this->parseAndCondition($selectors);
+
+            default:
+                throw new QuerySyntaxException(sprintf("Unknown $-Operator `%s` found.", $operator));
+        }
+    }
+
+    private function parseNotCondition($selectors)
+    {
+        $conditions = $this->parseSelectors($selectors);
+
+        return function (JsonQuery $jsonQuery) use ($conditions) {
+            return !$conditions($jsonQuery);
+        };
+    }
+
     private function parseAndCondition($selectors)
     {
-        $tmp = (array) $selectors;
+        $selectorsArray = (array) $selectors;
 
         $list = [];
-        foreach ($tmp as $mixed => $args) {
+        foreach ($selectorsArray as $mixed => $args) {
             if ($this->isOperator($mixed)) {
-                $foo = 1;
+                $list[] = $this->parseOperator($mixed, $args);
             } elseif ($this->isField($mixed)) {
                 if (is_object($args)) {
                     $conditions = (array) $args;
@@ -135,7 +125,7 @@ class QueryExecuter
             }
         }
 
-        $andCloure = function (JsonQuery $jsonQuery) use ($list) {
+        return function (JsonQuery $jsonQuery) use ($list) {
             foreach ($list as $condition) {
                 $result = $condition($jsonQuery);
 
@@ -147,8 +137,6 @@ class QueryExecuter
 
             return true;
         };
-
-        return $andCloure;
     }
 
     private function parseOrCondition($selectors)
@@ -180,7 +168,7 @@ class QueryExecuter
             return false;
         }
 
-        if (in_array($op, array_keys(self::$rulesMap))) {
+        if (in_array($op, array_keys(ConditionProvider::RULES))) {
             return true;
         }
 

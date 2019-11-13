@@ -17,6 +17,7 @@ class QueryModifierSortTest extends QueryTestBase
             ->find([])
             ->fields(["index", "guid"])
             ->sort("index", "asc")
+            ->limit(60)
             ->execute()
         ;
 

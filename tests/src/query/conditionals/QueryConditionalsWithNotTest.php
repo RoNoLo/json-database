@@ -5,7 +5,7 @@ namespace RoNoLo\JsonDatabase;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 
-class QueryConditionalsWithOrTest extends QueryTestBase
+class QueryConditionalsWithNotTest extends QueryTestBase
 {
     /**
      * This will test, if a simple returning of full documents works.
@@ -38,7 +38,7 @@ class QueryConditionalsWithOrTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 16;
+        $expected = 984;
 
         $this->assertEquals($expected, $result->count());
     }
@@ -67,7 +67,7 @@ class QueryConditionalsWithOrTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 45;
+        $expected = 992;
 
         $this->assertEquals($expected, $result->count());
     }

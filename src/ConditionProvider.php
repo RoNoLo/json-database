@@ -4,6 +4,26 @@ namespace RoNoLo\JsonDatabase;
 
 class ConditionProvider
 {
+    const RULES = [
+        '$eq' => 'isEqual',
+        '$neq' => 'isNotEqual',
+        '$gt' => 'isGreaterThan',
+        '$lt' => 'isLessThan',
+        '$gte' => 'isGreaterThanOrEqual',
+        '$lte' => 'isLessThanOrEqual',
+        '$in'    => 'isIn',
+        '$nin' => 'isNotIn',
+        '$null' => 'isNull',
+        '$n' => 'isNull',
+        '$notnull' => 'isNotNull',
+        '$nn' => 'isNotNull',
+        '$contains' => 'contains',
+        '$c' => 'contains',
+        '$ne' => 'isNotEmpty',
+        '$e' => 'isEmpty',
+        '$not' => 'isNot'
+    ];
+
     public function get($op, $value, $comparable)
     {
         switch ($op) {

@@ -13,10 +13,6 @@ use RoNoLo\JsonQuery\JsonQuery;
  */
 class Query
 {
-    const LOGIC_AND = 'AND';
-    const LOGIC_OR = 'OR';
-    const LOGIC_NOT = 'NOT';
-
     /** @var StoreInterface */
     protected $store = null;
 
@@ -35,32 +31,9 @@ class Query
     /** @var null */
     protected $sort = null;
 
-    protected static $rulesMap = [
-        '$eq' => 'isEqual',
-        '$neq' => 'isNotEqual',
-        '$gt' => 'isGreaterThan',
-        '$lt' => 'isLessThan',
-        '$gte' => 'isGreaterThanOrEqual',
-        '$lte' => 'isLessThanOrEqual',
-        '$in'    => 'isIn',
-        '$nin' => 'isNotIn',
-        '$null' => 'isNull',
-        '$n' => 'isNull',
-        '$notnull' => 'isNotNull',
-        '$nn' => 'isNotNull',
-        '$contains' => 'contains',
-        '$c' => 'contains',
-        '$ne' => 'isNotEmpty',
-        '$e' => 'isEmpty',
-        '$not' => 'isNot'
-    ];
-
-    protected $conditionExecutor;
-
     public function __construct(StoreInterface $store)
     {
         $this->store = $store;
-        $this->conditionExecutor = new ConditionExecutor();
     }
 
     public function find(array $input)
@@ -80,6 +53,8 @@ class Query
      *
      * To COPY key/values:
      * ->fields(["to" => "from.here", "bernd" => "foo.moo.boo"]);
+     * To KEEP only specific keys:
+     * ->fields(["name", "age", "color"]);
      *
      * @param array $fields
      *
@@ -96,6 +71,14 @@ class Query
         return $this;
     }
 
+    /**
+     * Sets the field to sort by and direction.
+     *
+     * @param string|null $field
+     * @param string $direction
+     *
+     * @return $this|array
+     */
     public function sort(?string $field = null, $direction = "asc")
     {
         if (is_null($field)) {
