@@ -2,17 +2,19 @@
 
 namespace RoNoLo\JsonDatabase;
 
-use Exception;
-
 class ResultTest extends TestBase
 {
     public function testCanCreateResult()
     {
+        return;
+
         $json = file_get_contents(__DIR__ . '/../fixtures/query_1000_docs.json');
         $data = json_decode($json, true);
 
         foreach ($data as &$item) {
-            $item['registered'] = (new \DateTime("-" . rand(0, 10000) . " days"))->format(DATE_ISO8601);
+            $item['balance'] = floatval($item['balance']);
+            $item['latitude'] = floatval($item['latitude']);
+            $item['longitude'] = floatval($item['longitude']);
         }
 
         $json = json_encode($data, JSON_PRETTY_PRINT);

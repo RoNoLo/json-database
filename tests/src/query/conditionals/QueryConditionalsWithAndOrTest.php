@@ -12,7 +12,7 @@ class QueryConditionalsWithAndOrTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND ( phone = '12345' OR age = 40 );
+     * SELECT * FROM store WHERE age > 20 AND age < 50 AND ( eyeColor = 'blue' OR favoriteFruit = 'apple' );
      */
     public function testRequestingDocumentsOrAndAnd()
     {
@@ -20,17 +20,18 @@ class QueryConditionalsWithAndOrTest extends QueryTestBase
         $result = $query
             ->find([
                 "age" => [
-                    '$eq' => 20,
+                    '$gt' => 20,
+                    '$lt' => 50,
                 ],
                 '$or' => [
                     [
-                        "phone" => [
-                            '$eq' => "12345",
+                        "eyeColor" => [
+                            '$eq' => "blue",
                         ]
                     ],
                     [
-                        "age" => [
-                            '$eq' => 40
+                        "favoriteFruit" => [
+                            '$eq' => "apple"
                         ]
                     ]
                 ]
@@ -38,7 +39,7 @@ class QueryConditionalsWithAndOrTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 45;
+        $expected = 319;
 
         $this->assertEquals($expected, $result->count());
     }
@@ -48,25 +49,28 @@ class QueryConditionalsWithAndOrTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND ( phone = '12345' OR age = 40 );
+     * SELECT * FROM store WHERE age > 20 AND age < 50 AND ( eyeColor = 'blue' OR favoriteFruit = 'apple' );
      */
     public function testRequestingDocumentsOrAndAndOr()
     {
         $query = new Query($this->store);
         $result = $query
             ->find([
-                "age" => [
-                    '$eq' => 20,
-                ],
-                '$or' => [
-                    [
-                        "phone" => [
-                            '$eq' => "12345",
-                        ]
+                '$and' => [
+                    "age" => [
+                        '$gt' => 20,
+                        '$lt' => 50,
                     ],
-                    [
-                        "age" => [
-                            '$eq' => 40
+                    '$or' => [
+                        [
+                            "eyeColor" => [
+                                '$eq' => "blue",
+                            ]
+                        ],
+                        [
+                            "favoriteFruit" => [
+                                '$eq' => "apple"
+                            ]
                         ]
                     ]
                 ]
@@ -74,7 +78,56 @@ class QueryConditionalsWithAndOrTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 45;
+        $expected = 319;
+
+        $this->assertEquals($expected, $result->count());
+    }
+
+    /**
+     * SELECT *
+     * FROM store
+     * WHERE (
+     *   age > 20 AND age < 50 AND eyeColor = 'blue' AND (
+     *     balance > 1000.0 OR isActive = true
+     *   ) OR favoriteFruit = 'apple'
+     * );
+     */
+    public function testRequestingDocumentsOrAndAndOrDeep()
+    {
+        $query = new Query($this->store);
+        $result = $query
+            ->find([
+                '$or' => [
+                    [
+                        "eyeColor" => [
+                            '$eq' => "blue",
+                        ],
+                        "age" => [
+                            '$gt' => 20,
+                            '$lt' => 50,
+                        ],
+                        '$or' => [
+                            [
+                                "balance" => [
+                                    '$gt' => 1000.0
+                                ]
+                            ],
+                            [
+                                "isActive" => true
+                            ]
+                        ]
+                    ],
+                    [
+                        "favoriteFruit" => [
+                            '$eq' => "apple"
+                        ]
+                    ]
+                ]
+            ])
+            ->execute()
+        ;
+
+        $expected = 470;
 
         $this->assertEquals($expected, $result->count());
     }

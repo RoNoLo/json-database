@@ -17,34 +17,22 @@ class QueryExecuter
         self::OP_NOT
     ];
 
-    const CAST_DATETIME = '$DateTime:';
-
-    const VALUE_CASTS = [
-        self::CAST_DATETIME => '/^(\$DateTime:) ?(.+)$/',
-    ];
-
-    protected $queryOriginal = [];
-
-    public function parse(array $query): \Closure
+    public function parse(array $query = []): \Closure
     {
-        $this->queryOriginal = json_decode(json_encode($query));
+        // Check if no selector was given
+        if (!count($query)) {
+            return function () { return true; };
+        }
 
-        return $this->parseSelectors($this->queryOriginal);
+        return $this->parseSelectors($query);
     }
 
     protected function parseSelectors($selectors): \Closure
     {
         // Do we have AND condition?
-        if (is_object($selectors)) {
+        if ($this->isJsonObject($selectors)) {
             $conditions = $this->parseAndCondition($selectors);
-        } elseif (is_array($selectors)) {
-            // Check if no selectors where applyed to just get all documents
-            if (!count($selectors)) {
-                return function () {
-                    return true;
-                };
-            }
-
+        } elseif ($this->isJsonArray($selectors)) {
             $conditions = $this->parseOrCondition($selectors);
         } else {
             throw new \Exception("What are you?");
@@ -79,20 +67,17 @@ class QueryExecuter
         };
     }
 
-    private function parseAndCondition($selectors)
+    private function parseAndCondition(array $selectors)
     {
-        $selectorsArray = (array) $selectors;
-
         $list = [];
-        foreach ($selectorsArray as $mixed => $args) {
+        foreach ($selectors as $mixed => $args) {
             if ($this->isOperator($mixed)) {
                 $list[] = $this->parseOperator($mixed, $args);
             } elseif ($this->isField($mixed)) {
-                if (is_object($args)) {
+                if ($this->isJsonObject($args)) {
                     $conditions = (array) $args;
 
                     foreach ($conditions as $op => $value) {
-                        $value = $this->parseValueForTypeCasting($value);
                         $list[] = function (JsonQuery $jsonQuery) use ($mixed, $value, $op) {
                             $fieldValue = $jsonQuery->get($mixed);
 
@@ -172,27 +157,28 @@ class QueryExecuter
     }
 
     /**
-     * String values could have a case operator, which will turn it
-     * into a specific type. This will be done on "compile time".
+     * An AND syntax is defined by the first array key.
+     * If it is a string, it's an AND syntax.
      *
-     * @param $value
-     * @return mixed
-     * @throws \Exception
+     * @param $selectors
+     *
+     * @return bool
      */
-    private function parseValueForTypeCasting($value)
+    private function isJsonObject($selectors)
     {
-        if (!is_string($value)) {
-            return $value;
-        }
+        return is_array($selectors) && is_string(key($selectors));
+    }
 
-        foreach (self::VALUE_CASTS as $cast => $regex) {
-            if (strpos($value, $cast) === 0 && preg_match($regex, $value, $matches)) {
-                switch ($cast) {
-                    case $matches[1]: return new \DateTime($matches[2]);
-                }
-            }
-        }
-
-        return $value;
+    /**
+     * An OR syntax is defined by the first array key.
+     * If it is an int, it's an OR syntax.
+     *
+     * @param $selectors
+     *
+     * @return bool
+     */
+    private function isJsonArray($selectors)
+    {
+        return is_array($selectors) && is_int(key($selectors));
     }
 }

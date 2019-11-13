@@ -170,7 +170,6 @@ class ConditionProvider
                     return $valueDateTime > $comparable;
 
                 default:
-                    trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
                     return false;
             }
         };
@@ -204,7 +203,6 @@ class ConditionProvider
                     return $valueDateTime < $comparable;
 
                 default:
-                    trigger_error(sprintf("Cannot compare via `\$lt` the value `%s`.", $value), E_USER_NOTICE);
                     return false;
             }
         };
@@ -238,7 +236,6 @@ class ConditionProvider
                     return $valueDateTime >= $comparable;
 
                 default:
-                    trigger_error(sprintf("Cannot compare via `\$gte` the value `%s`.", $value), E_USER_NOTICE);
                     return false;
             }
         };
@@ -272,7 +269,6 @@ class ConditionProvider
                     return $valueDateTime <= $comparable;
 
                 default:
-                    trigger_error(sprintf("Cannot compare via `\$lte` the value `%s`.", $value), E_USER_NOTICE);
                     return false;
             }
         };
