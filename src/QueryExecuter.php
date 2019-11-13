@@ -4,49 +4,31 @@ namespace RoNoLo\JsonDatabase;
 
 use RoNoLo\JsonDatabase\Exception\QuerySyntaxException;
 use RoNoLo\JsonQuery\JsonQuery;
-use function foo\func;
 
 class QueryExecuter
 {
-    protected $queryOriginal = [];
+    const OP_AND = '$and';
+    const OP_OR = '$or';
+    const OP_NOT = '$not';
 
-    protected $selectors = [];
-
-    protected static $rulesMap = [
-        '$eq' => 'equal',
-        '$seq' => 'strictEqual',
-        '$neq' => 'notEqual',
-        '$sneq' => 'strictNotEqual',
-        '$gt' => 'greaterThan',
-        '$lt' => 'lessThan',
-        '$gte' => 'greaterThanOrEqual',
-        '$lte' => 'lessThanOrEqual',
-        '$in' => 'in',
-        '$nin' => 'notIn',
-        '$null' => 'isNull',
-        '$n' => 'isNull',
-        '$notnull' => 'isNotNull',
-        '$nn' => 'isNotNull',
-        '$sw' => 'startWith',
-        '$ew' => 'endWith',
-        '$contains' => 'contains',
-        '$c' => 'contains',
-        '$ne' => 'isNotEmpty',
-        '$e' => 'isEmpty',
-        '$not' => 'notOperator',
-        '$and' => 'andOperator',
-        '$or' => 'orOperator'
+    const OPERATORS = [
+        self::OP_AND,
+        self::OP_OR,
+        self::OP_NOT
     ];
+
+    const CAST_DATETIME = '$DateTime:';
+
+    const VALUE_CASTS = [
+        self::CAST_DATETIME => '/^(\$DateTime:) ?(.+)$/',
+    ];
+
+    protected $queryOriginal = [];
 
     public function parse(array $query): \Closure
     {
         $this->queryOriginal = json_decode(json_encode($query));
 
-        return $this->buildExecutionTree();
-    }
-
-    private function buildExecutionTree()
-    {
         return $this->parseSelectors($this->queryOriginal);
     }
 
@@ -74,13 +56,13 @@ class QueryExecuter
     private function parseOperator(string $operator, $selectors)
     {
         switch ($operator) {
-            case '$not':
+            case self::OP_NOT:
                 return $this->parseNotCondition($selectors);
 
-            case '$or':
+            case self::OP_OR:
                 return $this->parseOrCondition($selectors);
 
-            case '$and':
+            case self::OP_AND:
                 return $this->parseAndCondition($selectors);
 
             default:
@@ -110,6 +92,7 @@ class QueryExecuter
                     $conditions = (array) $args;
 
                     foreach ($conditions as $op => $value) {
+                        $value = $this->parseValueForTypeCasting($value);
                         $list[] = function (JsonQuery $jsonQuery) use ($mixed, $value, $op) {
                             $fieldValue = $jsonQuery->get($mixed);
 
@@ -168,7 +151,7 @@ class QueryExecuter
             return false;
         }
 
-        if (in_array($op, array_keys(ConditionProvider::RULES))) {
+        if (in_array($op, array_keys(self::OPERATORS))) {
             return true;
         }
 
@@ -186,5 +169,30 @@ class QueryExecuter
         }
 
         return true;
+    }
+
+    /**
+     * String values could have a case operator, which will turn it
+     * into a specific type. This will be done on "compile time".
+     *
+     * @param $value
+     * @return mixed
+     * @throws \Exception
+     */
+    private function parseValueForTypeCasting($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        foreach (self::VALUE_CASTS as $cast => $regex) {
+            if (strpos($value, $cast) === 0 && preg_match($regex, $value, $matches)) {
+                switch ($cast) {
+                    case $matches[1]: return new \DateTime($matches[2]);
+                }
+            }
+        }
+
+        return $value;
     }
 }

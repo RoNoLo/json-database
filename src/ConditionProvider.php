@@ -8,8 +8,8 @@ class ConditionProvider
         '$eq' => 'isEqual',
         '$neq' => 'isNotEqual',
         '$gt' => 'isGreaterThan',
-        '$lt' => 'isLessThan',
         '$gte' => 'isGreaterThanOrEqual',
+        '$lt' => 'isLessThan',
         '$lte' => 'isLessThanOrEqual',
         '$in'    => 'isIn',
         '$nin' => 'isNotIn',
@@ -21,17 +21,31 @@ class ConditionProvider
         '$c' => 'contains',
         '$ne' => 'isNotEmpty',
         '$e' => 'isEmpty',
-        '$not' => 'isNot'
+        '$regex' => 'isRegExMatch',
     ];
 
     public function get($op, $value, $comparable)
     {
         switch ($op) {
-            case '$eq': return $this->equal($value, $comparable);
-            case '$gt': return $this->greaterThan($value, $comparable);
-            case '$lt': return $this->lessThan($value, $comparable);
+            case '$eq': return $this->isEqual($value, $comparable);
+            case '$neq': return $this->isNotEqual($value, $comparable);
+            case '$gt': return $this->isGreaterThan($value, $comparable);
+            case '$gte': return $this->isGreaterThanOrEqual($value, $comparable);
+            case '$lt': return $this->isLessThan($value, $comparable);
+            case '$lte': return $this->isLessThanOrEqual($value, $comparable);
+            case '$in': return $this->isIn($value, $comparable);
+            case '$nin': return $this->isNotIn($value, $comparable);
+            case '$n':
+            case '$null': return $this->isNull($value);
+            case '$nn':
+            case '$notnull': return $this->isNotNull($value);
+            case '$c':
+            case '$contains': return $this->contains($value, $comparable);
             case '$ne': return $this->isNotEmpty($value);
-            default: throw new \Exception("Not implemented yet");
+            case '$e': return $this->isEmpty($value);
+            case '$regex': return $this->isRegExMatch($value, $comparable);
+            default:
+                throw new \Exception(sprintf("%s is not implemented yet", $op));
         }
     }
 
@@ -44,22 +58,42 @@ class ConditionProvider
      *
      * @return \Closure
      */
-    public function equal($value, $comparable)
+    public function isEqual($value, $comparable)
     {
-        return function () use ($value, $comparable) { return $value == $comparable; };
-    }
+        return function () use ($value, $comparable)
+        {
+            switch (true) {
+                // We are strict with scalars
+                case is_int($comparable):
+                case is_float($comparable):
+                case is_string($comparable):
+                default:
+                    return $value === $comparable;
 
-    /**
-     * Strict equals
-     *
-     * @param mixed $value
-     * @param mixed $comparable
-     *
-     * @return bool
-     */
-    public function strictEqual($value, $comparable)
-    {
-        return $value === $comparable;
+                case is_object($comparable) && $comparable instanceof \DateTime:
+                    if (is_object($value) && $value instanceof \DateTime) {
+                        $valueDateTime = $value;
+                    } elseif (is_string($value)) {
+                        $valueDateTime = date_create($value);
+                    } else {
+                        $unixtime = strtotime($value);
+                        if ($unixtime === false) {
+                            $valueDateTime = null;
+                        } else {
+                            $valueDateTime = (new \DateTime())->setTimestamp($unixtime);
+                        }
+                    }
+
+                    if (!$valueDateTime) {
+                        trigger_error(sprintf(
+                            "It was not possible to convert value `%s` into a \DateTime for the condition.",
+                            $value
+                        ), E_USER_NOTICE);
+                    }
+
+                    return $valueDateTime == $comparable;
+            }
+        };
     }
 
     /**
@@ -68,24 +102,45 @@ class ConditionProvider
      * @param mixed $value
      * @param mixed $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function notEqual($value, $comparable)
+    public function isNotEqual($value, $comparable)
     {
-        return $value != $comparable;
-    }
+        return function () use ($value, $comparable)
+        {
+            switch (true) {
+                // We are strict with scalars
+                case is_int($comparable):
+                case is_float($comparable):
+                case is_string($comparable):
+                default:
+                    return $value !== $comparable;
 
-    /**
-     * Strict not equal
-     *
-     * @param mixed $value
-     * @param mixed $comparable
-     *
-     * @return bool
-     */
-    public function strictNotEqual($value, $comparable)
-    {
-        return $value !== $comparable;
+                case is_object($comparable) && $comparable instanceof \DateTime:
+                    if (is_object($value) && $value instanceof \DateTime) {
+                        $valueDateTime = $value;
+                    } elseif (is_string($value)) {
+                        $valueDateTime = date_create($value);
+                    } else {
+                        $unixtime = strtotime($value);
+                        if ($unixtime === false) {
+                            $valueDateTime = null;
+                        } else {
+                            $valueDateTime = (new \DateTime())->setTimestamp($unixtime);
+                        }
+                    }
+
+                    if (!$valueDateTime) {
+                        trigger_error(sprintf(
+                            "It was not possible to convert value `%s` into a \DateTime for the condition.",
+                            $value
+                        ), E_USER_NOTICE);
+                    }
+
+                    return $valueDateTime != $comparable;
+
+            }
+        };
     }
 
     /**
@@ -95,7 +150,7 @@ class ConditionProvider
      * @param mixed $comparable
      * @return \Closure
      */
-    public function greaterThan($value, $comparable)
+    public function isGreaterThan($value, $comparable)
     {
         return function () use ($value, $comparable)
         {
@@ -104,8 +159,7 @@ class ConditionProvider
                 case is_float($comparable):
                     return $value > $comparable;
 
-                case is_string($comparable):
-                    // TODO: Check for a String like '$DateTime:...'
+                case is_object($comparable) && $comparable instanceof \DateTime:
                     $valueDateTime = date_create($value);
                     if (!$valueDateTime) {
                         trigger_error(sprintf(
@@ -130,7 +184,7 @@ class ConditionProvider
      *
      * @return \Closure
      */
-    public function lessThan($value, $comparable)
+    public function isLessThan($value, $comparable)
     {
         return function () use ($value, $comparable)
         {
@@ -138,15 +192,19 @@ class ConditionProvider
                 case is_int($comparable):
                 case is_float($comparable):
                     return $value < $comparable;
+
                 case is_object($comparable) && $comparable instanceof \DateTime:
                     $valueDateTime = date_create($value);
                     if (!$valueDateTime) {
-                        trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
-                            $value), E_USER_NOTICE);
+                        trigger_error(sprintf(
+                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
+                            $value
+                        ), E_USER_NOTICE);
                     }
                     return $valueDateTime < $comparable;
+
                 default:
-                    trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
+                    trigger_error(sprintf("Cannot compare via `\$lt` the value `%s`.", $value), E_USER_NOTICE);
                     return false;
             }
         };
@@ -158,24 +216,32 @@ class ConditionProvider
      * @param mixed $value
      * @param mixed $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function greaterThanOrEqual($value, $comparable)
+    public function isGreaterThanOrEqual($value, $comparable)
     {
-        switch (true) {
-            case is_int($comparable):
-            case is_float($comparable):
-                return $value >= $comparable;
-            case is_object($comparable) && $comparable instanceof \DateTime:
-                $valueDateTime = date_create($value);
-                if (!$valueDateTime) {
-                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
-                }
-                return $valueDateTime >= $comparable;
-            default:
-                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
-                return false;
-        }
+        return function () use ($value, $comparable)
+        {
+            switch (true) {
+                case is_int($comparable):
+                case is_float($comparable):
+                    return $value >= $comparable;
+
+                case is_object($comparable) && $comparable instanceof \DateTime:
+                    $valueDateTime = date_create($value);
+                    if (!$valueDateTime) {
+                        trigger_error(sprintf(
+                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
+                            $value
+                        ), E_USER_NOTICE);
+                    }
+                    return $valueDateTime >= $comparable;
+
+                default:
+                    trigger_error(sprintf("Cannot compare via `\$gte` the value `%s`.", $value), E_USER_NOTICE);
+                    return false;
+            }
+        };
     }
 
     /**
@@ -184,24 +250,32 @@ class ConditionProvider
      * @param mixed $value
      * @param mixed $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function lessThanOrEqual($value, $comparable)
+    public function isLessThanOrEqual($value, $comparable)
     {
-        switch (true) {
-            case is_int($comparable):
-            case is_float($comparable):
-                return $value <= $comparable;
-            case is_object($comparable) && $comparable instanceof \DateTime:
-                $valueDateTime = date_create($value);
-                if (!$valueDateTime) {
-                    trigger_error(sprintf("It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.", $value), E_USER_NOTICE);
-                }
-                return $valueDateTime <= $comparable;
-            default:
-                trigger_error(sprintf("Cannot compare via `\$gt` the value `%s`.", $value), E_USER_NOTICE);
-                return false;
-        }
+        return function () use ($value, $comparable)
+        {
+            switch (true) {
+                case is_int($comparable):
+                case is_float($comparable):
+                    return $value <= $comparable;
+
+                case is_object($comparable) && $comparable instanceof \DateTime:
+                    $valueDateTime = date_create($value);
+                    if (!$valueDateTime) {
+                        trigger_error(sprintf(
+                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
+                            $value
+                        ), E_USER_NOTICE);
+                    }
+                    return $valueDateTime <= $comparable;
+
+                default:
+                    trigger_error(sprintf("Cannot compare via `\$lte` the value `%s`.", $value), E_USER_NOTICE);
+                    return false;
+            }
+        };
     }
 
     /**
@@ -210,11 +284,14 @@ class ConditionProvider
      * @param mixed $value
      * @param array $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function in($value, $comparable)
+    public function isIn($value, $comparable)
     {
-        return (is_array($comparable) && in_array($value, $comparable));
+        return function () use ($value, $comparable)
+        {
+            return (is_array($comparable) && in_array($value, $comparable));
+        };
     }
 
     /**
@@ -223,11 +300,14 @@ class ConditionProvider
      * @param mixed $value
      * @param array $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function notIn($value, $comparable)
+    public function isNotIn($value, $comparable)
     {
-        return (is_array($comparable) && !in_array($value, $comparable));
+        return function () use ($value, $comparable)
+        {
+            return (is_array($comparable) && !in_array($value, $comparable));
+        };
     }
 
     /**
@@ -235,11 +315,14 @@ class ConditionProvider
      *
      * @param mixed $value
      *
-     * @return bool
+     * @return \Closure
      */
-    public function isNull($value, $comparable)
+    public function isNull($value)
     {
-        return is_null($value);
+        return function () use ($value)
+        {
+            return is_null($value);
+        };
     }
 
     /**
@@ -247,17 +330,21 @@ class ConditionProvider
      *
      * @param mixed $value
      *
-     * @return bool
+     * @return \Closure
      */
-    public function isNotNull($value, $comparable)
+    public function isNotNull($value)
     {
-        return !is_null($value);
+        return function () use ($value)
+        {
+            return !is_null($value);
+        };
     }
 
     /**
-     * Is not null equal
+     * Is not empty string.
      *
      * @param mixed $value
+     *
      * @return \Closure
      */
     public function isNotEmpty($value)
@@ -271,45 +358,19 @@ class ConditionProvider
     }
 
     /**
-     * Start With
+     * Is empty string.
      *
      * @param mixed $value
-     * @param string $comparable
-     *
-     * @return bool
+     * @return \Closure
      */
-    public function startWith($value, $comparable)
+    public function isEmpty($value)
     {
-        if (is_array($comparable) || is_array($value) || is_object($comparable) || is_object($value)) {
-            return false;
-        }
+        return function () use ($value)
+        {
+            $value = (string) $value;
 
-        if (preg_match("/^$comparable/", $value)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * End with
-     *
-     * @param mixed $value
-     * @param string $comparable
-     *
-     * @return bool
-     */
-    public function endWith($value, $comparable)
-    {
-        if (is_array($comparable) || is_array($value) || is_object($comparable) || is_object($value)) {
-            return false;
-        }
-
-        if (preg_match("/$comparable$/", $value)) {
-            return true;
-        }
-
-        return false;
+            return trim($value) === '';
+        };
     }
 
     /**
@@ -318,19 +379,23 @@ class ConditionProvider
      * @param mixed $value
      * @param string $comparable
      *
-     * @return bool
+     * @return \Closure
      */
-    public function match($value, $comparable)
+    public function isRegExMatch($value, $comparable)
     {
-        if (is_array($comparable) || is_array($value) || is_object($comparable) || is_object($value)) {
-            return false;
-        }
+        return function () use ($value, $comparable)
+        {
+            if (!is_string($comparable)) {
+                return false;
+            }
 
-        $comparable = trim($comparable);
-        if (preg_match("/^$comparable$/", $value)) {
-            return true;
-        }
-        return false;
+            $comparable = trim($comparable);
+            if (preg_match($comparable, $value)) {
+                return true;
+            }
+
+            return false;
+        };
     }
 
     /**
@@ -339,10 +404,13 @@ class ConditionProvider
      * @param string $value
      * @param string $comparable
      *
-     * @return bool
+     * @return \Closure
      */
     public function contains($value, $comparable)
     {
-        return (strpos($value, $comparable) !== false);
+        return function () use ($value, $comparable)
+        {
+            return (strpos($value, $comparable) !== false);
+        };
     }
 }

@@ -30,7 +30,7 @@ class QueryConditionalsWithMultipleFieldsTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 423;
+        $expected = 210;
 
         $this->assertEquals($expected, $result->count());
     }

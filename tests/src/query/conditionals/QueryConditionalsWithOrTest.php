@@ -72,7 +72,7 @@ class QueryConditionalsWithOrTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 45;
+        $expected = 16;
 
         $this->assertEquals($expected, $result->count());
     }

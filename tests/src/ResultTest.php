@@ -11,13 +11,11 @@ class ResultTest extends TestBase
         $json = file_get_contents(__DIR__ . '/../fixtures/query_1000_docs.json');
         $data = json_decode($json, true);
 
-        $i = 0;
         foreach ($data as &$item) {
-            $item['index'] = $i;
-            $i++;
+            $item['registered'] = (new \DateTime("-" . rand(0, 10000) . " days"))->format(DATE_ISO8601);
         }
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
-        file_put_contents(__DIR__ . '/../fixtures/query_1000_docs.json.gz', $json);
+        file_put_contents(__DIR__ . '/../fixtures/query_1000_docs.json', $json);
     }
 }
