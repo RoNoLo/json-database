@@ -13,7 +13,7 @@ class QuerySimpleEqualManyTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND gender = 'female';
+     * SELECT * FROM store WHERE age = 20 AND isActive = false;
      */
     public function testRequestingDocumentsVerySimpleArray()
     {
@@ -21,12 +21,12 @@ class QuerySimpleEqualManyTest extends QueryTestBase
         $result = $query
             ->find([
                 "age" => 20,
-                "gender" => "female"
+                "isActive" => false
             ])
             ->execute()
         ;
 
-        $expected = 26;
+        $expected = 8;
 
         $this->assertEquals($expected, $result->count());
     }
@@ -36,7 +36,7 @@ class QuerySimpleEqualManyTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND phone = '1234567' AND name = 'Thomas';
+     * SELECT * FROM store WHERE age = 20 AND phone = '1234567' AND name.first = 'Thomas';
      */
     public function testRequestingDocumentsVerySimpleArrayEmptyResult()
     {
@@ -48,7 +48,7 @@ class QuerySimpleEqualManyTest extends QueryTestBase
             ->find([
                 "age" => 20,
                 "phone" => "1234567",
-                "name" => "Thomas"
+                "name.first" => "Thomas"
             ])
             ->execute()
         ;

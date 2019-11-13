@@ -12,24 +12,26 @@ class QueryConditionalsWithOrTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND phone = '12345' OR age = 40;
+     * SELECT * FROM store WHERE IS NOT ( age = 20 AND phone = '12345' OR age = 40 );
      */
     public function testRequestingDocumentsSimpleDeepOr()
     {
         $query = new Query($this->store);
         $result = $query
             ->find([
-                [
-                    "age" => [
-                        '$eq' => 20,
+                '$not' => [
+                    [
+                        "age" => [
+                            '$eq' => 20,
+                        ],
+                        "phone" => [
+                            '$eq' => "12345",
+                        ]
                     ],
-                    "phone" => [
-                        '$eq' => "12345",
-                    ]
-                ],
-                [
-                    "age" => [
-                        '$eq' => 40
+                    [
+                        "age" => [
+                            '$eq' => 40
+                        ]
                     ]
                 ]
             ])
@@ -46,26 +48,19 @@ class QueryConditionalsWithOrTest extends QueryTestBase
      * Notice, that the find() has no "selector" key. Just a _simple_ condition
      * query for all documents.
      *
-     * SELECT * FROM store WHERE age = 20 AND phone = '12345' OR age = 40;
+     * SELECT * FROM store WHERE IS NOT ( age = 20 AND eyeColor = 'brows' );
      */
     public function testRequestingDocumentsSimpleDeepOrKeyword()
     {
         $query = new Query($this->store);
         $result = $query
             ->find([
-                '$or' => [
-                    [
-                        "age" => [
-                            '$eq' => 20,
-                        ],
-                        "phone" => [
-                            '$eq' => "12345",
-                        ]
+                '$not' => [
+                    "age" => [
+                        '$eq' => 20,
                     ],
-                    [
-                        "age" => [
-                            '$eq' => 40
-                        ]
+                    "eyeColor" => [
+                        '$eq' => "brown",
                     ]
                 ]
             ])

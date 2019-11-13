@@ -25,7 +25,7 @@ class QuerySimpleEqualTest extends QueryTestBase
             ->execute()
         ;
 
-        $expected = 51;
+        $expected = 16;
 
         $this->assertEquals($expected, $result->count());
     }

@@ -36,26 +36,23 @@ class Query
     protected $sort = null;
 
     protected static $rulesMap = [
-        '$eq' => 'equal',
-        '$seq' => 'strictEqual',
-        '$neq' => 'notEqual',
-        '$sneq' => 'strictNotEqual',
-        '$gt' => 'greaterThan',
-        '$lt' => 'lessThan',
-        '$gte' => 'greaterThanOrEqual',
-        '$lte' => 'lessThanOrEqual',
-        '$in'    => 'in',
-        '$nin' => 'notIn',
+        '$eq' => 'isEqual',
+        '$neq' => 'isNotEqual',
+        '$gt' => 'isGreaterThan',
+        '$lt' => 'isLessThan',
+        '$gte' => 'isGreaterThanOrEqual',
+        '$lte' => 'isLessThanOrEqual',
+        '$in'    => 'isIn',
+        '$nin' => 'isNotIn',
         '$null' => 'isNull',
         '$n' => 'isNull',
         '$notnull' => 'isNotNull',
         '$nn' => 'isNotNull',
-        '$sw' => 'startWith',
-        '$ew' => 'endWith',
         '$contains' => 'contains',
         '$c' => 'contains',
         '$ne' => 'isNotEmpty',
-        '$e' => 'isEmpty'
+        '$e' => 'isEmpty',
+        '$not' => 'isNot'
     ];
 
     protected $conditionExecutor;
@@ -142,14 +139,9 @@ class Query
         return ($this->conditions)($jsonQuery);
     }
 
-    public function getConditions()
-    {
-        return $this->conditions;
-    }
-
     /**
-     * Parsing the given JSON like query into conditions and
-     * postprocessing.
+     * Parsing the given JSON like query into an execution tree
+     * of Closures.
      *
      * @param array $conditions
      */

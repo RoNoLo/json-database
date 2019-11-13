@@ -8,14 +8,14 @@ use League\Flysystem\Filesystem;
 class QueryModifierFieldsTest extends QueryTestBase
 {
     /**
-     * SELECT picture, age, name FROM store ORDER BY index ASC;
+     * SELECT picture, age, eyeColor FROM store ORDER BY index ASC;
      */
     public function testRequestingDocumentsWithFieldsToInclude()
     {
         $query = new Query($this->store);
         $result = $query
             ->find([])
-            ->fields(["picture", "age", "name"])
+            ->fields(["picture", "age", "eyeColor"])
             ->sort("index", "asc")
             ->execute()
         ;
@@ -24,22 +24,22 @@ class QueryModifierFieldsTest extends QueryTestBase
 
         $expected = (object) [
             "picture" => "http://placehold.it/32x32",
-            "age" => 29,
-            "name" => "Bentley Bentley",
+            "age" => 60,
+            "eyeColor" => "brown",
         ];
 
         $this->assertEquals($expected, $actually);
     }
 
     /**
-     * SELECT picture AS image, age AS years, name AS fullname FROM store ORDER BY index ASC;
+     * SELECT picture AS image, age AS years, eyeColor AS color FROM store ORDER BY index ASC;
      */
     public function testRequestingDocumentsWithFieldsToExclude()
     {
         $query = new Query($this->store);
         $result = $query
             ->find([])
-            ->fields(["image" => "picture", "years" => "age", "fullname" => "name"])
+            ->fields(["image" => "picture", "years" => "age", "color" => "eyeColor"])
             ->sort("index", "asc")
             ->execute()
         ;
@@ -48,8 +48,8 @@ class QueryModifierFieldsTest extends QueryTestBase
 
         $expected = (object) [
             "image" => "http://placehold.it/32x32",
-            "years" => 29,
-            "fullname" => "Bentley Bentley",
+            "years" => 60,
+            "color" => "brown",
         ];
 
         $this->assertEquals($expected, $actually);

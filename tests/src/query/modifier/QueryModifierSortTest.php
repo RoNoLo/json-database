@@ -23,11 +23,11 @@ class QueryModifierSortTest extends QueryTestBase
         $actually = $result[0];
 
         $this->assertEquals(0, $actually->index);
-        $this->assertEquals("35be1a95-da82-4181-8ebb-b86969a46def", $actually->guid);
+        $this->assertEquals("b5a93d8b-1523-4ce0-a850-cf8523bc50ac", $actually->guid);
 
         $actually = $result[50];
 
         $this->assertEquals(50, $actually->index);
-        $this->assertEquals("87bcc60b-7b0b-464e-8902-823ea064b880", $actually->guid);
+        $this->assertEquals("660987eb-0a5e-4b07-9b01-f0c1a8b9c9a0", $actually->guid);
     }
 }
