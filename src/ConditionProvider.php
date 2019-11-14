@@ -65,30 +65,22 @@ class ConditionProvider
             switch (true) {
                 // We are strict with scalars
                 case is_int($comparable):
+                    return intval($value) === $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) === $comparable;
+
                 case is_string($comparable):
+                    return (string) $value === $comparable;
+
                 default:
                     return $value === $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    if (is_object($value) && $value instanceof \DateTime) {
-                        $valueDateTime = $value;
-                    } elseif (is_string($value)) {
-                        $valueDateTime = date_create($value);
-                    } else {
-                        $unixtime = strtotime($value);
-                        if ($unixtime === false) {
-                            $valueDateTime = null;
-                        } else {
-                            $valueDateTime = (new \DateTime())->setTimestamp($unixtime);
-                        }
-                    }
+                    $valueDateTime = $this->toDateTime($value);
 
                     if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
+                        return false;
                     }
 
                     return $valueDateTime == $comparable;
@@ -111,30 +103,22 @@ class ConditionProvider
             switch (true) {
                 // We are strict with scalars
                 case is_int($comparable):
+                    return intval($value) !== $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) !== $comparable;
+
                 case is_string($comparable):
+                    return (string) $value !== $comparable;
+
                 default:
                     return $value !== $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    if (is_object($value) && $value instanceof \DateTime) {
-                        $valueDateTime = $value;
-                    } elseif (is_string($value)) {
-                        $valueDateTime = date_create($value);
-                    } else {
-                        $unixtime = strtotime($value);
-                        if ($unixtime === false) {
-                            $valueDateTime = null;
-                        } else {
-                            $valueDateTime = (new \DateTime())->setTimestamp($unixtime);
-                        }
-                    }
+                    $valueDateTime = $this->toDateTime($value);
 
                     if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
+                        return false;
                     }
 
                     return $valueDateTime != $comparable;
@@ -156,21 +140,25 @@ class ConditionProvider
         {
             switch (true) {
                 case is_int($comparable):
+                    return intval($value) > $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) > $comparable;
+
+                case is_string($comparable):
+                    return (string) $value > $comparable;
+
+                default:
                     return $value > $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    $valueDateTime = date_create($value);
-                    if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
-                    }
-                    return $valueDateTime > $comparable;
+                    $valueDateTime = $this->toDateTime($value);
 
-                default:
-                    return false;
+                    if (!$valueDateTime) {
+                        return false;
+                    }
+
+                    return $valueDateTime > $comparable;
             }
         };
     }
@@ -189,21 +177,25 @@ class ConditionProvider
         {
             switch (true) {
                 case is_int($comparable):
+                    return intval($value) < $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) < $comparable;
+
+                case is_string($comparable):
+                    return (string) $value < $comparable;
+
+                default:
                     return $value < $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    $valueDateTime = date_create($value);
-                    if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
-                    }
-                    return $valueDateTime < $comparable;
+                    $valueDateTime = $this->toDateTime($value);
 
-                default:
-                    return false;
+                    if (!$valueDateTime) {
+                        return false;
+                    }
+
+                    return $valueDateTime < $comparable;
             }
         };
     }
@@ -222,21 +214,25 @@ class ConditionProvider
         {
             switch (true) {
                 case is_int($comparable):
+                    return intval($value) >= $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) >= $comparable;
+
+                case is_string($comparable):
+                    return (string) $value >= $comparable;
+
+                default:
                     return $value >= $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    $valueDateTime = date_create($value);
-                    if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
-                    }
-                    return $valueDateTime >= $comparable;
+                    $valueDateTime = $this->toDateTime($value);
 
-                default:
-                    return false;
+                    if (!$valueDateTime) {
+                        return false;
+                    }
+
+                    return $valueDateTime >= $comparable;
             }
         };
     }
@@ -255,21 +251,25 @@ class ConditionProvider
         {
             switch (true) {
                 case is_int($comparable):
+                    return intval($value) <= $comparable;
+
                 case is_float($comparable):
+                    return floatval($value) <= $comparable;
+
+                case is_string($comparable):
+                    return (string) $value <= $comparable;
+
+                default:
                     return $value <= $comparable;
 
                 case is_object($comparable) && $comparable instanceof \DateTime:
-                    $valueDateTime = date_create($value);
-                    if (!$valueDateTime) {
-                        trigger_error(sprintf(
-                            "It was not possible to convert value `%s` into a \DateTime with ATOM format (!) for the condition.",
-                            $value
-                        ), E_USER_NOTICE);
-                    }
-                    return $valueDateTime <= $comparable;
+                    $valueDateTime = $this->toDateTime($value);
 
-                default:
-                    return false;
+                    if (!$valueDateTime) {
+                        return false;
+                    }
+
+                    return $valueDateTime <= $comparable;
             }
         };
     }
@@ -408,5 +408,28 @@ class ConditionProvider
         {
             return (strpos($value, $comparable) !== false);
         };
+    }
+
+    /**
+     * @param mixed $value
+     * @return \DateTime|null
+     * @throws \Exception
+     */
+    private function toDateTime($value)
+    {
+        if (is_object($value) && $value instanceof \DateTime) {
+            return $value;
+        } elseif (is_string($value)) {
+            $dateTime = date_create($value);
+
+            return $dateTime ? $dateTime : null;
+        } else {
+            $unixtime = strtotime($value);
+            if ($unixtime === false) {
+                return null;
+            } else {
+                return (new \DateTime())->setTimestamp($unixtime);
+            }
+        }
     }
 }

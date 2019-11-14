@@ -14,7 +14,7 @@ class ConditionProviderGreaterThenTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEqual($expected, $value, $comparable)
+    public function testGreaterThen($expected, $value, $comparable)
     {
         $conditionExecutor = new ConditionProvider();
 
@@ -44,9 +44,14 @@ class ConditionProviderGreaterThenTest extends TestBase
                 10
             ],
             [
-                false,
+                true,
                 "heinz",
                 "Heinz"
+            ],
+            [
+                false,
+                "Heinz",
+                "heinz"
             ],
             [
                 false,

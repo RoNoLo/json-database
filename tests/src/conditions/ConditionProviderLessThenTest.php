@@ -14,7 +14,7 @@ class ConditionProviderLessThenTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEqual($expected, $value, $comparable)
+    public function testLessThen($expected, $value, $comparable)
     {
         $conditionExecutor = new ConditionProvider();
 
@@ -39,7 +39,7 @@ class ConditionProviderLessThenTest extends TestBase
                 null
             ],
             [
-                false,
+                true,
                 "heinz",
                 10
             ],
@@ -47,6 +47,11 @@ class ConditionProviderLessThenTest extends TestBase
                 false,
                 "heinz",
                 "Heinz"
+            ],
+            [
+                true,
+                "Heinz",
+                "heinz"
             ],
             [
                 false,

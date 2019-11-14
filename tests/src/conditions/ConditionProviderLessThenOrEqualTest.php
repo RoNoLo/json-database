@@ -5,7 +5,7 @@ namespace RoNoLo\JsonDatabase;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 
-class ConditionProviderGreaterThenOrEqualTest extends TestBase
+class ConditionProviderLessThenOrEqualTest extends TestBase
 {
     /**
      * @dataProvider equalProvider
@@ -14,11 +14,11 @@ class ConditionProviderGreaterThenOrEqualTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEqual($expected, $value, $comparable)
+    public function testLessThenOrEqual($expected, $value, $comparable)
     {
         $conditionExecutor = new ConditionProvider();
 
-        $condition = $conditionExecutor->isGreaterThanOrEqual($value, $comparable);
+        $condition = $conditionExecutor->isLessThanOrEqual($value, $comparable);
 
         $result = $condition();
 
@@ -29,7 +29,7 @@ class ConditionProviderGreaterThenOrEqualTest extends TestBase
     {
         return [
             [
-                false,
+                true,
                 10,
                 11
             ],
@@ -39,17 +39,17 @@ class ConditionProviderGreaterThenOrEqualTest extends TestBase
                 null
             ],
             [
-                false,
+                true,
                 "heinz",
                 10
             ],
             [
-                true,
+                false,
                 "heinz",
                 "Heinz"
             ],
             [
-                false,
+                true,
                 "Heinz",
                 "heinz"
             ],
@@ -64,27 +64,22 @@ class ConditionProviderGreaterThenOrEqualTest extends TestBase
                 []
             ],
             [
-                true,
+                false,
                 11,
                 10
             ],
             [
-                true,
-                10,
-                10
-            ],
-            [
-                true,
+                false,
                 11.5,
                 11.4
             ],
             [
                 true,
-                11.4,
-                11.4
+                11.5,
+                11.5
             ],
             [
-                false,
+                true,
                 11.4,
                 11.5
             ],
