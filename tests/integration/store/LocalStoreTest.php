@@ -36,7 +36,7 @@ class LocalStoreTest extends TestBase
             "age" => 20
         ])->execute();
 
-        $this->assertEquals(51, $result->count());
+        $this->assertEquals(16, $result->count());
 
         // Change stuff
         foreach ($result as $id => $data) {

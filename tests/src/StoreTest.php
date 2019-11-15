@@ -3,7 +3,6 @@
 namespace RoNoLo\JsonDatabase;
 
 use League\Flysystem\Memory\MemoryAdapter;
-use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
 
 class StoreTest extends TestBase
 {

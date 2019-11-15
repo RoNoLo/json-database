@@ -29,8 +29,6 @@ abstract class TestBase extends TestCase
     {
         $data = json_decode(file_get_contents($filePath));
 
-        foreach ($data as $item) {
-            $store->put($item);
-        }
+        $store->putMany($data);
     }
 }

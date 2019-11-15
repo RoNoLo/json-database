@@ -48,6 +48,21 @@ class ConditionProviderNotEqualTest extends TestBase
                 "heinz",
                 "Heinz"
             ],
+            [
+                false,
+                new \DateTime("2020-01-01"),
+                new \DateTime("2020-01-01")
+            ],
+            [
+                false,
+                "2020-01-01 00:00:00",
+                new \DateTime("2020-01-01")
+            ],
+            [
+                true,
+                new \DateTime("2020-01-02"),
+                new \DateTime("2020-01-01")
+            ],
         ];
     }
 }

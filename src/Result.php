@@ -23,8 +23,6 @@ class Result implements \IteratorAggregate, \ArrayAccess
 
     protected $assoc = false;
 
-    protected $idx = 0;
-
     /**
      * Constructor
      *
@@ -78,6 +76,14 @@ class Result implements \IteratorAggregate, \ArrayAccess
 
         $id = [$id];
         return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+    }
+
+    /**
+     * @return array
+     */
+    public function getIds()
+    {
+        return $this->ids;
     }
 
     /** @return DocumentIterator */

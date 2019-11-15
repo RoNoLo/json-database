@@ -4,6 +4,7 @@ namespace RoNoLo\JsonDatabase;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 
 class DatabaseTest extends TestBase
 {
@@ -29,54 +30,57 @@ class DatabaseTest extends TestBase
         $db = new Database();
         $db->addStore('person', new Store(new Local($this->datastorePath . '/person')));
         $db->addStore('hobby', new Store(new Local($this->datastorePath . '/hobby')));
-        $db->addSchema('person', [
-            'hobby' => [
-                'store' => 'hobby',
-                'id' => 'name'
-            ]
-        ]);
+        $db->setIndexStore(new Store(new Local($this->datastorePath . '/_index')));
         $db->addIndex('person', [
             'age'
         ]);
 
-        $this->fillDb($db, $this->fixturesPath . DIRECTORY_SEPARATOR . 'database_20.json');
+        $hobby1 = $db->put('hobby', [
+            'name' => 'Music',
+            'stars' => 4,
+        ]);
+        $hobby2 = $db->put('hobby', [
+            'name' => 'Boxen',
+            'stars' => 2,
+        ]);
+        $hobby3 = $db->put('hobby', [
+            'name' => 'Movies',
+            'stars' => 5,
+        ]);
 
-        // Find stuff
-        $query = new Query($store);
+        $person1 = $db->put('person', [
+            'firstname' => 'Ronald',
+            'lastname' => 'Locke',
+            'age' => 42,
+            'hobbies' => [
+                '$hobby:' . $hobby1,
+                '$hobby:' . $hobby2,
+            ]
+        ]);
+        $person2 = $db->put('person', [
+            'firstname' => 'Tom',
+            'lastname' => 'Locke',
+            'age' => 31,
+            'hobbies' => [
+                '$hobby:' . $hobby2,
+            ]
+        ]);
+        $person3 = $db->put('person', [
+            'firstname' => 'Brain',
+            'lastname' => 'Locke',
+            'age' => 22,
+            'hobbies' => [
+                '$hobby:' . $hobby2,
+                '$hobby:' . $hobby3,
+            ]
+        ]);
+        $person4 = $db->put('person', [
+            'firstname' => 'Jean',
+            'lastname' => 'Locke',
+            'age' => 12,
+            'hobbies' => []
+        ]);
 
-        $result = $query->find([
-            "age" => 20
-        ])->execute();
-
-        $this->assertEquals(51, $result->count());
-
-        // Change stuff
-        foreach ($result as $id => $data) {
-            $data->age = 99;
-
-            $store->store($data, $id);
-        }
-
-        // Find again, but 0 results
-        $result = $query->find([
-            "age" => 20
-        ])->execute();
-
-        $this->assertEquals(0, $result->count());
-
-        // Find again
-        $result = $query->find([
-            "age" => 99
-        ])->execute();
-
-        $store->removeMany($result->getIds());
-
-        // Find again
-        $result = $query->find([
-            "age" => 99
-        ])->execute();
-
-        $this->assertEquals(0, $result->count());
     }
 
     protected function tearDown(): void

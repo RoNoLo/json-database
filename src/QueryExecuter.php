@@ -35,7 +35,8 @@ class QueryExecuter
         } elseif ($this->isJsonArray($selectors)) {
             $conditions = $this->parseOrCondition($selectors);
         } else {
-            throw new \Exception("What are you?");
+            // This can be stupid. Will see.
+            $conditions = function () { return true; };
         }
 
         return $conditions;
