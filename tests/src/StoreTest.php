@@ -92,7 +92,7 @@ class StoreTest extends TestBase
 
         $result = $store->readMany($ids, false, false);
 
-        $this->assertInstanceOf(DocumentIterator::class, $result);
+        $this->assertInstanceOf(StoreDocumentIterator::class, $result);
     }
 
     /**
@@ -125,7 +125,7 @@ class StoreTest extends TestBase
 
         $result = $store->readMany($ids, true);
 
-        $this->assertInstanceOf(DocumentIterator::class, $result);
+        $this->assertInstanceOf(StoreDocumentIterator::class, $result);
 
         foreach ($result as $id => $document) {
             $tmp = $document['slug'];

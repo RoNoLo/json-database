@@ -21,48 +21,57 @@ interface DatabaseInterface
      *
      * It has to be a single document i.e. a \stdClass after converting it via json_encode().
      *
-     * @param string $store
+     * @param string $storeName
      * @param \stdClass|array $document
      * @return string
      */
-    public function put(string $store, $document): string;
+    public function put(string $storeName, $document): string;
 
     /**
      * Reads a document from the store.
      *
-     * @param string $store
+     * @param string $storeName
      * @param string $id
      * @param bool $assoc Will be used for json_decode's 2nd argument.
+     *
      * @return \stdClass|array
      */
-    public function read(string $store, string $id, $assoc = false);
+    public function read(string $storeName, string $id, $assoc = false);
 
     /**
      * Reads documents from the store.
      *
-     * @param string $store
+     * @param string $storeName
      * @param array $ids
      * @param bool $assoc Will be used for json_decode's 2nd argument.
      * @param bool $check If false, no documents exists check will be executed in advance, just the Iterator will be created.
-     * @return DocumentIterator
+     * @return StoreDocumentIterator
      */
-    public function readMany(string $store, array $ids, $assoc = false, $check = true);
+    public function readMany(string $storeName, array $ids, $assoc = false, $check = true);
 
     /**
      * Removes a document from the store.
      *
-     * @param string $store
+     * @param string $storeName
      * @param string $id
      * @return bool
      */
-    public function remove(string $store, string $id);
+    public function remove(string $storeName, string $id);
 
     /**
      * Removes many documents from the store.
      *
-     * @param string $store
+     * @param string $storeName
      * @param array $ids
      * @return void
      */
-    public function removeMany(string $store, array $ids);
+    public function removeMany(string $storeName, array $ids);
+
+    /**
+     * Removes all documents from the store.
+     *
+     * @param string $storeName
+     * @return mixed
+     */
+    public function truncate(string $storeName);
 }

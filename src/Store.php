@@ -33,6 +33,14 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
+    public function has(string $id): bool
+    {
+        $path = $this->getPathForDocument($id);
+
+        return $this->flysystem->has($path);
+    }
+
+    /** @inheritDoc */
     public function putMany(array $documents): array
     {
         // This will force an array as root
@@ -83,18 +91,18 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function read($id, $assoc = false)
+    public function read(string $id, $assoc = false)
     {
         $path = $this->getPathForDocument($id);
 
         try {
             $json = $this->flysystem->read($path);
-            $document = json_decode($json, $assoc);
-            if ($assoc) {
-                $document['__id'] = $id;
-            } else {
-                $document->__id = $id;
+
+            if (is_null($assoc)) {
+                return $json;
             }
+
+            $document = json_decode($json, !!$assoc);
 
             return $document;
         }
@@ -107,19 +115,17 @@ class Store implements StoreInterface
     public function readMany(array $ids, $assoc = false, $check = true)
     {
         if (!$check) {
-            return new DocumentIterator($this, $ids, [], $assoc);
+            return new StoreDocumentIterator($this, $ids, [], $assoc);
         }
 
         $exists = [];
         foreach ($ids as $id) {
-            $path = $this->getPathForDocument($id);
-
-            if ($this->flysystem->has($path)) {
+            if ($this->has($id)) {
                 $exists[] = $id;
             }
         }
 
-        return new DocumentIterator($this, $exists, [], $assoc);
+        return new StoreDocumentIterator($this, $exists, [], $assoc);
     }
 
     /** @inheritDoc */
@@ -138,32 +144,42 @@ class Store implements StoreInterface
         foreach ($ids as $id) {
             $this->remove($id);
         }
+    }
 
-        return true;
+    /** @inheritDoc */
+    public function truncate()
+    {
+        $contents = $this->flysystem->listContents('');
+
+        foreach ($contents as $content) {
+            if ($content['type'] == 'dir') {
+                $this->flysystem->deleteDir($content['path']);
+            }
+        }
     }
 
     /** @inheritDoc */
     public function find(Query $query, $assoc = false): Result
     {
-        $files = $this->flysystem->listContents('', true);
+        $contents = $this->flysystem->listContents('', true);
 
         $ids = [];
-        foreach ($files as $file) {
-            if ($file['type'] != 'file') {
+        foreach ($contents as $content) {
+            if ($content['type'] != 'file') {
                 continue;
             }
-            if ($file['extension'] != 'json') {
+            if ($content['extension'] != 'json') {
                 continue;
             }
 
-            $json = $this->flysystem->read($file['path']);
+            $json = $this->flysystem->read($content['path']);
 
             // Done here to reuse it for sorting
             $jsonQuery = JsonQuery::fromJson($json);
 
             if ($query->match($jsonQuery)) {
                 if (!$query->sort()) {
-                    $ids[$file['filename']] = 1;
+                    $ids[$content['filename']] = 1;
                 } else {
                     $sortField = key($query->sort());
                     $sortValue = $jsonQuery->get($sortField);
@@ -172,7 +188,7 @@ class Store implements StoreInterface
                         throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
                     }
 
-                    $ids[$file['filename']] = $sortValue;
+                    $ids[$content['filename']] = $sortValue;
                 }
             }
         }

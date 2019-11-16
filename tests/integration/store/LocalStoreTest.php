@@ -65,6 +65,8 @@ class LocalStoreTest extends TestBase
         ])->execute();
 
         $this->assertEquals(0, $result->count());
+
+        $store->truncate();
     }
 
     protected function tearDown(): void

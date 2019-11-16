@@ -75,7 +75,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
         }
 
         $id = [$id];
-        return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+        return (new StoreDocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
     }
 
     /**
@@ -86,10 +86,10 @@ class Result implements \IteratorAggregate, \ArrayAccess
         return $this->ids;
     }
 
-    /** @return DocumentIterator */
+    /** @return StoreDocumentIterator */
     public function getIterator()
     {
-        return new DocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
+        return new StoreDocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
     }
 
     public function offsetExists($offset)
@@ -100,7 +100,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
     public function offsetGet($offset)
     {
         $id = [$this->ids[$offset]];
-        return (new DocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+        return (new StoreDocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
     }
 
     public function offsetSet($offset, $value)

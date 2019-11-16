@@ -4,7 +4,7 @@ namespace RoNoLo\JsonDatabase;
 
 use RoNoLo\JsonQuery\JsonQuery;
 
-class DocumentIterator implements \Iterator
+class DatabaseDocumentIterator implements \Iterator
 {
     /** @var StoreInterface */
     private $store;
@@ -21,20 +21,25 @@ class DocumentIterator implements \Iterator
     /** @var bool */
     private $assoc;
 
+    /** @var string */
+    private $storeName;
+
     /**
      * DocumentIterator constructor.
      *
-     * @param StoreInterface $store
+     * @param DatabaseInterface $database
+     * @param string $storeName
      * @param array $ids
      * @param array $fields
      * @param bool $assoc
      */
-    public function __construct(StoreInterface $store, array &$ids, array $fields = [], $assoc = false)
+    public function __construct(DatabaseInterface $database, string $storeName, array &$ids, array $fields = [], $assoc = false)
     {
-        $this->store = $store;
+        $this->store = $database;
         $this->ids = $ids;
         $this->fields = $fields;
         $this->assoc = $assoc;
+        $this->storeName = $storeName;
     }
 
     /**

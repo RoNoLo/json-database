@@ -6,34 +6,15 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 
-class DatabaseTest extends TestBase
+class DatabaseReferenceObjectsTest extends TestBase
 {
-    /** @var Filesystem */
-    private $flysystem;
-
-    private $datastoreAdapter;
-
-    private $repoTestPath = 'repo';
-
-    protected function setUp(): void
+    public function testAddingPersonsWithHobbyReferencesAndReadingTheFullPersonObject()
     {
-        $adapter = new Local($this->datastorePath);
+        define('STORE_JSON_OPTIONS', JSON_PRETTY_PRINT);
 
-        $this->flysystem = new Filesystem($adapter);
-        $this->flysystem->createDir($this->repoTestPath);
-
-        $this->datastoreAdapter = new Local($this->datastorePath . '/' . $this->repoTestPath);
-    }
-
-    public function testAddingWritingFindingFromZipArchiveRepository()
-    {
         $db = new Database();
         $db->addStore('person', new Store(new Local($this->datastorePath . '/person')));
         $db->addStore('hobby', new Store(new Local($this->datastorePath . '/hobby')));
-        $db->setIndexStore(new Store(new Local($this->datastorePath . '/_index')));
-        $db->addIndex('person', [
-            'age'
-        ]);
 
         $hobby1 = $db->put('hobby', [
             'name' => 'Music',
@@ -81,20 +62,26 @@ class DatabaseTest extends TestBase
             'hobbies' => []
         ]);
 
-    }
+        // Now read back The persons
+        $personA = $db->read('person', $person1);
+        $this->assertCount(2, $personA->hobbies);
+        $this->assertEquals(4, $personA->hobbies[0]->stars);
+        $this->assertEquals(2, $personA->hobbies[1]->stars);
 
-    protected function tearDown(): void
-    {
-        $this->flysystem->deleteDir($this->repoTestPath);
-    }
+        $personB = $db->read('person', $person2);
+        $this->assertCount(1, $personB->hobbies);
+        $this->assertEquals(2, $personB->hobbies[0]->stars);
 
-    private function fillDb(Database $db, string $filePath)
-    {
-        $data = json_decode(file_get_contents($filePath));
+        $personC = $db->read('person', $person3);
+        $this->assertCount(2, $personC->hobbies);
+        $this->assertEquals(2, $personC->hobbies[0]->stars);
+        $this->assertEquals(5, $personC->hobbies[1]->stars);
 
-        foreach ($data as $item) {
-            $db->store('person', $item);
-        }
+        $personD = $db->read('person', $person4);
+        $this->assertCount(0, $personD->hobbies);
+
+        $db->truncate('hobby');
+        $db->truncate('person');
     }
 }
 
