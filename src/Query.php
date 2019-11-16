@@ -2,7 +2,6 @@
 
 namespace RoNoLo\JsonDatabase;
 
-use RoNoLo\JsonDatabase\Exception\QuerySyntaxException;
 use RoNoLo\JsonQuery\JsonQuery;
 
 /**

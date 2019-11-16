@@ -28,7 +28,7 @@ class DatabaseIndexTest extends TestBase
             ]);
         }
 
-        $foo = 1;
+        $query = Query($db);
     }
 }
 
