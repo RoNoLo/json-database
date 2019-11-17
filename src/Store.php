@@ -14,10 +14,9 @@ use RoNoLo\JsonQuery\JsonQuery;
 /**
  * Store
  *
- * Analageous to a table in a traditional RDBMS, a repository is a siloed
- * collection where documents live.
+ * Analageous to a table in a traditional RDBMS, a store is a collection where documents live.
  */
-class Store implements StoreInterface
+class Store implements StoreInterface, DocumentsGeneratorInterface, DocumentReaderInterface
 {
     /** @var Filesystem */
     protected $flysystem;
@@ -91,7 +90,7 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function read(string $id, $assoc = false)
+    public function read(string $id, $assoc = false, string $storeName = null)
     {
         $path = $this->getPathForDocument($id);
 
@@ -159,11 +158,10 @@ class Store implements StoreInterface
     }
 
     /** @inheritDoc */
-    public function find(Query $query, $assoc = false): Result
+    public function generateAllDocuments(string $storeName = null): \Generator
     {
         $contents = $this->flysystem->listContents('', true);
 
-        $ids = [];
         foreach ($contents as $content) {
             if ($content['type'] != 'file') {
                 continue;
@@ -172,53 +170,8 @@ class Store implements StoreInterface
                 continue;
             }
 
-            $json = $this->flysystem->read($content['path']);
-
-            // Done here to reuse it for sorting
-            $jsonQuery = JsonQuery::fromJson($json);
-
-            if ($query->match($jsonQuery)) {
-                if (!$query->sort()) {
-                    $ids[$content['filename']] = 1;
-                } else {
-                    $sortField = key($query->sort());
-                    $sortValue = $jsonQuery->get($sortField);
-
-                    if (is_array($sortValue)) {
-                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
-                    }
-
-                    $ids[$content['filename']] = $sortValue;
-                }
-            }
+            yield $this->flysystem->read($content['path']);
         }
-
-        // Check for sorting
-        if ($query->sort()) {
-            $sortDirection = strtolower(current($query->sort()));
-
-            $sortDirection == "asc" ? asort($ids) : arsort($ids);
-        }
-
-        $ids = array_keys($ids);
-
-        $total = count($ids);
-
-        // Check for 'skip'
-        if ($query->skip() > 0) {
-            if ($query->skip() > $total) {
-                return new Result($this);
-            } else {
-                $ids = array_slice($ids, $query->skip());
-            }
-        }
-
-        // Check for 'limit'
-        if ($query->limit() < count($ids)) {
-            $ids = array_slice($ids, 0, $query->limit());
-        }
-
-        return new Result($this, $query, $ids, $total, $assoc);
     }
 
     /**

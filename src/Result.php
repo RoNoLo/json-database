@@ -12,7 +12,7 @@ use RoNoLo\JsonDatabase\Exception\ResultSetException;
  */
 class Result implements \IteratorAggregate, \ArrayAccess
 {
-    protected $store;
+    protected $documentReader;
 
     protected $ids;
 
@@ -26,15 +26,15 @@ class Result implements \IteratorAggregate, \ArrayAccess
     /**
      * Constructor
      *
-     * @param StoreInterface $store
+     * @param DocumentReaderInterface $documentReader
+     * @param Query $query
      * @param array $ids
      * @param int $total
-     * @param Query $query
      * @param bool $assoc
      */
-    public function __construct(StoreInterface $store, Query $query, array $ids = [], int $total = 0,  bool $assoc = false)
+    public function __construct(DocumentReaderInterface $documentReader, Query $query, array $ids = [], int $total = 0,  bool $assoc = false)
     {
-        $this->store = $store;
+        $this->documentReader = $documentReader;
         $this->ids = $ids;
         $this->total = $total;
         $this->query = $query;
@@ -75,7 +75,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
         }
 
         $id = [$id];
-        return (new StoreDocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+        return (new StoreDocumentIterator($this->documentReader, $id, $this->query->fields(), $this->assoc))->current();
     }
 
     /**
@@ -89,7 +89,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
     /** @return StoreDocumentIterator */
     public function getIterator()
     {
-        return new StoreDocumentIterator($this->store, $this->ids, $this->query->fields(), $this->assoc);
+        return new StoreDocumentIterator($this->documentReader, $this->ids, $this->query->fields(), $this->assoc);
     }
 
     public function offsetExists($offset)
@@ -100,7 +100,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
     public function offsetGet($offset)
     {
         $id = [$this->ids[$offset]];
-        return (new StoreDocumentIterator($this->store, $id, $this->query->fields(), $this->assoc))->current();
+        return (new StoreDocumentIterator($this->documentReader, $id, $this->query->fields(), $this->assoc))->current();
     }
 
     public function offsetSet($offset, $value)

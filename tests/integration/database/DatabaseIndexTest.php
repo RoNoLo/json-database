@@ -28,7 +28,15 @@ class DatabaseIndexTest extends TestBase
             ]);
         }
 
-        $query = Query($db);
+        $query = new Query($db);
+
+        $result = $query->from('person')
+            ->find([
+                "age" => 30
+            ])
+            ->execute();
+
+        $this->assertEquals(16, $result->count());
     }
 }
 

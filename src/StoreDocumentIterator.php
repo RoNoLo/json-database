@@ -6,8 +6,8 @@ use RoNoLo\JsonQuery\JsonQuery;
 
 class StoreDocumentIterator implements \Iterator
 {
-    /** @var StoreInterface */
-    private $store;
+    /** @var DocumentReaderInterface */
+    private $documentReader;
 
     /** @var array */
     private $ids;
@@ -24,14 +24,14 @@ class StoreDocumentIterator implements \Iterator
     /**
      * DocumentIterator constructor.
      *
-     * @param StoreInterface $store
+     * @param DocumentReaderInterface $documentReader
      * @param array $ids
      * @param array $fields
      * @param bool $assoc
      */
-    public function __construct(StoreInterface $store, array &$ids, array $fields = [], $assoc = false)
+    public function __construct(DocumentReaderInterface $documentReader, array &$ids, array $fields = [], $assoc = false)
     {
-        $this->store = $store;
+        $this->documentReader = $documentReader;
         $this->ids = $ids;
         $this->fields = $fields;
         $this->assoc = $assoc;
@@ -42,7 +42,7 @@ class StoreDocumentIterator implements \Iterator
      */
     public function current()
     {
-        $document = $this->store->read($this->ids[$this->idx]);
+        $document = $this->documentReader->read($this->ids[$this->idx], false, );
 
         if (!count($this->fields)) {
             return $this->assoc ? json_decode(json_encode($document), true) : $document;

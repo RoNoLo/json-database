@@ -7,7 +7,7 @@ use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
 use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
 use RoNoLo\JsonQuery\JsonQuery;
 
-class Database implements DatabaseInterface
+class Database implements DatabaseInterface, DocumentsGeneratorInterface, DocumentReaderInterface
 {
     /** @var StoreInterface[] */
     private $stores;
@@ -98,38 +98,11 @@ class Database implements DatabaseInterface
         $store = $this->getStore($storeName);
 
         // Returned as pure JSON
-        $document = $store->read($id, null);
+        $documentJson = $store->read($id, null);
 
-        // Now we look for referenced documents
-        $breaker = 10;
-        while ($breaker--) {
-            $nothing = true;
-            foreach ($this->stores as $name => $refStore) {
-                if (preg_match_all('/"\$' . $name . ':([0-9a-zA-Z]+)"/', $document, $matches)) {
-                    foreach ($matches[0] as $match => $placeholder) {
-                        try {
-                            $refDocument = $refStore->read($matches[1][$match], null);
-                        } catch (DocumentNotFoundException $e) {
-                            // We will add an error document instead of an exception
-                            $refDocument = json_encode([
-                                '__id' => $matches[1][$match],
-                                '__error' => $e->getMessage()
-                            ]);
-                        }
+        $documentJson = $this->attachObjectReferences($documentJson);
 
-                        $document = str_replace($placeholder, $refDocument, $document);
-                    }
-
-                    $nothing = false;
-                }
-            }
-
-            if ($nothing) {
-                break;
-            }
-        }
-
-        return json_decode($document, !!$assoc);
+        return json_decode($documentJson, !!$assoc);
     }
 
     /** @inheritDoc */
@@ -199,6 +172,16 @@ class Database implements DatabaseInterface
         }
     }
 
+    /** @inheritDoc */
+    public function generateAllDocuments(string $storeName = null): \Generator
+    {
+        $store = $this->getStore($storeName);
+
+        foreach ($store->generateAllDocuments() as $documentJson) {
+            yield $this->attachObjectReferences($documentJson);;
+        }
+    }
+
     private function getStore($name): StoreInterface
     {
         if (!isset($this->stores[$name])) {
@@ -206,5 +189,39 @@ class Database implements DatabaseInterface
         }
 
         return $this->stores[$name];
+    }
+
+    private function attachObjectReferences(string $documentJson)
+    {
+        // Now we look for referenced documents
+        $breaker = 10;
+        while ($breaker--) {
+            $nothing = true;
+            foreach ($this->stores as $name => $refStore) {
+                if (preg_match_all('/"\$' . $name . ':([0-9a-zA-Z]+)"/', $documentJson, $matches)) {
+                    foreach ($matches[0] as $match => $placeholder) {
+                        try {
+                            $refDocument = $refStore->read($matches[1][$match], null);
+                        } catch (DocumentNotFoundException $e) {
+                            // We will add an error document instead of an exception
+                            $refDocument = json_encode([
+                                '__id' => $matches[1][$match],
+                                '__error' => $e->getMessage()
+                            ]);
+                        }
+
+                        $documentJson = str_replace($placeholder, $refDocument, $documentJson);
+                    }
+
+                    $nothing = false;
+                }
+            }
+
+            if ($nothing) {
+                break;
+            }
+        }
+
+        return $documentJson;
     }
 }

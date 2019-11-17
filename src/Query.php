@@ -2,6 +2,7 @@
 
 namespace RoNoLo\JsonDatabase;
 
+use RoNoLo\JsonDatabase\Exception\QueryExecutionException;
 use RoNoLo\JsonQuery\JsonQuery;
 
 /**
@@ -12,8 +13,8 @@ use RoNoLo\JsonQuery\JsonQuery;
  */
 class Query
 {
-    /** @var StoreInterface */
-    protected $store = null;
+    /** @var DocumentsGeneratorInterface */
+    protected $documentStorage = null;
 
     /** @var \Closure */
     protected $conditions = [];
@@ -27,12 +28,22 @@ class Query
     /** @var int */
     protected $limit = PHP_INT_MAX;
 
+    /** @var string|null */
+    protected $fromStore = null;
+
     /** @var null */
     protected $sort = null;
 
-    public function __construct(StoreInterface $store)
+    public function __construct(DocumentsGeneratorInterface $documentStorage)
     {
-        $this->store = $store;
+        $this->documentStorage = $documentStorage;
+    }
+
+    public function from(string $name)
+    {
+        $this->fromStore = $name;
+
+        return $this;
     }
 
     public function find(array $input)
@@ -59,12 +70,8 @@ class Query
      *
      * @return $this|array
      */
-    public function fields(?array $fields = null)
+    public function fields(array $fields)
     {
-        if (is_null($fields)) {
-            return $this->fields;
-        }
-
         $this->fields = $fields;
 
         return $this;
@@ -73,47 +80,83 @@ class Query
     /**
      * Sets the field to sort by and direction.
      *
-     * @param string|null $field
+     * @param string $field
      * @param string $direction
      *
-     * @return $this|array
+     * @return $this
      */
-    public function sort(?string $field = null, $direction = "asc")
+    public function sort(string $field = null, $direction = "asc")
     {
-        if (is_null($field)) {
-            return $this->sort;
-        }
-
         $this->sort = [$field => $direction];
 
         return $this;
     }
 
-    public function limit(?int $limit = null)
+    public function limit(int $limit)
     {
-        if (is_null($limit)) {
-            return $this->limit;
-        }
-
         $this->limit = $limit;
 
         return $this;
     }
 
-    public function skip(?int $skip = null)
+    public function skip(int $skip)
     {
-        if (is_null($skip)) {
-            return $this->skip;
-        }
-
         $this->skip = $skip;
 
         return $this;
     }
 
-    public function execute()
+    public function execute($assoc = false)
     {
-        return $this->store->find($this);
+        $ids = [];
+        foreach ($this->documentStorage->generateAllDocuments($this->fromStore) as $documentJson) {
+            $document = json_decode($documentJson);
+
+            // Done here to reuse it for sorting
+            $jsonQuery = JsonQuery::fromData($document);
+
+            if ($this->match($jsonQuery)) {
+                if (!$this->sort()) {
+                    $ids[$document->__id] = 1;
+                } else {
+                    $sortField = key($this->sort());
+                    $sortValue = $jsonQuery->get($sortField);
+
+                    if (is_array($sortValue)) {
+                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+                    }
+
+                    $ids[$document->__id] = $sortValue;
+                }
+            }
+        }
+
+        // Check for sorting
+        if ($this->sort) {
+            $sortDirection = strtolower(current($this->sort));
+
+            $sortDirection == "asc" ? asort($ids) : arsort($ids);
+        }
+
+        $ids = array_keys($ids);
+
+        $total = count($ids);
+
+        // Check for 'skip'
+        if ($this->skip > 0) {
+            if ($this->skip > $total) {
+                return new Result($this);
+            } else {
+                $ids = array_slice($ids, $this->skip);
+            }
+        }
+
+        // Check for 'limit'
+        if ($this->limit < count($ids)) {
+            $ids = array_slice($ids, 0, $this->limit);
+        }
+
+        return new Result($this->documentStorage, $this, $ids, $total, $assoc);
     }
 
     public function match(JsonQuery $jsonQuery)

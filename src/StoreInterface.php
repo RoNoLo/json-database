@@ -37,17 +37,6 @@ interface StoreInterface
     public function put($document): string;
 
     /**
-     * Reads a document from the store.
-     *
-     * @param string $id
-     * @param bool $assoc Will be used for json_decode's 2nd argument. If null is given a JSON string will be returned.
-     *
-     * @return \stdClass|array
-     * @throws DocumentNotFoundException
-     */
-    public function read(string $id, $assoc = false);
-
-    /**
      * Reads documents from the store.
      *
      * @param array $ids
@@ -80,10 +69,4 @@ interface StoreInterface
      * @return void
      */
     public function truncate();
-
-    /**
-     * @param Query $query
-     * @return Result
-     */
-    public function find(Query $query): Result;
 }
