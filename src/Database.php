@@ -13,27 +13,65 @@ class Database
     /** @var Store[] */
     private $stores;
 
+    /** @var array */
     private $index;
 
     /** @var Store */
     private $indexStore;
 
-    public function addStore($name, Store $store)
+    /** @var array */
+    private $options = [];
+
+    public function __construct($options = [])
     {
-        $this->stores[$name] = $store;
+        $this->options = [
+            'remove_referenced_id' => true,
+        ] + $options;
     }
 
+    /**
+     * Adds a store to the database.
+     *
+     * @param string $storeName
+     * @param Store $store
+     */
+    public function addStore(string $storeName, Store $store)
+    {
+        $this->stores[$storeName] = $store;
+    }
+
+    /**
+     * Sets the store which shall be used for the index.
+     *
+     * @param Store $store
+     */
     public function setIndexStore(Store $store)
     {
         $this->indexStore = $store;
     }
 
-    public function addIndex($storeName, $name, $fields)
+    /**
+     * Adds an index to the database.
+     *
+     * @param string $storeName
+     * @param string $indexName
+     * @param array $fields
+     */
+    public function addIndex(string $storeName, string $indexName, array $fields)
     {
-        $this->index[$storeName][$name] = $fields;
+        $this->index[$storeName][$indexName] = $fields;
     }
 
-    /** @inheritDoc */
+    /**
+     * Stores many documents to the store.
+     *
+     * @param string $storeName
+     * @param array $documents
+     *
+     * @return array Of IDs
+     * @throws DocumentNotStoredException
+     * @throws DatabaseRuntimeException
+     */
     public function putMany(string $storeName, array $documents): array
     {
         // This will force an array as root
@@ -55,7 +93,18 @@ class Database
         return $ids;
     }
 
-    /** @inheritDoc */
+    /**
+     * Stores a document or data structure to the store.
+     *
+     * It has to be a single document i.e. a \stdClass after converting it via json_encode().
+     *
+     * @param string $storeName
+     * @param \stdClass|array $document
+     *
+     * @return string
+     * @throws DatabaseRuntimeException
+     * @throws DocumentNotStoredException
+     */
     public function put(string $storeName, $document): string
     {
         $store = $this->getStore($storeName);
@@ -93,7 +142,17 @@ class Database
         return $id;
     }
 
-    /** @inheritDoc */
+    /**
+     * Reads a document from the store.
+     *
+     * @param string $storeName
+     * @param string $id
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     *
+     * @return \stdClass|array
+     * @throws DatabaseRuntimeException
+     * @throws DocumentNotFoundException
+     */
     public function read(string $storeName, string $id, $assoc = false)
     {
         $store = $this->getStore($storeName);
@@ -106,7 +165,17 @@ class Database
         return json_decode($documentJson, !!$assoc);
     }
 
-    /** @inheritDoc */
+    /**
+     * Reads documents from the store.
+     *
+     * @param string $storeName
+     * @param array $ids
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     * @param bool $check If false, no documents exists check will be executed in advance, just the Iterator will be created.
+     *
+     * @return DocumentIterator
+     * @throws DatabaseRuntimeException
+     */
     public function readMany(string $storeName, array $ids, $assoc = false, $check = true)
     {
         if (!$check) {
@@ -125,7 +194,17 @@ class Database
         return new DocumentIterator($this, $storeName, $exists, [], $assoc);
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes a document from the store.
+     *
+     * @param string $storeName
+     * @param string $id
+     *
+     * @return void
+     * @throws DatabaseRuntimeException
+     * @throws DocumentNotFoundException
+     * @throws DocumentNotStoredException
+     */
     public function remove(string $storeName, string $id)
     {
         $store = $this->getStore($storeName);
@@ -149,7 +228,17 @@ class Database
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes many documents from the store.
+     *
+     * @param string $storeName
+     * @param array $ids
+     *
+     * @return void
+     * @throws DatabaseRuntimeException
+     * @throws DocumentNotFoundException
+     * @throws DocumentNotStoredException
+     */
     public function removeMany(string $storeName, array $ids)
     {
         foreach ($ids as $id) {
@@ -157,7 +246,14 @@ class Database
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes all documents from the store.
+     *
+     * @param string $storeName
+     *
+     * @return mixed
+     * @throws DatabaseRuntimeException
+     */
     public function truncate(string $storeName)
     {
         $store = $this->getStore($storeName);
@@ -173,7 +269,14 @@ class Database
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Returns all documents for further processing.
+     *
+     * @param string|null $storeName
+     *
+     * @return \Generator
+     * @throws DatabaseRuntimeException
+     */
     public function generateAllDocuments(string $storeName = null): \Generator
     {
         $store = $this->getStore($storeName);
@@ -183,7 +286,15 @@ class Database
         }
     }
 
-    private function getStore($name): Store
+    /**
+     * Returns the store by name.
+     *
+     * @param string $name
+     *
+     * @return Store
+     * @throws DatabaseRuntimeException
+     */
+    private function getStore(string $name): Store
     {
         if (!isset($this->stores[$name])) {
             throw new DatabaseRuntimeException(sprintf("No store with name `%s` was previously added.", $name));
@@ -192,6 +303,13 @@ class Database
         return $this->stores[$name];
     }
 
+    /**
+     * Resolves all references to other store objects and adds them into the document.
+     *
+     * @param string $documentJson
+     *
+     * @return mixed|string
+     */
     private function attachObjectReferences(string $documentJson)
     {
         // Now we look for referenced documents
@@ -202,13 +320,20 @@ class Database
                 if (preg_match_all('/"\$' . $name . ':([0-9a-zA-Z]+)"/', $documentJson, $matches)) {
                     foreach ($matches[0] as $match => $placeholder) {
                         try {
-                            $refDocument = $refStore->read($matches[1][$match], null);
+                            $refDocument = $refStore->read($matches[1][$match], true);
+
+                            // Removing the object __id from referenced documents.
+                            if ($this->options['remove_referenced_id']) {
+                                unset($refDocument['__id']);
+                            }
+
+                            $refDocument = json_encode($refDocument, defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
                         } catch (DocumentNotFoundException $e) {
                             // We will add an error document instead of an exception
                             $refDocument = json_encode([
                                 '__id' => $matches[1][$match],
                                 '__error' => $e->getMessage()
-                            ]);
+                            ], defined('STORE_JSON_OPTIONS') ? intval(STORE_JSON_OPTIONS) : 0);
                         }
 
                         $documentJson = str_replace($placeholder, $refDocument, $documentJson);
