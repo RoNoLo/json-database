@@ -3,7 +3,7 @@
 namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\{AdapterInterface, FileNotFoundException, Filesystem};
-use RoNoLo\JsonStorage\Exception\{DocumentNotFoundException, DocumentNotStoredException};
+use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException, DocumentNotFoundException, DocumentNotStoredException};
 use RoNoLo\JsonStorage\Store\DocumentIterator;
 
 /**
@@ -26,7 +26,12 @@ class Store
         $this->flysystem = new Filesystem($adapter);
     }
 
-    /** @inheritDoc */
+    /**
+     * Tells if a document exists.
+     *
+     * @param string $id
+     * @return bool
+     */
     public function has(string $id): bool
     {
         $path = $this->getPathForDocument($id);
@@ -34,7 +39,14 @@ class Store
         return $this->flysystem->has($path);
     }
 
-    /** @inheritDoc */
+    /**
+     * Stores many documents to the store.
+     *
+     * @param array $documents
+     *
+     * @return array Of IDs
+     * @throws DocumentNotStoredException
+     */
     public function putMany(array $documents): array
     {
         // This will force an array as root
@@ -52,7 +64,16 @@ class Store
         return $ids;
     }
 
-    /** @inheritDoc */
+    /**
+     * Stores a document or data structure to the store.
+     *
+     * It has to be a single document i.e. a \stdClass after converting it via json_encode().
+     *
+     * @param \stdClass|array $document
+     *
+     * @return string
+     * @throws DocumentNotStoredException
+     */
     public function put($document): string
     {
         // This will force an stdClass object as root
@@ -84,7 +105,15 @@ class Store
         return $id;
     }
 
-    /** @inheritDoc */
+    /**
+     * Reads a document from the store.
+     *
+     * @param string $id
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     *
+     * @return bool|false|mixed|string
+     * @throws DocumentNotFoundException
+     */
     public function read(string $id, $assoc = false)
     {
         $path = $this->getPathForDocument($id);
@@ -105,7 +134,15 @@ class Store
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Reads documents from the store.
+     *
+     * @param array $ids
+     * @param bool $assoc Will be used for json_decode's 2nd argument.
+     * @param bool $check If false, no documents exists check will be executed in advance, just the Iterator will be created.
+     *
+     * @return DocumentIterator
+     */
     public function readMany(array $ids, $assoc = false, $check = true)
     {
         if (!$check) {
@@ -122,7 +159,13 @@ class Store
         return new DocumentIterator($this, $existIds, [], $assoc);
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes a document from the store.
+     *
+     * @param string $id
+     *
+     * @return bool
+     */
     public function remove(string $id)
     {
         try {
@@ -132,7 +175,13 @@ class Store
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes many documents from the store.
+     *
+     * @param array $ids
+     *
+     * @return void
+     */
     public function removeMany(array $ids)
     {
         foreach ($ids as $id) {
@@ -140,7 +189,11 @@ class Store
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * Removes all documents from the store.
+     *
+     * @return void
+     */
     public function truncate()
     {
         $contents = $this->flysystem->listContents('');
@@ -152,8 +205,13 @@ class Store
         }
     }
 
-    /** @inheritDoc */
-    public function generateAllDocuments(string $storeName = null): \Generator
+    /**
+     * Returns all documents for further processing.
+     *
+     * @return \Generator
+     * @throws FileNotFoundException
+     */
+    public function generateAllDocuments(): \Generator
     {
         $contents = $this->flysystem->listContents('', true);
 

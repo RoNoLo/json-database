@@ -2,9 +2,7 @@
 
 namespace RoNoLo\JsonStorage;
 
-use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
-use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
-use RoNoLo\JsonStorage\Exception\DocumentNotStoredException;
+use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException, DocumentNotFoundException, DocumentNotStoredException};
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
 
@@ -143,7 +141,7 @@ class Database
     }
 
     /**
-     * Reads a document from the store.
+     * Reads a document from a store.
      *
      * @param string $storeName
      * @param string $id
@@ -276,6 +274,7 @@ class Database
      *
      * @return \Generator
      * @throws DatabaseRuntimeException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function generateAllDocuments(string $storeName = null): \Generator
     {

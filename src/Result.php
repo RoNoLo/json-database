@@ -2,8 +2,7 @@
 
 namespace RoNoLo\JsonStorage;
 
-use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
-use RoNoLo\JsonStorage\Exception\ResultSetException;
+use RoNoLo\JsonStorage\Exception\{DocumentNotFoundException, ResultSetException};
 
 /**
  * Result
