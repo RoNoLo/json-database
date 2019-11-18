@@ -1,28 +1,29 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use RoNoLo\JsonDatabase\Exception\DatabaseRuntimeException;
-use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
-use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
+use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
+use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
+use RoNoLo\JsonStorage\Exception\DocumentNotStoredException;
 use RoNoLo\JsonQuery\JsonQuery;
+use RoNoLo\JsonStorage\Database\DocumentIterator;
 
-class Database implements DatabaseInterface, DocumentsGeneratorInterface, DocumentReaderInterface
+class Database
 {
-    /** @var StoreInterface[] */
+    /** @var Store[] */
     private $stores;
 
     private $index;
 
-    /** @var StoreInterface */
+    /** @var Store */
     private $indexStore;
 
-    public function addStore($name, StoreInterface $store)
+    public function addStore($name, Store $store)
     {
         $this->stores[$name] = $store;
     }
 
-    public function setIndexStore(StoreInterface $store)
+    public function setIndexStore(Store $store)
     {
         $this->indexStore = $store;
     }
@@ -109,7 +110,7 @@ class Database implements DatabaseInterface, DocumentsGeneratorInterface, Docume
     public function readMany(string $storeName, array $ids, $assoc = false, $check = true)
     {
         if (!$check) {
-            return new DatabaseDocumentIterator($this, $storeName, $ids, [], $assoc);
+            return new DocumentIterator($this, $storeName, $ids, [], $assoc);
         }
 
         $store = $this->getStore($storeName);
@@ -121,7 +122,7 @@ class Database implements DatabaseInterface, DocumentsGeneratorInterface, Docume
             }
         }
 
-        return new DatabaseDocumentIterator($this, $storeName, $exists, [], $assoc);
+        return new DocumentIterator($this, $storeName, $exists, [], $assoc);
     }
 
     /** @inheritDoc */
@@ -182,7 +183,7 @@ class Database implements DatabaseInterface, DocumentsGeneratorInterface, Docume
         }
     }
 
-    private function getStore($name): StoreInterface
+    private function getStore($name): Store
     {
         if (!isset($this->stores[$name])) {
             throw new DatabaseRuntimeException(sprintf("No store with name `%s` was previously added.", $name));

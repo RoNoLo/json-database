@@ -1,10 +1,8 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Memory\MemoryAdapter;
+use RoNoLo\JsonStorage\Store\Query;
 
 class QuerySimpleAllTest extends QueryTestBase
 {

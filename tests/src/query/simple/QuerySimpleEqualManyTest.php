@@ -1,10 +1,8 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Memory\MemoryAdapter;
+use RoNoLo\JsonStorage\Store\Query;
 
 class QuerySimpleEqualManyTest extends QueryTestBase
 {
@@ -40,10 +38,7 @@ class QuerySimpleEqualManyTest extends QueryTestBase
      */
     public function testRequestingDocumentsVerySimpleArrayEmptyResult()
     {
-        $store = new Store(new MemoryAdapter());
-        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
-
-        $query = new Query($store);
+        $query = new Query($this->store);
         $result = $query
             ->find([
                 "age" => 20,

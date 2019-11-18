@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +25,7 @@ abstract class TestBase extends TestCase
         parent::__construct($name, $data, $dataName);
     }
 
-    protected function fillStore(StoreInterface $store, $filePath)
+    protected function fillStore(Store $store, $filePath)
     {
         $data = json_decode(file_get_contents($filePath));
 
@@ -149,9 +149,9 @@ abstract class TestBase extends TestCase
         return $lastname[rand(0, count($lastname) - 1)];
     }
 
-    protected function randomAge()
+    protected function randomAge($from = 10, $to = 100)
     {
-        return rand(1, 110);
+        return rand($from, $to);
     }
 
     protected function randomStars()

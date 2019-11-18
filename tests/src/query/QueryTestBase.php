@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit\Framework\TestCase;

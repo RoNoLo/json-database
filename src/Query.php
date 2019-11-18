@@ -1,21 +1,18 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use RoNoLo\JsonDatabase\Exception\QueryExecutionException;
 use RoNoLo\JsonQuery\JsonQuery;
+use RoNoLo\JsonStorage\Query\QueryExecuter;
 
 /**
  * Query
  *
- * Builds an executes a query whichs searches and sorts documents from a
+ * Builds an executes a query which searches and sorts documents from a
  * repository.
  */
-class Query
+abstract class Query
 {
-    /** @var DocumentsGeneratorInterface */
-    protected $documentStorage = null;
-
     /** @var \Closure */
     protected $conditions = [];
 
@@ -28,20 +25,15 @@ class Query
     /** @var int */
     protected $limit = PHP_INT_MAX;
 
-    /** @var string|null */
-    protected $fromStore = null;
-
     /** @var null */
     protected $sort = null;
 
-    public function __construct(DocumentsGeneratorInterface $documentStorage)
-    {
-        $this->documentStorage = $documentStorage;
-    }
+    /** @var string|null */
+    protected $store = null;
 
-    public function from(string $name)
+    public function from(string $store)
     {
-        $this->fromStore = $name;
+        $this->store = $store;
 
         return $this;
     }
@@ -106,63 +98,12 @@ class Query
         return $this;
     }
 
-    public function execute($assoc = false)
-    {
-        $ids = [];
-        foreach ($this->documentStorage->generateAllDocuments($this->fromStore) as $documentJson) {
-            $document = json_decode($documentJson);
-
-            // Done here to reuse it for sorting
-            $jsonQuery = JsonQuery::fromData($document);
-
-            if ($this->match($jsonQuery)) {
-                if (!$this->sort()) {
-                    $ids[$document->__id] = 1;
-                } else {
-                    $sortField = key($this->sort());
-                    $sortValue = $jsonQuery->get($sortField);
-
-                    if (is_array($sortValue)) {
-                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
-                    }
-
-                    $ids[$document->__id] = $sortValue;
-                }
-            }
-        }
-
-        // Check for sorting
-        if ($this->sort) {
-            $sortDirection = strtolower(current($this->sort));
-
-            $sortDirection == "asc" ? asort($ids) : arsort($ids);
-        }
-
-        $ids = array_keys($ids);
-
-        $total = count($ids);
-
-        // Check for 'skip'
-        if ($this->skip > 0) {
-            if ($this->skip > $total) {
-                return new Result($this);
-            } else {
-                $ids = array_slice($ids, $this->skip);
-            }
-        }
-
-        // Check for 'limit'
-        if ($this->limit < count($ids)) {
-            $ids = array_slice($ids, 0, $this->limit);
-        }
-
-        return new Result($this->documentStorage, $this, $ids, $total, $assoc);
-    }
-
     public function match(JsonQuery $jsonQuery)
     {
         return ($this->conditions)($jsonQuery);
     }
+
+    abstract public function execute($assoc = false);
 
     /**
      * Parsing the given JSON like query into an execution tree
@@ -170,7 +111,7 @@ class Query
      *
      * @param array $conditions
      */
-    private function parseInput(array $conditions)
+    protected function parseInput(array $conditions)
     {
         $this->conditions = (new QueryExecuter())->parse($conditions);
     }

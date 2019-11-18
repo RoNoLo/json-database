@@ -1,5 +1,5 @@
 <?php
 
-namespace RoNoLo\JsonDatabase\Exception;
+namespace RoNoLo\JsonStorage\Exception;
 
 class QuerySyntaxException extends \Exception {}

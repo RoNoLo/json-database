@@ -1,22 +1,17 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\Filesystem;
-use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
-use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
-use RoNoLo\JsonDatabase\Exception\QueryExecutionException;
-use RoNoLo\JsonQuery\JsonQuery;
+use League\Flysystem\{AdapterInterface, FileNotFoundException, Filesystem};
+use RoNoLo\JsonStorage\Exception\{DocumentNotFoundException, DocumentNotStoredException};
+use RoNoLo\JsonStorage\Store\DocumentIterator;
 
 /**
  * Store
  *
  * Analageous to a table in a traditional RDBMS, a store is a collection where documents live.
  */
-class Store implements StoreInterface, DocumentsGeneratorInterface, DocumentReaderInterface
+class Store
 {
     /** @var Filesystem */
     protected $flysystem;
@@ -90,7 +85,7 @@ class Store implements StoreInterface, DocumentsGeneratorInterface, DocumentRead
     }
 
     /** @inheritDoc */
-    public function read(string $id, $assoc = false, string $storeName = null)
+    public function read(string $id, $assoc = false)
     {
         $path = $this->getPathForDocument($id);
 
@@ -114,17 +109,17 @@ class Store implements StoreInterface, DocumentsGeneratorInterface, DocumentRead
     public function readMany(array $ids, $assoc = false, $check = true)
     {
         if (!$check) {
-            return new StoreDocumentIterator($this, $ids, [], $assoc);
+            return new DocumentIterator($this, $ids, [], $assoc);
         }
 
-        $exists = [];
+        $existIds = [];
         foreach ($ids as $id) {
             if ($this->has($id)) {
-                $exists[] = $id;
+                $existIds[] = $id;
             }
         }
 
-        return new StoreDocumentIterator($this, $exists, [], $assoc);
+        return new DocumentIterator($this, $existIds, [], $assoc);
     }
 
     /** @inheritDoc */

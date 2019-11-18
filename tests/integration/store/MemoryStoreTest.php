@@ -1,8 +1,9 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Memory\MemoryAdapter;
+use RoNoLo\JsonStorage\Store\Query;
 
 class MemoryStoreTest extends TestBase
 {

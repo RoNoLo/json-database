@@ -1,5 +1,5 @@
 <?php
 
-namespace RoNoLo\JsonDatabase\Exception;
+namespace RoNoLo\JsonStorage\Exception;
 
 class JsonCollectionImportException extends \Exception {}

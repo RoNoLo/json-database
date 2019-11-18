@@ -1,10 +1,9 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Memory\MemoryAdapter;
+use RoNoLo\JsonStorage\Database\Query;
 
 class DatabaseIndexTest extends TestBase
 {
@@ -23,16 +22,17 @@ class DatabaseIndexTest extends TestBase
             $db->put('person', [
                 'firstname' => $this->randomFirstname(),
                 'lastname' => $this->randomLastname(),
-                'age' => $this->randomAge(),
+                'age' => $this->randomAge(10, 30),
                 'rating' => $this->randomStars()
             ]);
         }
 
         $query = new Query($db);
 
-        $result = $query->from('person')
+        $result = $query
+            ->from('person')
             ->find([
-                "age" => 30
+                "age" => 25
             ])
             ->execute();
 

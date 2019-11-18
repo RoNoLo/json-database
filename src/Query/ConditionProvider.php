@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage\Query;
 
 class ConditionProvider
 {

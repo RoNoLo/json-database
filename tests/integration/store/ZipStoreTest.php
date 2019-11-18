@@ -1,9 +1,9 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+use RoNoLo\JsonStorage\Store\Query;
 
 class ZipStoreTest extends TestBase
 {

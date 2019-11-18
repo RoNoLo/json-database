@@ -1,9 +1,10 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use RoNoLo\JsonStorage\Store\Query;
 
 class LocalStoreTest extends TestBase
 {

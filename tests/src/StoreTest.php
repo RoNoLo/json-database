@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Memory\MemoryAdapter;
 
@@ -92,7 +92,7 @@ class StoreTest extends TestBase
 
         $result = $store->readMany($ids, false, false);
 
-        $this->assertInstanceOf(StoreDocumentIterator::class, $result);
+        $this->assertInstanceOf(DocumentIterator::class, $result);
     }
 
     /**
@@ -125,7 +125,7 @@ class StoreTest extends TestBase
 
         $result = $store->readMany($ids, true);
 
-        $this->assertInstanceOf(StoreDocumentIterator::class, $result);
+        $this->assertInstanceOf(DocumentIterator::class, $result);
 
         foreach ($result as $id => $document) {
             $tmp = $document['slug'];

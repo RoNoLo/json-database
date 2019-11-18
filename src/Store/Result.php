@@ -1,39 +1,36 @@
 <?php
 
-namespace RoNoLo\JsonStorage;
+namespace RoNoLo\JsonStorage\Store;
 
 use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
 use RoNoLo\JsonStorage\Exception\ResultSetException;
+use RoNoLo\JsonStorage\Result as AbstractResult;
+use RoNoLo\JsonStorage\Store;
 
 /**
  * Result
  *
  * A collection of Documents returned from a Query.
  */
-abstract class Result implements \IteratorAggregate, \ArrayAccess
+class Result extends AbstractResult
 {
-    protected $ids;
-
-    protected $total;
-
-    protected $assoc = false;
-
-    protected $fields = [];
+    /** @var Store */
+    protected $store;
 
     /**
      * Constructor
      *
+     * @param Store $store
      * @param array $ids
      * @param array $fields
      * @param int $total
      * @param bool $assoc
      */
-    public function __construct(array $ids = [], array $fields = [], int $total = 0,  bool $assoc = false)
+    public function __construct(Store $store, array $ids = [], array $fields = [], int $total = 0,  bool $assoc = false)
     {
-        $this->ids = $ids;
-        $this->total = $total;
-        $this->assoc = $assoc;
-        $this->fields = $fields;
+        $this->store = $store;
+
+        parent::__construct($ids, $fields, $total, $assoc);
     }
 
     /**
@@ -63,12 +60,15 @@ abstract class Result implements \IteratorAggregate, \ArrayAccess
      * @return array|\stdClass
      * @throws DocumentNotFoundException
      */
-    abstract public function document($id);
+    public function document($id)
+    {
+        if (!in_array($id, $this->ids)) {
+            throw new DocumentNotFoundException("No documentwith ID " . $id . " was found in result set.");
+        }
 
-    /** @return DocumentIterator */
-    abstract public function getIterator();
-
-    abstract public function offsetGet($offset);
+        $id = [$id];
+        return (new DocumentIterator($this->store, $id, $this->fields, $this->assoc))->current();
+    }
 
     /**
      * @return array
@@ -78,9 +78,21 @@ abstract class Result implements \IteratorAggregate, \ArrayAccess
         return $this->ids;
     }
 
+    /** @return DocumentIterator */
+    public function getIterator()
+    {
+        return new DocumentIterator($this->store, $this->ids, $this->fields, $this->assoc);
+    }
+
     public function offsetExists($offset)
     {
         return isset($this->ids[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        $id = [$this->ids[$offset]];
+        return (new DocumentIterator($this->store, $id, $this->fields, $this->assoc))->current();
     }
 
     public function offsetSet($offset, $value)

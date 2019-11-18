@@ -1,14 +1,14 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage;
 
 use Exception;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
-use RoNoLo\JsonDatabase\Exception\DocumentNotFoundException;
-use RoNoLo\JsonDatabase\Exception\DocumentNotStoredException;
+use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
+use RoNoLo\JsonStorage\Exception\DocumentNotStoredException;
 
 class StoreExceptionsTest extends TestBase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace RoNoLo\JsonDatabase;
+namespace RoNoLo\JsonStorage\Query;
 
-use RoNoLo\JsonDatabase\Exception\QuerySyntaxException;
+use RoNoLo\JsonStorage\Exception\QuerySyntaxException;
 use RoNoLo\JsonQuery\JsonQuery;
 
 class QueryExecuter
