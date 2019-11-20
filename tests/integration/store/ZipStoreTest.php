@@ -5,7 +5,7 @@ namespace RoNoLo\JsonStorage;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 use RoNoLo\JsonStorage\Store\Query;
 
-class ZipStoreTest extends TestBase
+class ZipStoreTest extends StoreTestBase
 {
     private $datastoreAdapter;
 
@@ -20,7 +20,7 @@ class ZipStoreTest extends TestBase
     {
         $store = new Store($this->datastoreAdapter);
 
-        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
 
         // Find stuff
         $query = new Query($store);

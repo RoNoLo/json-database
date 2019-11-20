@@ -3,13 +3,14 @@
 namespace RoNoLo\JsonStorage;
 
 use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException, DocumentNotFoundException, DocumentNotStoredException};
+use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
 
 class Database
 {
     /** @var Store[] */
-    private $stores;
+    private $stores = [];
 
     /** @var array */
     private $index;
@@ -61,16 +62,72 @@ class Database
     }
 
     /**
+     * Returns all added indexes.
+     *
+     * @return array
+     */
+    public function getIndexes()
+    {
+        return $this->index;
+    }
+
+    /**
+     * Rebuilds all available indices for all stored data.
+     *
+     * @throws DatabaseRuntimeException
+     * @throws DocumentNotStoredException
+     * @throws FileNotFoundException
+     */
+    public function rebuildIndexes()
+    {
+        $this->indexStore->truncate();
+
+        foreach ($this->index as $storeName => $index) {
+            foreach ($index as $keyName => $fields) {
+                $indexName = $storeName . '_' . $keyName;
+
+                try {
+                    $indexDocument = $this->indexStore->read($indexName, true);
+                } catch (DocumentNotFoundException $e) {
+                    // When Index is first created.
+                    $indexDocument = [
+                        '__id' => $indexName
+                    ];
+                }
+
+                foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
+                    $documentJson = $this->attachObjectReferences($documentJson);
+
+                    $document = json_decode($documentJson);
+
+                    // Okay we have an index. We have to extract the value
+                    $jsonQuery = JsonQuery::fromData($document);
+
+                    $index = [];
+                    foreach ($fields as $field) {
+                        $index[$field] = $jsonQuery->get($field);
+                    }
+
+                    $indexDocument[$document->__id] = $index;
+                }
+
+                $this->indexStore->put($indexDocument);
+            }
+        }
+    }
+
+    /**
      * Stores many documents to the store.
      *
      * @param string $storeName
      * @param array $documents
+     * @param bool $refCode
      *
      * @return array Of IDs
-     * @throws DocumentNotStoredException
      * @throws DatabaseRuntimeException
+     * @throws DocumentNotStoredException
      */
-    public function putMany(string $storeName, array $documents): array
+    public function putMany(string $storeName, array $documents, $refCode = false): array
     {
         // This will force an array as root
         $documents = json_decode(json_encode($documents));
@@ -85,7 +142,7 @@ class Database
 
         $ids = [];
         foreach ($documents as $document) {
-            $ids[] = $this->put($storeName, $document);
+            $ids[] = $this->put($storeName, $document, $refCode);
         }
 
         return $ids;
@@ -98,46 +155,21 @@ class Database
      *
      * @param string $storeName
      * @param \stdClass|array $document
+     * @param bool $refCode If true a reference string to use in another JSON is returned.
      *
      * @return string
      * @throws DatabaseRuntimeException
      * @throws DocumentNotStoredException
      */
-    public function put(string $storeName, $document): string
+    public function put(string $storeName, $document, $refCode = false): string
     {
         $store = $this->getStore($storeName);
 
         $id = $store->put($document);
 
-        if (!isset($this->index[$storeName])) {
-            return $id;
-        }
+        $this->addToIndexes($storeName, $document, $id);
 
-        // Okay we have an index. We have to extract the value
-        $jsonQuery = JsonQuery::fromData($document);
-
-        foreach ($this->index[$storeName] as $name => $fields) {
-            $index = [];
-            foreach ($fields as $field) {
-                $index[$field] = $jsonQuery->get($field);
-            }
-
-            $indexName = $storeName . '_' . $name;
-
-            try {
-                $indexDocument = $this->indexStore->read($indexName, true);
-            } catch (DocumentNotFoundException $e) {
-                // When Index is first created.
-                $indexDocument = [
-                    '__id' => $indexName
-                ];
-            }
-            $indexDocument[$id] = $index;
-
-            $this->indexStore->put($indexDocument);
-        }
-
-        return $id;
+        return $refCode ? '$' . $storeName . ':' . $id : $id;
     }
 
     /**
@@ -268,21 +300,44 @@ class Database
     }
 
     /**
+     * Truncates every store and index.
+     *
+     * @throws DatabaseRuntimeException
+     */
+    public function truncateEverything()
+    {
+        foreach ($this->stores as $storeName => $store) {
+            $this->truncate($storeName);
+        }
+    }
+
+    /**
      * Returns all documents for further processing.
      *
      * @param string|null $storeName
      *
      * @return \Generator
      * @throws DatabaseRuntimeException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    public function generateAllDocuments(string $storeName = null): \Generator
+    public function documentsGenerator(string $storeName = null): \Generator
     {
         $store = $this->getStore($storeName);
 
-        foreach ($store->generateAllDocuments() as $documentJson) {
+        foreach ($store->documentsGenerator() as $documentJson) {
             yield $this->attachObjectReferences($documentJson);;
         }
+    }
+
+    public function getIndex($storeName, $indexName)
+    {
+        $indexKey = $storeName . '_' . $indexName;
+
+        if (!$this->indexStore->has($indexKey)) {
+            throw new QueryExecutionException(sprintf("Index for store `%s` with name `%s` not found.", $storeName, $indexName));
+        }
+
+        return $this->indexStore->read($storeName . '_' . $indexName, true);
     }
 
     /**
@@ -348,5 +403,37 @@ class Database
         }
 
         return $documentJson;
+    }
+
+    private function addToIndexes(string $storeName, $document, string $id)
+    {
+        // Do we have an index definition?
+        if (!isset($this->index[$storeName])) {
+            return;
+        }
+
+        // Okay we have an index. We have to extract the value
+        $jsonQuery = JsonQuery::fromData($document);
+
+        foreach ($this->index[$storeName] as $name => $fields) {
+            $index = [];
+            foreach ($fields as $field) {
+                $index[$field] = $jsonQuery->get($field);
+            }
+
+            $indexName = $storeName . '_' . $name;
+
+            try {
+                $indexDocument = $this->indexStore->read($indexName, true);
+            } catch (DocumentNotFoundException $e) {
+                // When Index is first created.
+                $indexDocument = [
+                    '__id' => $indexName
+                ];
+            }
+            $indexDocument[$id] = $index;
+
+            $this->indexStore->put($indexDocument);
+        }
     }
 }

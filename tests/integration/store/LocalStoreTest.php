@@ -6,7 +6,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use RoNoLo\JsonStorage\Store\Query;
 
-class LocalStoreTest extends TestBase
+class LocalStoreTest extends StoreTestBase
 {
     /** @var Filesystem */
     private $flysystem;
@@ -28,7 +28,7 @@ class LocalStoreTest extends TestBase
     public function testAddingWritingFindingWithLocalAdapter()
     {
         $store = new Store($this->datastoreAdapter);
-        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
 
         // Find stuff
         $query = new Query($store);

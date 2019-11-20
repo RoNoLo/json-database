@@ -205,13 +205,32 @@ class Store
         }
     }
 
+    public function count(): int
+    {
+        $contents = $this->flysystem->listContents('', true);
+
+        $count = 0;
+        foreach ($contents as $content) {
+            if ($content['type'] != 'file') {
+                continue;
+            }
+            if ($content['extension'] != 'json') {
+                continue;
+            }
+
+            $count++;
+        }
+
+        return $count;
+    }
+
     /**
      * Returns all documents for further processing.
      *
      * @return \Generator
      * @throws FileNotFoundException
      */
-    public function generateAllDocuments(): \Generator
+    public function documentsGenerator(): \Generator
     {
         $contents = $this->flysystem->listContents('', true);
 

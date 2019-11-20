@@ -4,7 +4,7 @@ namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Adapter\Local;
 
-class DatabaseReferenceObjectsTest extends TestBase
+class DatabaseReferenceObjectsTest extends DatabaseTestBase
 {
     public function testAddingPersonsWithHobbyReferencesAndReadingTheFullPersonObject()
     {

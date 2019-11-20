@@ -26,7 +26,7 @@ class Query extends AbstractQuery
     public function execute($assoc = false)
     {
         $ids = [];
-        foreach ($this->store->generateAllDocuments() as $documentJson) {
+        foreach ($this->store->documentsGenerator() as $documentJson) {
             $document = json_decode($documentJson);
 
             // Done here to reuse it for sorting

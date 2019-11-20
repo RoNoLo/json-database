@@ -18,7 +18,8 @@
     "require-dev": {
         "phpunit/phpunit": "^8.4",
         "league/flysystem-ziparchive": "^1.0",
-        "league/flysystem-memory": "^1.0"
+        "league/flysystem-memory": "^1.0",
+        "symfony/filesystem": "^4.3"
     },
     "suggest": {
         "league/flysystem-ziparchive": "Allows to have a single ZIP file as database",

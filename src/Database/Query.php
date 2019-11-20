@@ -18,36 +18,75 @@ class Query extends AbstractQuery
     /** @var Database */
     protected $database;
 
+    protected $useIndex = [];
+
     public function __construct(Database $database)
     {
         $this->database = $database;
     }
 
+    public function useIndex(string $indexName)
+    {
+        $this->useIndex[$this->store] = $indexName;
+
+        return $this;
+    }
+
     public function execute($assoc = false)
     {
-        $ids = [];
-        foreach ($this->database->generateAllDocuments($this->store) as $documentJson) {
-            $document = json_decode($documentJson);
+        // Check if we can use an index by just executing the query on an index element.
+        if (isset($this->useIndex[$this->store])) {
+            $indexDocuments = $this->database->getIndex($this->store, $this->useIndex[$this->store]);
+            unset($indexDocuments['__id']);
 
-            // Done here to reuse it for sorting
-            $jsonQuery = JsonQuery::fromData($document);
+            foreach ($indexDocuments as $id => $indexDocument) {
+                $jsonQuery = JsonQuery::fromData($indexDocument);
 
-            if ($this->match($jsonQuery)) {
-                if (!$this->sort) {
-                    $ids[$document->__id] = 1;
-                } else {
-                    $sortField = key($this->sort);
-                    $sortValue = $jsonQuery->get($sortField);
+                if ($this->match($jsonQuery)) {
+                    if (!$this->sort) {
+                        $ids[$id] = 1;
+                    } else {
+                        $sortField = key($this->sort);
+                        $sortValue = $jsonQuery->get($sortField);
 
-                    if (is_array($sortValue)) {
-                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+                        if (is_array($sortValue)) {
+                            throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+                        }
+
+                        $ids[$id] = $sortValue;
                     }
+                }
+            }
+        } else {
+            // No usable index found, we request all documents to perform the query.
+            $ids = [];
+            foreach ($this->database->documentsGenerator($this->store) as $documentJson) {
+                $document = json_decode($documentJson);
 
-                    $ids[$document->__id] = $sortValue;
+                $jsonQuery = JsonQuery::fromData($document);
+
+                if ($this->match($jsonQuery)) {
+                    if (!$this->sort) {
+                        $ids[$document->__id] = 1;
+                    } else {
+                        $sortField = key($this->sort);
+                        $sortValue = $jsonQuery->get($sortField);
+
+                        if (is_array($sortValue)) {
+                            throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+                        }
+
+                        $ids[$document->__id] = $sortValue;
+                    }
                 }
             }
         }
 
+        return $this->postprocess($ids, $assoc);
+    }
+
+    private function postprocess(array $ids, bool $assoc = false)
+    {
         // Check for sorting
         if ($this->sort) {
             $sortDirection = strtolower(current($this->sort));

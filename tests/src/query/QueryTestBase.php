@@ -5,7 +5,7 @@ namespace RoNoLo\JsonStorage;
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit\Framework\TestCase;
 
-abstract class QueryTestBase extends TestBase
+abstract class QueryTestBase extends StoreTestBase
 {
     protected $store;
 

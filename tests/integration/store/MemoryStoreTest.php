@@ -5,13 +5,13 @@ namespace RoNoLo\JsonStorage;
 use League\Flysystem\Memory\MemoryAdapter;
 use RoNoLo\JsonStorage\Store\Query;
 
-class MemoryStoreTest extends TestBase
+class MemoryStoreTest extends StoreTestBase
 {
     public function testAddingWritingFindingWithMemoryStore()
     {
         $store = new Store(new MemoryAdapter());
 
-        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
 
         // Find stuff
         $query = new Query($store);
