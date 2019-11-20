@@ -17,7 +17,7 @@ class ConditionProviderNullTest extends TestBase
     {
         $conditionExecutor = new ConditionProvider();
 
-        $condition = $conditionExecutor->isNull($value);
+        $condition = $conditionExecutor->isNotNull($value);
 
         $result = $condition();
 
@@ -28,51 +28,51 @@ class ConditionProviderNullTest extends TestBase
     {
         return [
             [
-                false,
+                true,
                 10,
             ],
             [
-                true,
+                false,
                 null,
             ],
             [
-                false,
+                true,
                 "heinz",
             ],
             [
-                false,
+                true,
                 "heinz",
             ],
             [
-                false,
+                true,
                 "Heinz",
             ],
             [
-                false,
+                true,
                 [],
             ],
             [
-                false,
+                true,
                 11,
             ],
             [
-                false,
+                true,
                 11.5,
             ],
             [
-                false,
+                true,
                 "\0",
             ],
             [
-                false,
+                true,
                 new \stdClass(),
             ],
             [
-                false,
+                true,
                 "2020-01-01 00:00:00",
             ],
             [
-                false,
+                true,
                 new \DateTime("2020-01-02"),
             ],
         ];

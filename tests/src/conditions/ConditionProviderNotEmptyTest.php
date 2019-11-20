@@ -4,7 +4,7 @@ namespace RoNoLo\JsonStorage;
 
 use RoNoLo\JsonStorage\Query\ConditionProvider;
 
-class ConditionProviderNullTest extends TestBase
+class ConditionProviderNotEmptyTest extends TestBase
 {
     /**
      * @dataProvider equalProvider
@@ -13,11 +13,11 @@ class ConditionProviderNullTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testLessThen($expected, $value)
+    public function testNotEmptyThen($expected, $value)
     {
         $conditionExecutor = new ConditionProvider();
 
-        $condition = $conditionExecutor->isNull($value);
+        $condition = $conditionExecutor->isNotEmpty($value);
 
         $result = $condition();
 
@@ -28,7 +28,7 @@ class ConditionProviderNullTest extends TestBase
     {
         return [
             [
-                false,
+                true,
                 10,
             ],
             [
@@ -36,15 +36,15 @@ class ConditionProviderNullTest extends TestBase
                 null,
             ],
             [
-                false,
+                true,
                 "heinz",
             ],
             [
-                false,
+                true,
                 "heinz",
             ],
             [
-                false,
+                true,
                 "Heinz",
             ],
             [
@@ -52,11 +52,19 @@ class ConditionProviderNullTest extends TestBase
                 [],
             ],
             [
-                false,
+                true,
                 11,
             ],
             [
                 false,
+                '',
+            ],
+            [
+                false,
+                "",
+            ],
+            [
+                true,
                 11.5,
             ],
             [
@@ -64,15 +72,15 @@ class ConditionProviderNullTest extends TestBase
                 "\0",
             ],
             [
-                false,
+                true,
                 new \stdClass(),
             ],
             [
-                false,
+                true,
                 "2020-01-01 00:00:00",
             ],
             [
-                false,
+                true,
                 new \DateTime("2020-01-02"),
             ],
         ];

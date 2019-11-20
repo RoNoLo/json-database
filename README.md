@@ -1,4 +1,4 @@
-# JsonDatabase
+# JsonStorage
 
 A document store which uses any type of filesystem to store documents as JSON.
 It uses https://flysystem.thephpleague.com/ to abstract the storage space.
@@ -39,28 +39,54 @@ $store->remove($id);
 It is also possible to query documents in a CouchDB like fashion from the store.
 
 ```php
-$query = new Query($store);
+$query = new Store\Query($store);
 $result = $query->find([
     "name" => "Bernd"
 ]);
 
 // An iterator can be used to fetch one by one all documents
 
-foreach ($result->data() as $id => $document) {
+foreach ($result as $id => $document) {
     ; // do something with the document
 }
 ```
 
-
-
 ## Json Database Usage
 
+When using the JsonStorage as database, the usage will be a little more parameter
+heavy, but it will come with a few benefits. The major difference is referenced documents.
 
+A Referenced document is one which lives in it own store, but is maybe shared by other
+store documents. Here an example how it looks under the hood.
 
-## Notice
+```php
+$db = new Database();
+$db->addStore('person', new Store(new MemoryAdapter());
+$db->addStore('interests', new Store(new MemoryAdapter());
 
-This repository contains the bare minimum please see https://github.com/ronolo/jsondatabase-tools
-for tools to import or export data.
+// Create a few interests
+$hobby1 = $db->put('interests', ['name' => 'Music', 'stars' => 4], true);
+$hobby2 = $db->put('interests', ['name' => 'Boxen', 'stars' => 3.4], true);
+$hobby3 = $db->put('interests', ['name' => 'Movies', 'stars' => 5], true);
+
+// Create some persons
+$person1 = $db->put('person', [
+    'name' => 'Ronald',   
+    'interests' => [$hobby1, $hobby2]
+]);
+$person2 = $db->put('person', [
+    'name' => 'Ellen',   
+    'interests' => [$hobby2, $hobby3]
+]);
+$person3 = $db->put('person', [
+    'name' => 'James',   
+    'interests' => []
+]);
+$person4 = $db->put('person', [
+    'name' => 'Katja',   
+    'interests' => [$hobby3, $hobby1, $hobby2]
+]);
+``` 
 
 ## Goals
 

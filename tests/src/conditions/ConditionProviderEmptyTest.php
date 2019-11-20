@@ -4,7 +4,7 @@ namespace RoNoLo\JsonStorage;
 
 use RoNoLo\JsonStorage\Query\ConditionProvider;
 
-class ConditionProviderNullTest extends TestBase
+class ConditionProviderEmptyTest extends TestBase
 {
     /**
      * @dataProvider equalProvider
@@ -13,11 +13,11 @@ class ConditionProviderNullTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testLessThen($expected, $value)
+    public function testEmptyThen($expected, $value)
     {
         $conditionExecutor = new ConditionProvider();
 
-        $condition = $conditionExecutor->isNull($value);
+        $condition = $conditionExecutor->isEmpty($value);
 
         $result = $condition();
 
@@ -32,7 +32,7 @@ class ConditionProviderNullTest extends TestBase
                 10,
             ],
             [
-                true,
+                false,
                 null,
             ],
             [
@@ -48,7 +48,7 @@ class ConditionProviderNullTest extends TestBase
                 "Heinz",
             ],
             [
-                false,
+                true,
                 [],
             ],
             [
@@ -56,11 +56,19 @@ class ConditionProviderNullTest extends TestBase
                 11,
             ],
             [
+                true,
+                '',
+            ],
+            [
+                true,
+                "",
+            ],
+            [
                 false,
                 11.5,
             ],
             [
-                false,
+                true,
                 "\0",
             ],
             [

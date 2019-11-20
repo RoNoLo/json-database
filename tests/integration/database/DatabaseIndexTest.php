@@ -24,10 +24,13 @@ class DatabaseIndexTest extends DatabaseTestBase
             'balance'
         ]);
 
+        $this->db->setOption('create_indexes', false);
         $this->fillDatabase($this->db, 'person', $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
+        $this->db->rebuildIndexes();
+        $this->db->setOption('create_indexes', true);
     }
 
-    public function testCanQueryWithUseageOfIndex()
+    public function testCanQueryWithUseOfIndex()
     {
         $query = new Query($this->db);
 
@@ -40,7 +43,10 @@ class DatabaseIndexTest extends DatabaseTestBase
             ->execute();
 
         $this->assertEquals(16, $result->count());
+    }
 
+    public function testCanQueryWithoutUseOfIndex()
+    {
         $query = new Query($this->db);
 
         $result = $query

@@ -347,14 +347,18 @@ class ConditionProvider
     {
         return function () use ($value)
         {
-            $value = (string) $value;
+            if (is_array($value)) {
+                return count($value) !== 0;
+            } elseif (is_string($value)) {
+                return trim($value) !== '';
+            }
 
-            return trim($value) !== '';
+            return true;
         };
     }
 
     /**
-     * Is empty string.
+     * Is empty string or empty array.
      *
      * @param mixed $value
      * @return \Closure
@@ -363,9 +367,13 @@ class ConditionProvider
     {
         return function () use ($value)
         {
-            $value = (string) $value;
+            if (is_array($value)) {
+                return count($value) === 0;
+            } elseif (is_string($value)) {
+                return trim($value) === '';
+            }
 
-            return trim($value) === '';
+            return false;
         };
     }
 

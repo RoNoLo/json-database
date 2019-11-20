@@ -25,7 +25,19 @@ class Database
     {
         $this->options = [
             'remove_referenced_id' => true,
+            'create_indexes' => true,
         ] + $options;
+    }
+
+    /**
+     * Set Options key/value pairs.
+     *
+     * @param $name
+     * @param $value
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
     }
 
     /**
@@ -407,6 +419,10 @@ class Database
 
     private function addToIndexes(string $storeName, $document, string $id)
     {
+        if (!$this->options['create_indexes']) {
+            return;
+        }
+
         // Do we have an index definition?
         if (!isset($this->index[$storeName])) {
             return;
