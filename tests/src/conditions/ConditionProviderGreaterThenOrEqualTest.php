@@ -13,7 +13,7 @@ class ConditionProviderGreaterThenOrEqualTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEqual($expected, $value, $comparable)
+    public function testGreaterThenOrEqual($expected, $value, $comparable)
     {
         $conditionExecutor = new ConditionProvider();
 

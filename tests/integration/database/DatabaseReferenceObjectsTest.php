@@ -8,8 +8,6 @@ class DatabaseReferenceObjectsTest extends DatabaseTestBase
 {
     public function testAddingPersonsWithHobbyReferencesAndReadingTheFullPersonObject()
     {
-        define('STORE_JSON_OPTIONS', JSON_PRETTY_PRINT);
-
         $db = new Database();
         $db->addStore('person', new Store(new Local($this->datastorePath . '/person')));
         $db->addStore('hobby', new Store(new Local($this->datastorePath . '/hobby')));

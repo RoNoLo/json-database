@@ -20,7 +20,7 @@ class ZipStoreTest extends StoreTestBase
     {
         $store = new Store($this->datastoreAdapter);
 
-        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
+        $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json.gz');
 
         // Find stuff
         $query = new Query($store);

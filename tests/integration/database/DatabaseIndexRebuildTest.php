@@ -14,8 +14,6 @@ class DatabaseIndexRebuildTest extends DatabaseTestBase
 
     protected function setUp(): void
     {
-        define('STORE_JSON_OPTIONS', JSON_PRETTY_PRINT);
-
         $this->indexStore = new Store(new Local($this->datastorePath . '/index'));
 
         $this->db = new Database();
@@ -30,7 +28,7 @@ class DatabaseIndexRebuildTest extends DatabaseTestBase
             'name'
         ]);
 
-        $this->fillDatabase($this->db, 'person', $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
+        $this->fillDatabase($this->db, 'person', $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json.gz');
     }
 
     public function testRebuildIndex()

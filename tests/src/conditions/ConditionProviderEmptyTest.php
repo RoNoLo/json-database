@@ -13,7 +13,7 @@ class ConditionProviderEmptyTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEmptyThen($expected, $value)
+    public function testIsEmpty($expected, $value)
     {
         $conditionExecutor = new ConditionProvider();
 

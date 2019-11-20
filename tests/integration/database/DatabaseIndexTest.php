@@ -25,7 +25,7 @@ class DatabaseIndexTest extends DatabaseTestBase
         ]);
 
         $this->db->setOption('create_indexes', false);
-        $this->fillDatabase($this->db, 'person', $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json');
+        $this->fillDatabase($this->db, 'person', $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json.gz');
         $this->db->rebuildIndexes();
         $this->db->setOption('create_indexes', true);
     }

@@ -6,9 +6,14 @@ class ResultTest extends TestBase
 {
     public function testCanCreateResult()
     {
+
+        $json = file_get_contents(__DIR__ . '/../fixtures/store_1000_docs.json');
+        $gz = gzencode($json, 9);
+        file_put_contents(__DIR__ . '/../fixtures/store_1000_docs.json.gz', $gz);
+
         return;
 
-        $json = file_get_contents(__DIR__ . '/../fixtures/query_1000_docs.json');
+        /*
         $data = json_decode($json, true);
 
         foreach ($data as &$item) {
@@ -19,5 +24,6 @@ class ResultTest extends TestBase
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
         file_put_contents(__DIR__ . '/../fixtures/query_1000_docs.json', $json);
+        */
     }
 }

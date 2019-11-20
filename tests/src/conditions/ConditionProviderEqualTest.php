@@ -13,7 +13,7 @@ class ConditionProviderEqualTest extends TestBase
      * @param $value
      * @param $comparable
      */
-    public function testEqual($expected, $value, $comparable)
+    public function testIsEqual($expected, $value, $comparable)
     {
         $conditionExecutor = new ConditionProvider();
 

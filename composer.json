@@ -13,9 +13,10 @@
         "php": ">= 7.2",
         "ext-json": "*",
         "league/flysystem": "^1.0",
-        "ronolo/jsonquery": "^1.1"
+        "ronolo/jsonquery": "^1.1",
     },
     "require-dev": {
+        "ext-zlib": "*",
         "phpunit/phpunit": "^8.4",
         "league/flysystem-ziparchive": "^1.0",
         "league/flysystem-memory": "^1.0",
