@@ -36,7 +36,7 @@ class Query extends AbstractQuery
     {
         // Check if we can use an index by just executing the query on an index element.
         if (isset($this->useIndex[$this->store])) {
-            $indexDocuments = $this->database->getIndex($this->store, $this->useIndex[$this->store]);
+            $indexDocuments = $this->database->getIndexMeta($this->store, $this->useIndex[$this->store]);
             unset($indexDocuments['__id']);
 
             foreach ($indexDocuments as $id => $indexDocument) {
@@ -85,8 +85,14 @@ class Query extends AbstractQuery
         return $this->postprocess($ids, $assoc);
     }
 
-    private function postprocess(array $ids, bool $assoc = false)
+    private function postprocess(array $ids = [], bool $assoc = false)
     {
+        $total = count($ids);
+
+        if (!count($ids)) {
+            return new Result($this->database, $this->store, $ids, $this->fields, $total, $assoc);
+        }
+
         // Check for sorting
         if ($this->sort) {
             $sortDirection = strtolower(current($this->sort));
@@ -95,8 +101,6 @@ class Query extends AbstractQuery
         }
 
         $ids = array_keys($ids);
-
-        $total = count($ids);
 
         // Check for 'skip'
         if ($this->skip > 0) {

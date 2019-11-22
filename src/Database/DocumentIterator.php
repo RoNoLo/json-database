@@ -25,7 +25,7 @@ class DocumentIterator extends AbstractDocumentIterator
      */
     public function __construct(Database $database, string $storeName, array &$ids, array $fields = [], $assoc = false)
     {
-        $this->store = $database;
+        $this->database = $database;
         $this->storeName = $storeName;
 
         parent::__construct($ids, $fields, $assoc);

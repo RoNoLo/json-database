@@ -2,7 +2,10 @@
 
 namespace RoNoLo\JsonStorage;
 
-use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException, DocumentNotFoundException, DocumentNotStoredException};
+use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException,
+    DocumentNotFoundException,
+    DocumentNotStoredException,
+    QueryExecutionException};
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
@@ -13,10 +16,13 @@ class Database
     private $stores = [];
 
     /** @var array */
-    private $index;
+    private $indexMeta;
 
     /** @var Store */
     private $indexStore;
+
+    /** @var array */
+    private $indexes;
 
     /** @var array */
     private $options = [];
@@ -70,7 +76,7 @@ class Database
      */
     public function addIndex(string $storeName, string $indexName, array $fields)
     {
-        $this->index[$storeName][$indexName] = $fields;
+        $this->indexMeta[$storeName][$indexName] = $fields;
     }
 
     /**
@@ -78,9 +84,9 @@ class Database
      *
      * @return array
      */
-    public function getIndexes()
+    private function boot()
     {
-        return $this->index;
+        return $this->indexMeta;
     }
 
     /**
@@ -94,7 +100,7 @@ class Database
     {
         $this->indexStore->truncate();
 
-        foreach ($this->index as $storeName => $index) {
+        foreach ($this->indexMeta as $storeName => $index) {
             foreach ($index as $keyName => $fields) {
                 $indexName = $storeName . '_' . $keyName;
 
@@ -254,8 +260,8 @@ class Database
         $return = $store->remove($id);
 
         if ($return) {
-            if (isset($this->index[$storeName])) {
-                foreach ($this->index[$storeName] as $name => $fields) {
+            if (isset($this->indexMeta[$storeName])) {
+                foreach ($this->indexMeta[$storeName] as $name => $fields) {
                     $indexName = $storeName . '_' . $name;
 
                     $indexDocument = $this->indexStore->read($indexName, true);
@@ -302,8 +308,8 @@ class Database
 
         $store->truncate();
 
-        if (isset($this->index[$storeName])) {
-            foreach ($this->index[$storeName] as $name => $fields) {
+        if (isset($this->indexMeta[$storeName])) {
+            foreach ($this->indexMeta[$storeName] as $name => $fields) {
                 $indexName = $storeName . '_' . $name;
 
                 $this->indexStore->remove($indexName);
@@ -341,7 +347,7 @@ class Database
         }
     }
 
-    public function getIndex($storeName, $indexName)
+    public function getIndexMeta($storeName, $indexName)
     {
         $indexKey = $storeName . '_' . $indexName;
 
@@ -424,14 +430,14 @@ class Database
         }
 
         // Do we have an index definition?
-        if (!isset($this->index[$storeName])) {
+        if (!isset($this->indexMeta[$storeName])) {
             return;
         }
 
         // Okay we have an index. We have to extract the value
         $jsonQuery = JsonQuery::fromData($document);
 
-        foreach ($this->index[$storeName] as $name => $fields) {
+        foreach ($this->indexMeta[$storeName] as $name => $fields) {
             $index = [];
             foreach ($fields as $field) {
                 $index[$field] = $jsonQuery->get($field);
