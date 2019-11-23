@@ -17,6 +17,18 @@ class Result extends AbstractResult
     /** @var Store */
     protected $store;
 
+    public static function fromJson(Store $store, $data)
+    {
+        $data = (array) $data;
+
+        $ids = $data['ids'];
+        $fields = $data['fields'];
+        $total = $data['total'];
+        $assoc = $data['assoc'];
+
+        return new self($store, $ids, $fields, $total, $assoc);
+    }
+
     /**
      * Constructor
      *

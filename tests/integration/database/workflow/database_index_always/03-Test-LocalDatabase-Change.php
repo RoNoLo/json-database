@@ -9,8 +9,7 @@ use SebastianBergmann\Timer\Timer;
 $documents_amount = require_once __DIR__ . DIRECTORY_SEPARATOR . 'setup.php';
 
 $testsRoot = realpath(
-    __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
-    DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests'
+    __DIR__ . DIRECTORY_SEPARATOR
 );
 
 include_once $testsRoot . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';

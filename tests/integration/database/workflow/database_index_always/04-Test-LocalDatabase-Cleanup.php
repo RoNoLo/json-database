@@ -8,8 +8,7 @@ use RoNoLo\JsonStorage\Store\Query;
 use SebastianBergmann\Timer\Timer;
 
 $testsRoot = realpath(
-    __DIR__ . DIRECTORY_SEPARATOR . '..' .
-    DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests'
+    __DIR__ . DIRECTORY_SEPARATOR
 );
 
 $datastorePath = $testsRoot . DIRECTORY_SEPARATOR . 'datastore';

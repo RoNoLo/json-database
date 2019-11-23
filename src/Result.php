@@ -9,7 +9,7 @@ use RoNoLo\JsonStorage\Exception\{DocumentNotFoundException, ResultSetException}
  *
  * A collection of Documents returned from a Query.
  */
-abstract class Result implements \IteratorAggregate, \ArrayAccess
+abstract class Result implements \IteratorAggregate, \ArrayAccess, \JsonSerializable, \Countable
 {
     protected $ids;
 
@@ -90,5 +90,15 @@ abstract class Result implements \IteratorAggregate, \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->ids[$offset]);
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'ids' => $this->ids,
+            'fields' => $this->fields,
+            'total' => $this->total,
+            'assoc' => $this->assoc
+        ];
     }
 }

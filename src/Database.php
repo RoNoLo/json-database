@@ -8,130 +8,29 @@ use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException,
     QueryExecutionException};
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
+use RoNoLo\JsonStorage\Config;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
 
 class Database
 {
     /** @var Store[] */
-    private $stores = [];
+    protected $stores = [];
 
     /** @var array */
-    private $indexMeta;
+    protected $options = [];
 
-    /** @var Store */
-    private $indexStore;
-
-    /** @var array */
-    private $indexes;
-
-    /** @var array */
-    private $options = [];
-
-    public function __construct($options = [])
+    public static function create(Config $config)
     {
+        return new static($config->getStores(), $config->getOptions());
+    }
+
+    protected function __construct($stores, $options = [])
+    {
+        $this->stores = $stores;
         $this->options = [
+            // Remove the document ID from referenced documents.
             'remove_referenced_id' => true,
-            'create_indexes' => true,
         ] + $options;
-    }
-
-    /**
-     * Set Options key/value pairs.
-     *
-     * @param $name
-     * @param $value
-     */
-    public function setOption($name, $value)
-    {
-        $this->options[$name] = $value;
-    }
-
-    /**
-     * Adds a store to the database.
-     *
-     * @param string $storeName
-     * @param Store $store
-     */
-    public function addStore(string $storeName, Store $store)
-    {
-        $this->stores[$storeName] = $store;
-    }
-
-    /**
-     * Sets the store which shall be used for the index.
-     *
-     * @param Store $store
-     */
-    public function setIndexStore(Store $store)
-    {
-        $this->indexStore = $store;
-    }
-
-    /**
-     * Adds an index to the database.
-     *
-     * @param string $storeName
-     * @param string $indexName
-     * @param array $fields
-     */
-    public function addIndex(string $storeName, string $indexName, array $fields)
-    {
-        $this->indexMeta[$storeName][$indexName] = $fields;
-    }
-
-    /**
-     * Returns all added indexes.
-     *
-     * @return array
-     */
-    private function boot()
-    {
-        return $this->indexMeta;
-    }
-
-    /**
-     * Rebuilds all available indices for all stored data.
-     *
-     * @throws DatabaseRuntimeException
-     * @throws DocumentNotStoredException
-     * @throws FileNotFoundException
-     */
-    public function rebuildIndexes()
-    {
-        $this->indexStore->truncate();
-
-        foreach ($this->indexMeta as $storeName => $index) {
-            foreach ($index as $keyName => $fields) {
-                $indexName = $storeName . '_' . $keyName;
-
-                try {
-                    $indexDocument = $this->indexStore->read($indexName, true);
-                } catch (DocumentNotFoundException $e) {
-                    // When Index is first created.
-                    $indexDocument = [
-                        '__id' => $indexName
-                    ];
-                }
-
-                foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
-                    $documentJson = $this->attachObjectReferences($documentJson);
-
-                    $document = json_decode($documentJson);
-
-                    // Okay we have an index. We have to extract the value
-                    $jsonQuery = JsonQuery::fromData($document);
-
-                    $index = [];
-                    foreach ($fields as $field) {
-                        $index[$field] = $jsonQuery->get($field);
-                    }
-
-                    $indexDocument[$document->__id] = $index;
-                }
-
-                $this->indexStore->put($indexDocument);
-            }
-        }
     }
 
     /**
@@ -153,10 +52,6 @@ class Database
         if (!is_array($documents)) {
             throw new DocumentNotStoredException("Your data was not an array of objects. (To store objects use ->put() instead.)");
         }
-
-        // Note: We could speed up the index writing here, by somewhat
-        // open and write the index only once, but an exception would kill
-        // the whole index. At the moment the slower approch is fine.
 
         $ids = [];
         foreach ($documents as $document) {
@@ -185,8 +80,6 @@ class Database
 
         $id = $store->put($document);
 
-        $this->addToIndexes($storeName, $document, $id);
-
         return $refCode ? '$' . $storeName . ':' . $id : $id;
     }
 
@@ -205,9 +98,7 @@ class Database
     {
         $store = $this->getStore($storeName);
 
-        // Returned as pure JSON
         $documentJson = $store->read($id, null);
-
         $documentJson = $this->attachObjectReferences($documentJson);
 
         return json_decode($documentJson, !!$assoc);
@@ -257,23 +148,7 @@ class Database
     {
         $store = $this->getStore($storeName);
 
-        $return = $store->remove($id);
-
-        if ($return) {
-            if (isset($this->indexMeta[$storeName])) {
-                foreach ($this->indexMeta[$storeName] as $name => $fields) {
-                    $indexName = $storeName . '_' . $name;
-
-                    $indexDocument = $this->indexStore->read($indexName, true);
-
-                    if (isset($indexDocument[$id])) {
-                        unset($indexDocument[$id]);
-
-                        $this->indexStore->put($indexDocument);
-                    }
-                }
-            }
-        }
+        $store->remove($id);
     }
 
     /**
@@ -307,14 +182,6 @@ class Database
         $store = $this->getStore($storeName);
 
         $store->truncate();
-
-        if (isset($this->indexMeta[$storeName])) {
-            foreach ($this->indexMeta[$storeName] as $name => $fields) {
-                $indexName = $storeName . '_' . $name;
-
-                $this->indexStore->remove($indexName);
-            }
-        }
     }
 
     /**
@@ -347,17 +214,6 @@ class Database
         }
     }
 
-    public function getIndexMeta($storeName, $indexName)
-    {
-        $indexKey = $storeName . '_' . $indexName;
-
-        if (!$this->indexStore->has($indexKey)) {
-            throw new QueryExecutionException(sprintf("Index for store `%s` with name `%s` not found.", $storeName, $indexName));
-        }
-
-        return $this->indexStore->read($storeName . '_' . $indexName, true);
-    }
-
     /**
      * Returns the store by name.
      *
@@ -366,7 +222,7 @@ class Database
      * @return Store
      * @throws DatabaseRuntimeException
      */
-    private function getStore(string $name): Store
+    protected function getStore(string $name): Store
     {
         if (!isset($this->stores[$name])) {
             throw new DatabaseRuntimeException(sprintf("No store with name `%s` was previously added.", $name));
@@ -382,7 +238,7 @@ class Database
      *
      * @return mixed|string
      */
-    private function attachObjectReferences(string $documentJson)
+    protected function attachObjectReferences(string $documentJson)
     {
         // Now we look for referenced documents
         $breaker = 10;
@@ -421,41 +277,5 @@ class Database
         }
 
         return $documentJson;
-    }
-
-    private function addToIndexes(string $storeName, $document, string $id)
-    {
-        if (!$this->options['create_indexes']) {
-            return;
-        }
-
-        // Do we have an index definition?
-        if (!isset($this->indexMeta[$storeName])) {
-            return;
-        }
-
-        // Okay we have an index. We have to extract the value
-        $jsonQuery = JsonQuery::fromData($document);
-
-        foreach ($this->indexMeta[$storeName] as $name => $fields) {
-            $index = [];
-            foreach ($fields as $field) {
-                $index[$field] = $jsonQuery->get($field);
-            }
-
-            $indexName = $storeName . '_' . $name;
-
-            try {
-                $indexDocument = $this->indexStore->read($indexName, true);
-            } catch (DocumentNotFoundException $e) {
-                // When Index is first created.
-                $indexDocument = [
-                    '__id' => $indexName
-                ];
-            }
-            $indexDocument[$id] = $index;
-
-            $this->indexStore->put($indexDocument);
-        }
     }
 }

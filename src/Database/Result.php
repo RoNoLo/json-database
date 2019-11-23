@@ -6,6 +6,7 @@ use RoNoLo\JsonStorage\Database;
 use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
 use RoNoLo\JsonStorage\Exception\ResultSetException;
 use RoNoLo\JsonStorage\Result as AbstractResult;
+use RoNoLo\JsonStorage\Store;
 
 /**
  * Result
@@ -19,6 +20,18 @@ class Result extends AbstractResult
 
     /** @var string */
     protected $storeName;
+
+    public static function fromJson(Database $database, string $storeName, $data)
+    {
+        $data = (array) $data;
+
+        $ids = $data['ids'];
+        $fields = $data['fields'];
+        $total = $data['total'];
+        $assoc = $data['assoc'];
+
+        return new self($database, $storeName, $ids, $fields, $total, $assoc);
+    }
 
     /**
      * Constructor
