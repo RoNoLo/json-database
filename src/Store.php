@@ -4,6 +4,7 @@ namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\{AdapterInterface, FileNotFoundException, Filesystem};
 use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException, DocumentNotFoundException, DocumentNotStoredException};
+use RoNoLo\JsonStorage\Store\Config;
 use RoNoLo\JsonStorage\Store\DocumentIterator;
 
 /**
@@ -13,17 +14,49 @@ use RoNoLo\JsonStorage\Store\DocumentIterator;
  */
 class Store
 {
+    const STORE_INDEX_FILE = '__index.json';
+
     /** @var Filesystem */
     protected $flysystem;
+
+    /** @var array */
+    protected $options = [];
+
+    /** @var array */
+    protected $index = [];
+
+    public static function create(Config $config)
+    {
+        return new static($config->getAdapter(), $config->getOptions());
+    }
 
     /**
      * Constructor
      *
      * @param AdapterInterface $adapter
+     * @param array $options
+     * @throws FileNotFoundException
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter, array $options = [])
     {
+        $this->options = [
+            // If for some reason, the index is damaged.
+            'rebuild_index' => false,
+        ] + $options;
         $this->flysystem = new Filesystem($adapter);
+
+        // Init or rebuild the Index.
+        if (!$this->flysystem->has(self::STORE_INDEX_FILE)) {
+            $this->rebuildIndex();
+        }
+
+        $indexJson = $this->flysystem->read(self::STORE_INDEX_FILE);
+        $this->index = json_decode($indexJson, true);
+    }
+
+    public function __destruct()
+    {
+        $this->flysystem->put(self::STORE_INDEX_FILE, json_encode($this->index));
     }
 
     /**
@@ -102,6 +135,8 @@ class Store
             );
         }
 
+        $this->index[] = $id;
+
         return $id;
     }
 
@@ -163,15 +198,17 @@ class Store
      * Removes a document from the store.
      *
      * @param string $id
-     *
-     * @return bool
      */
     public function remove(string $id)
     {
         try {
-            return $this->flysystem->delete($this->getPathForDocument($id));
+            foreach (array_keys($this->index, $id) as $key) {
+                unset($this->index[$key]);
+            }
+
+            $this->flysystem->delete($this->getPathForDocument($id));
         } catch (FileNotFoundException $e) {
-            return true; // Fail silently, because the document is not there anyway.
+            ;
         }
     }
 
@@ -203,25 +240,13 @@ class Store
                 $this->flysystem->deleteDir($content['path']);
             }
         }
+
+        $this->index = [];
     }
 
     public function count(): int
     {
-        $contents = $this->flysystem->listContents('', true);
-
-        $count = 0;
-        foreach ($contents as $content) {
-            if ($content['type'] != 'file') {
-                continue;
-            }
-            if ($content['extension'] != 'json') {
-                continue;
-            }
-
-            $count++;
-        }
-
-        return $count;
+        return count($this->index);
     }
 
     /**
@@ -232,18 +257,31 @@ class Store
      */
     public function documentsGenerator(): \Generator
     {
-        $contents = $this->flysystem->listContents('', true);
+        foreach ($this->index as $id) {
+            yield $this->flysystem->read($this->getPathForDocument($id));
+        }
+    }
 
-        foreach ($contents as $content) {
+    public function rebuildIndex()
+    {
+        $index = [];
+        foreach ($this->flysystem->listContents('', true) as $content) {
             if ($content['type'] != 'file') {
                 continue;
             }
             if ($content['extension'] != 'json') {
                 continue;
             }
+            if ($content['basename'] == self::STORE_INDEX_FILE) {
+                continue;
+            }
 
-            yield $this->flysystem->read($content['path']);
+            $documentJson = $this->flysystem->read($content['path']);
+            $document = json_decode($documentJson);
+            $index[] = $document->__id;
         }
+
+        $this->flysystem->put(self::STORE_INDEX_FILE, json_encode($index));
     }
 
     /**

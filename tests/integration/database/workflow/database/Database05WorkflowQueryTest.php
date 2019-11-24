@@ -2,14 +2,11 @@
 
 namespace RoNoLo\JsonStorage;
 
-use League\Flysystem\Adapter\Local;
-use RoNoLo\JsonStorage\Database\Query;
-
 class Database05WorkflowQueryTest extends DatabaseWorkflowTestBase
 {
     public function testQueryAge99Database()
     {
-        $query = new Query($this->db);
+        $query = new Database\Query($this->db);
 
         $result = $query
             ->from('something')

@@ -34,30 +34,30 @@ class Query extends AbstractQuery
 
     public function execute($assoc = false)
     {
-        // Check if we can use an index by just executing the query on an index element.
-        if (isset($this->useIndex[$this->store])) {
-            $indexDocuments = $this->database->getIndexMeta($this->store, $this->useIndex[$this->store]);
-            unset($indexDocuments['__id']);
-
-            foreach ($indexDocuments as $id => $indexDocument) {
-                $jsonQuery = JsonQuery::fromData($indexDocument);
-
-                if ($this->match($jsonQuery)) {
-                    if (!$this->sort) {
-                        $ids[$id] = 1;
-                    } else {
-                        $sortField = key($this->sort);
-                        $sortValue = $jsonQuery->get($sortField);
-
-                        if (is_array($sortValue)) {
-                            throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
-                        }
-
-                        $ids[$id] = $sortValue;
-                    }
-                }
-            }
-        } else {
+//        // Check if we can use an index by just executing the query on an index element.
+//        if (isset($this->useIndex[$this->store])) {
+//            $indexDocuments = $this->database->getIndexMeta($this->store, $this->useIndex[$this->store]);
+//            unset($indexDocuments['__id']);
+//
+//            foreach ($indexDocuments as $id => $indexDocument) {
+//                $jsonQuery = JsonQuery::fromData($indexDocument);
+//
+//                if ($this->match($jsonQuery)) {
+//                    if (!$this->sort) {
+//                        $ids[$id] = 1;
+//                    } else {
+//                        $sortField = key($this->sort);
+//                        $sortValue = $jsonQuery->get($sortField);
+//
+//                        if (is_array($sortValue)) {
+//                            throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
+//                        }
+//
+//                        $ids[$id] = $sortValue;
+//                    }
+//                }
+//            }
+//        } else {
             // No usable index found, we request all documents to perform the query.
             $ids = [];
             foreach ($this->database->documentsGenerator($this->store) as $documentJson) {
@@ -80,7 +80,7 @@ class Query extends AbstractQuery
                     }
                 }
             }
-        }
+//        }
 
         return $this->postprocess($ids, $assoc);
     }

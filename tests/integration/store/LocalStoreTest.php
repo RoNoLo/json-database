@@ -4,6 +4,7 @@ namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use RoNoLo\JsonStorage\Store\Config;
 use RoNoLo\JsonStorage\Store\Query;
 
 class LocalStoreTest extends StoreTestBase
@@ -27,16 +28,21 @@ class LocalStoreTest extends StoreTestBase
 
     public function testAddingWritingFindingWithLocalAdapter()
     {
-        $store = new Store($this->datastoreAdapter);
+        $config = new Config();
+        $config->setAdapter($this->datastoreAdapter);
+
+        $store = Store::create($config);
 
         $this->fillStore($store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json.gz');
 
         // Find stuff
         $query = new Query($store);
 
-        $result = $query->find([
-            "age" => 20
-        ])->execute();
+        $result = $query
+            ->find([
+                "age" => 20
+            ])
+            ->execute();
 
         $this->assertEquals(16, $result->count());
 

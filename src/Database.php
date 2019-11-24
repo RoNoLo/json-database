@@ -8,7 +8,7 @@ use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException,
     QueryExecutionException};
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
-use RoNoLo\JsonStorage\Config;
+use RoNoLo\JsonStorage\Database\Config;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
 
 class Database

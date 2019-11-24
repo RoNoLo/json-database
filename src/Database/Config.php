@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonStorage;
+namespace RoNoLo\JsonStorage\Database;
 
 use RoNoLo\JsonStorage\Store;
 

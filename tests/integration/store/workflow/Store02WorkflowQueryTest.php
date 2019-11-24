@@ -2,14 +2,13 @@
 
 namespace RoNoLo\JsonStorage;
 
-class Database02WorkflowQueryTest extends DatabaseWorkflowTestBase
+class Store02WorkflowQueryTest extends StoreWorkflowTestBase
 {
     public function testQueryAge20Database()
     {
-        $query = new Database\Query($this->db);
+        $query = new Store\Query($this->store);
 
         $result = $query
-            ->from('something')
             ->find([
                 "age" => 20
             ])
