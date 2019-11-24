@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonStorage\Database;
+namespace RoNoLo\JsonStorage\Database\Index;
 
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
@@ -10,11 +10,12 @@ use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
 use RoNoLo\JsonStorage\Exception\DocumentNotStoredException;
 use RoNoLo\JsonStorage\Exception\QueryExecutionException;
 use RoNoLo\JsonStorage\Store;
+use RoNoLo\JsonStorage\Database\Index\Config;
 
-abstract class IndexDatabase extends BaseDatabase
+abstract class Database extends BaseDatabase
 {
     /** @var array */
-    protected $indexMeta;
+    protected $index;
 
     /** @var Store */
     protected $indexStore;
@@ -22,26 +23,17 @@ abstract class IndexDatabase extends BaseDatabase
     /** @var array */
     protected $indexes;
 
-    /**
-     * Sets the store which shall be used for the index.
-     *
-     * @param Store $store
-     */
-    public function setIndexStore(Store $store)
+    public static function create(Config $config)
     {
-        $this->indexStore = $store;
+        return new static($config->getStores(), $config->getIndexStore(), $config->getIndexes(), $config->getOptions());
     }
 
-    /**
-     * Adds an index to the database.
-     *
-     * @param string $storeName
-     * @param string $indexName
-     * @param array $fields
-     */
-    public function addIndex(string $storeName, string $indexName, array $fields)
+    protected function __construct($stores, $indexStore, $indexes, $options = [])
     {
-        $this->indexMeta[$storeName][$indexName] = $fields;
+        parent::__construct($stores, $options);
+
+        $this->indexStore = $indexStore;
+        $this->indexes = $indexes;
     }
 
     /**

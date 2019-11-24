@@ -14,6 +14,8 @@ class Config
     public function setAdapter(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
+
+        return $this;
     }
 
     public function getAdapter(): AdapterInterface
@@ -24,6 +26,8 @@ class Config
     public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
+
+        return $this;
     }
 
     public function getOptions(): array

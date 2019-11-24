@@ -12,6 +12,6 @@ abstract class QueryTestBase extends StoreTestBase
     public function setUp(): void
     {
         $this->store = new Store(new MemoryAdapter());
-        $this->fillStore($this->store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'query_1000_docs.json');
+        $this->fillStore($this->store, $this->fixturesPath . DIRECTORY_SEPARATOR . 'store_1000_docs.json.gz');
     }
 }

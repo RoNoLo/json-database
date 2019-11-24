@@ -14,11 +14,15 @@ class Config
     public function addStore(string $name, Store $store)
     {
         $this->stores[$name] = $store;
+
+        return $this;
     }
 
     public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
+
+        return $this;
     }
 
     public function getStores(): array
