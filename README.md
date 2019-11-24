@@ -1,5 +1,7 @@
 # JsonStorage
 
+*Warning: Heavy development! Do not use below 1.0.0!*
+
 A document store which uses any type of filesystem to store documents as JSON.
 It uses https://flysystem.thephpleague.com/ to abstract the storage space.
 

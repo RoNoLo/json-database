@@ -5,14 +5,14 @@ namespace RoNoLo\JsonStorage\Database\Index;
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database as BaseDatabase;
+use RoNoLo\JsonStorage\Database\Config;
 use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
 use RoNoLo\JsonStorage\Exception\DocumentNotFoundException;
 use RoNoLo\JsonStorage\Exception\DocumentNotStoredException;
 use RoNoLo\JsonStorage\Exception\QueryExecutionException;
 use RoNoLo\JsonStorage\Store;
-use RoNoLo\JsonStorage\Database\Index\Config;
 
-abstract class Database extends BaseDatabase
+class Database extends BaseDatabase
 {
     /** @var array */
     protected $index;
@@ -36,6 +36,8 @@ abstract class Database extends BaseDatabase
         $this->indexes = $indexes;
     }
 
+
+
     /**
      * Rebuilds all available indices for all stored data.
      *
@@ -47,7 +49,7 @@ abstract class Database extends BaseDatabase
     {
         $this->indexStore->truncate();
 
-        foreach ($this->indexMeta as $storeName => $index) {
+        foreach ($this->indexes as $storeName => $index) {
             foreach ($index as $keyName => $fields) {
                 $indexName = $storeName . '_' . $keyName;
 

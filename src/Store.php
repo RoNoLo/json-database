@@ -37,7 +37,7 @@ class Store
      * @param array $options
      * @throws FileNotFoundException
      */
-    public function __construct(AdapterInterface $adapter, array $options = [])
+    protected function __construct(AdapterInterface $adapter, array $options = [])
     {
         $this->options = [
             // If for some reason, the index is damaged.
@@ -54,7 +54,7 @@ class Store
         $this->index = json_decode($indexJson, true);
     }
 
-    public function __destruct()
+    protected function __destruct()
     {
         $this->flysystem->put(self::STORE_INDEX_FILE, json_encode($this->index));
     }
