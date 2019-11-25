@@ -15,7 +15,7 @@ use RoNoLo\JsonStorage\Store;
 class Database extends BaseDatabase
 {
     /** @var array */
-    protected $index;
+    protected $index = [];
 
     /** @var Store */
     protected $indexStore;
@@ -34,9 +34,20 @@ class Database extends BaseDatabase
 
         $this->indexStore = $indexStore;
         $this->indexes = $indexes;
+
+        foreach ($this->indexes as $storeName => $indexMeta) {
+            foreach ($indexMeta as $indexName => $fields) {
+                $indexKey = $storeName . '_' . $indexName;
+
+                if (!$this->indexStore->has($indexKey)) {
+                    $this->rebuildIndex($storeName, $indexName, $fields);
+                }
+
+                $indexJson = $this->indexStore->read($indexKey);
+                $this->index[$storeName][$indexName] = json_decode($indexJson);
+            }
+        }
     }
-
-
 
     /**
      * Rebuilds all available indices for all stored data.
@@ -169,10 +180,6 @@ class Database extends BaseDatabase
 
     protected function addToIndexes(string $storeName, $document, string $id)
     {
-        if (!$this->options['create_indexes']) {
-            return;
-        }
-
         // Do we have an index definition?
         if (!isset($this->indexMeta[$storeName])) {
             return;
@@ -181,7 +188,7 @@ class Database extends BaseDatabase
         // Okay we have an index. We have to extract the value
         $jsonQuery = JsonQuery::fromData($document);
 
-        foreach ($this->indexMeta[$storeName] as $name => $fields) {
+        foreach ($this->indexes[$storeName] as $name => $fields) {
             $index = [];
             foreach ($fields as $field) {
                 $index[$field] = $jsonQuery->get($field);
@@ -200,6 +207,14 @@ class Database extends BaseDatabase
             $indexDocument[$id] = $index;
 
             $this->indexStore->put($indexDocument);
+        }
+    }
+
+    protected function rebuildIndex(int $storeName, int $indexName, $fields)
+    {
+        $index = [];
+        foreach ($this->documentsGenerator($storeName) as $document) {
+            $this->addToIndexes($storeName, $document, $id);
         }
     }
 }

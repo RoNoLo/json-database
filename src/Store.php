@@ -39,10 +39,7 @@ class Store
      */
     protected function __construct(AdapterInterface $adapter, array $options = [])
     {
-        $this->options = [
-            // If for some reason, the index is damaged.
-            'rebuild_index' => false,
-        ] + $options;
+        $this->options = [] + $options;
         $this->flysystem = new Filesystem($adapter);
 
         // Init or rebuild the Index.
@@ -54,7 +51,7 @@ class Store
         $this->index = json_decode($indexJson, true);
     }
 
-    protected function __destruct()
+    public function __destruct()
     {
         $this->flysystem->put(self::STORE_INDEX_FILE, json_encode($this->index));
     }

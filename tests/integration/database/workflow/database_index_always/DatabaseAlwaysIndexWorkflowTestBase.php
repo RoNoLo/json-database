@@ -40,7 +40,7 @@ abstract class DatabaseAlwaysIndexWorkflowTestBase extends TestBase
         $this->store = Store::create($storeConfig);
         $this->indexStore = Store::create($indexConfig);
 
-        $dbConfig = new Database\Index\Config();
+        $dbConfig = new Database\Config();
         $dbConfig->addStore('something', $this->store);
         $dbConfig->setIndexStore($this->indexStore);
         $dbConfig->addIndex('something', 'age', [
