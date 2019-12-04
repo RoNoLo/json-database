@@ -13,7 +13,8 @@
         "php": ">= 7.2",
         "ext-json": "*",
         "league/flysystem": "^1.0",
-        "ronolo/jsonquery": "^1.1"
+        "ronolo/jsonquery": "^1.1",
+        "ronolo/json-store":"^0.9"
     },
     "require-dev": {
         "ext-zlib": "*",
@@ -42,6 +43,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/ronolo/jsonquery.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/ronolo/json-store.git"
         }
     ]
 }

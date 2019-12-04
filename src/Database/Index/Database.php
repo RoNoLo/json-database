@@ -43,11 +43,25 @@ class Database extends BaseDatabase
                     $this->rebuildIndex($storeName, $indexName, $fields);
                 }
 
-                $indexJson = $this->indexStore->read($indexKey);
-                $this->index[$storeName][$indexName] = json_decode($indexJson);
+                $index = $this->indexStore->read($indexKey, true);
+                $this->index[$storeName][$indexName] = $index;
             }
         }
     }
+
+    public function __destruct()
+    {
+        foreach ($this->indexes as $storeName => $indexMeta) {
+            foreach ($indexMeta as $indexName => $fields) {
+                $indexKey = $storeName . '_' . $indexName;
+
+                $this->index[$storeName][$indexName]['__id'] = $indexKey;
+
+                $this->indexStore->put($this->index[$storeName][$indexName]);
+            }
+        }
+    }
+
 
     /**
      * Rebuilds all available indices for all stored data.
@@ -60,20 +74,11 @@ class Database extends BaseDatabase
     {
         $this->indexStore->truncate();
 
-        foreach ($this->indexes as $storeName => $index) {
-            foreach ($index as $keyName => $fields) {
-                $indexName = $storeName . '_' . $keyName;
+        foreach ($this->indexes as $storeName => $indexMeta) {
+            foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
+                foreach ($indexMeta as $indexName => $fields) {
+                    $indexKey = $storeName . '_' . $indexName;
 
-                try {
-                    $indexDocument = $this->indexStore->read($indexName, true);
-                } catch (DocumentNotFoundException $e) {
-                    // When Index is first created.
-                    $indexDocument = [
-                        '__id' => $indexName
-                    ];
-                }
-
-                foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
                     $documentJson = $this->attachObjectReferences($documentJson);
 
                     $document = json_decode($documentJson);
@@ -86,10 +91,10 @@ class Database extends BaseDatabase
                         $index[$field] = $jsonQuery->get($field);
                     }
 
-                    $indexDocument[$document->__id] = $index;
+                    $indexDocument[$document->__id] = $indexKey;
                 }
 
-                $this->indexStore->put($indexDocument);
+                $this->index[$storeName][$indexName] = $indexDocument;
             }
         }
     }
@@ -181,40 +186,29 @@ class Database extends BaseDatabase
     protected function addToIndexes(string $storeName, $document, string $id)
     {
         // Do we have an index definition?
-        if (!isset($this->indexMeta[$storeName])) {
+        if (!isset($this->indexes[$storeName])) {
             return;
         }
 
         // Okay we have an index. We have to extract the value
         $jsonQuery = JsonQuery::fromData($document);
 
-        foreach ($this->indexes[$storeName] as $name => $fields) {
-            $index = [];
+        foreach ($this->indexes[$storeName] as $indexName => $fields) {
             foreach ($fields as $field) {
-                $index[$field] = $jsonQuery->get($field);
+                $this->index[$storeName][$indexName][$field] = $jsonQuery->get($field);
             }
-
-            $indexName = $storeName . '_' . $name;
-
-            try {
-                $indexDocument = $this->indexStore->read($indexName, true);
-            } catch (DocumentNotFoundException $e) {
-                // When Index is first created.
-                $indexDocument = [
-                    '__id' => $indexName
-                ];
-            }
-            $indexDocument[$id] = $index;
-
-            $this->indexStore->put($indexDocument);
         }
     }
 
-    protected function rebuildIndex(int $storeName, int $indexName, $fields)
+    protected function rebuildIndex(string $storeName, string $indexName, $fields)
     {
-        $index = [];
+        $this->index[$storeName][$indexName] = [];
         foreach ($this->documentsGenerator($storeName) as $document) {
             $this->addToIndexes($storeName, $document, $id);
         }
+
+        $this->index[$storeName][$indexName]['__id'] = $storeName . '_' . $indexName;
+
+        $this->indexStore->put($this->index[$storeName][$indexName]);
     }
 }

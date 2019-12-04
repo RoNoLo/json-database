@@ -1,4 +1,4 @@
-# JsonStorage
+# Json Database
 
 *Warning: Heavy development! Do not use below 1.0.0!*
 
@@ -8,83 +8,77 @@ It uses https://flysystem.thephpleague.com/ to abstract the storage space.
 It uses a NoSQL like query system for the documents and aims to use very less 
 memory (aka not loading all documents into memory to process them).
 
-## Json Store Usage
+This is an _extension_ of the https://github.com/RoNoLo/json-store to have relations
+between JSON documents.
 
-First specify the adapter which shall be used to actually store the JSON files to
-a disc/cloud/memory/zip. See https://github.com/thephpleague/flysystem 
-to find the one which fits your needs. You have to init the adapter with the 
-correct parameters. 
+## Usage
 
-```php
-// First create the adapter
-$adapter = new Local('some/path/persons');
-// Secondly create the JsonDB
-$store = new Store($adapter);
-```
-
-The store is now ready. We can now store, read, delete and update documents. As a very
-basic usage, we can read every document back by ID.
-
-```php
-$document = file_get_contents('file/with/json/object.json');
-// store a document
-$id = $store->put($document);
-// read a document
-$document = $store->read($id);
-// update document
-$document->foobar = "Heinz";
-$store->put($document);
-// remove document
-$store->remove($id); 
-```
-
-It is also possible to query documents in a CouchDB like fashion from the store.
-
-```php
-$query = new Store\Query($store);
-$result = $query->find([
-    "name" => "Bernd"
-]);
-
-// An iterator can be used to fetch one by one all documents
-
-foreach ($result as $id => $document) {
-    ; // do something with the document
-}
-```
-
-## Json Database Usage
-
-When using the JsonStorage as database, the usage will be a little more parameter
+When using the JSON storage as database, the usage will be a little more parameter
 heavy, but it will come with a few benefits. The major difference is referenced documents.
+
+There are two flavors of databases provided. The simple one adds just referenced documents
+support and the second one adds also index support for faster queries, if you still want 
+to use this instead of a full blown NoSQL database. 
+
+Simple:
+
+```php
+$config = Database\Config();
+$config->addStore('person', (new Store\Config())->setAdapter(new MemoryAdapter()));
+$config->addStore('interests', (new Store\Config())->setAdapter(new MemoryAdapter()));
+
+$database = Database::create($config);
+```
+
+This will tell the database, that it knows 2 JSON stores under the hood and when ever
+a query against the database will happen the database will look for referenced documents
+put them in place and return the documents normally. 
+
+Indexed:
+
+```php
+$config = Database\Config();
+$config->addStore('person', (new Store\Config())->setAdapter(new Local('/foo/bar/persons')));
+$config->addStore('interests', (new Store\Config())->setAdapter(new Local('/foo/bar/interests')));
+$config->setIndexStore((new Store\Config())->setAdapter(new MemoryAdapter()));
+$config->addIndex('person', 'age', ['age', 'created']);
+
+$database = Database::create($config);
+```
+
+This database does the same as above, but has an extra store which only stores indicies of
+certain keys. whenever a query is fired it will fistly check if an index can be used to find
+documents, and if so everything is faster. 
 
 A Referenced document is one which lives in it own store, but is maybe shared by other
 store documents. Here an example how it looks under the hood.
 
 ```php
-$db = new Database();
-$db->addStore('person', new Store(new MemoryAdapter());
-$db->addStore('interests', new Store(new MemoryAdapter());
+$config = Database\Config();
+
+$config->addStore('person', (new Store\Config())->setAdapter(new Local('/foo/bar/persons')));
+$config->addStore('interests', (new Store\Config())->setAdapter(new Local('/foo/bar/interests')));
+$database = Database::create($config);
 
 // Create a few interests
-$hobby1 = $db->put('interests', ['name' => 'Music', 'stars' => 4], true);
-$hobby2 = $db->put('interests', ['name' => 'Boxen', 'stars' => 3.4], true);
-$hobby3 = $db->put('interests', ['name' => 'Movies', 'stars' => 5], true);
+$hobby1 = $database->put('interests', ['name' => 'Music', 'stars' => 4], true);
+$hobby2 = $database->put('interests', ['name' => 'Boxen', 'stars' => 3.4], true);
+$hobby3 = $database->put('interests', ['name' => 'Movies', 'stars' => 5], true);
 
 // Create some persons
-$person1 = $db->put('person', [
+$person1 = $database->put('person', [
     'name' => 'Ronald',   
     'interests' => [$hobby1, $hobby2]
 ]);
-$person2 = $db->put('person', [
+$person2 = $database->put('person', [
     'name' => 'Ellen',   
     'interests' => [$hobby2, $hobby3]
 ]);
-$person3 = $db->put('person', [
+$person3 = $database->put('person', [
     'name' => 'James',   
     'interests' => []
 ]);
-$person4 = $db->put('person', [
+$person4 = $database->put('person', [
     'name' => 'Katja',   
     'interests' => [$hobby3, $hobby1, $hobby2]
 ]);
