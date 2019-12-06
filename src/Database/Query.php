@@ -3,6 +3,7 @@
 namespace RoNoLo\JsonStorage\Database;
 
 use RoNoLo\JsonStorage\Database;
+use RoNoLo\JsonStorage\Database\Index\QueryFields;
 use RoNoLo\JsonStorage\Exception\QueryExecutionException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Query as AbstractQuery;
@@ -20,14 +21,37 @@ class Query extends AbstractQuery
 
     protected $useIndex = [];
 
+    protected $usedFields = [];
+
+    /** @var string|null */
+    protected $storeName = null;
+
     public function __construct(Database $database)
     {
         $this->database = $database;
     }
 
-    public function useIndex(string $indexName)
+    public function from(string $storeName)
     {
-        $this->useIndex[$this->store] = $indexName;
+        $this->storeName = $storeName;
+
+        return $this;
+    }
+
+    public function find(array $input)
+    {
+        parent::find($input);
+
+        $this->parseUsedFields($input);
+
+        return $this;
+    }
+
+    public function sort(string $field = null, $direction = "asc")
+    {
+        parent::sort($field, $direction);
+
+        $this->usedFields = array_merge($this->usedFields, [$field]);
 
         return $this;
     }
@@ -117,5 +141,12 @@ class Query extends AbstractQuery
         }
 
         return new Result($this->database, $this->store, $ids, $this->fields, $total, $assoc);
+    }
+
+    protected function parseUsedFields(array $input)
+    {
+        $usedFields = (new QueryFields())->parse($input);
+
+        $this->usedFields = array_merge($this->usedFields, $usedFields);
     }
 }

@@ -34,19 +34,6 @@ class Database extends BaseDatabase
 
         $this->indexStore = $indexStore;
         $this->indexes = $indexes;
-
-        foreach ($this->indexes as $storeName => $indexMeta) {
-            foreach ($indexMeta as $indexName => $fields) {
-                $indexKey = $storeName . '_' . $indexName;
-
-                if (!$this->indexStore->has($indexKey)) {
-                    $this->rebuildIndex($storeName, $indexName, $fields);
-                }
-
-                $index = $this->indexStore->read($indexKey, true);
-                $this->index[$storeName][$indexName] = $index;
-            }
-        }
     }
 
     public function __destruct()
@@ -125,6 +112,8 @@ class Database extends BaseDatabase
      */
     public function put(string $storeName, $document, $refCode = false): string
     {
+        $this->checkIndex($storeName);
+
         $id = parent::put($storeName, $document, false);
 
         $this->addToIndexes($storeName, $document, $id);
@@ -195,7 +184,7 @@ class Database extends BaseDatabase
 
         foreach ($this->indexes[$storeName] as $indexName => $fields) {
             foreach ($fields as $field) {
-                $this->index[$storeName][$indexName][$field] = $jsonQuery->get($field);
+                $this->index[$storeName][$indexName][$id][$field] = $jsonQuery->get($field);
             }
         }
     }
@@ -210,5 +199,30 @@ class Database extends BaseDatabase
         $this->index[$storeName][$indexName]['__id'] = $storeName . '_' . $indexName;
 
         $this->indexStore->put($this->index[$storeName][$indexName]);
+    }
+
+    protected function checkIndex(string $storeName)
+    {
+        if (!isset($this->indexes[$storeName])) {
+            return;
+        }
+
+        if (!isset($this->index[$storeName])) {
+            $this->loadIndex($storeName);
+        }
+    }
+
+    protected function loadIndex(string $storeName)
+    {
+        foreach ($this->indexes[$storeName] as $indexName => $fields) {
+            $indexKey = $storeName . '_' . $indexName;
+
+            if (!$this->indexStore->has($indexKey)) {
+                $this->rebuildIndex($storeName, $indexName, $fields);
+            }
+
+            $index = $this->indexStore->read($indexKey, true);
+            $this->index[$storeName][$indexName] = $index;
+        }
     }
 }

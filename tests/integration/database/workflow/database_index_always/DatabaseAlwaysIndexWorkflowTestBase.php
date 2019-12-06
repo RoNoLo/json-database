@@ -46,6 +46,19 @@ abstract class DatabaseAlwaysIndexWorkflowTestBase extends TestBase
         $dbConfig->addIndex('something', 'age', [
             "age"
         ]);
+        $dbConfig->addIndex('something', 'mother_registered', [
+            "parents.mother.first",
+            "parents.mother.last",
+            "registered"
+        ]);
+        $dbConfig->addIndex('something', 'latlong', [
+            "latitude",
+            "longitude"
+        ]);
+        $dbConfig->addIndex('something', 'email_tags', [
+            "email",
+            "tags"
+        ]);
 
         $this->db = Database\Index\Database::create($dbConfig);
     }
