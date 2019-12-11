@@ -64,8 +64,6 @@ class Database extends BaseDatabase
         foreach ($this->indexes as $storeName => $indexMeta) {
             foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
                 foreach ($indexMeta as $indexName => $fields) {
-                    $indexKey = $storeName . '_' . $indexName;
-
                     $documentJson = $this->attachObjectReferences($documentJson);
 
                     $document = json_decode($documentJson);
@@ -73,15 +71,10 @@ class Database extends BaseDatabase
                     // Okay we have an index. We have to extract the value
                     $jsonQuery = JsonQuery::fromData($document);
 
-                    $index = [];
                     foreach ($fields as $field) {
-                        $index[$field] = $jsonQuery->get($field);
+                        $this->index[$storeName][$indexName][$document->__id][$field] = $jsonQuery->get($field);
                     }
-
-                    $indexDocument[$document->__id] = $indexKey;
                 }
-
-                $this->index[$storeName][$indexName] = $indexDocument;
             }
         }
     }
@@ -152,6 +145,60 @@ class Database extends BaseDatabase
     }
 
     /**
+     * Returns all documents for further processing.
+     *
+     * @param string|null $storeName
+     * @param array $usedFields
+     *
+     * @return \Generator
+     * @throws DatabaseRuntimeException
+     * @throws FileNotFoundException
+     */
+    public function documentsGenerator(string $storeName = null, array $usedFields = []): \Generator
+    {
+        // We check if we have a index, which can be used.
+        if (count($usedFields)) {
+            $indexName = $this->canUseIndex($storeName, $usedFields);
+            if ($indexName) {
+                $this->loadIndex($storeName, $indexName);
+
+                foreach ($this->index[$storeName][$indexName] as $id => $indexDocument) {
+                    if ($id == '__id') {
+                        continue;
+                    }
+
+                    yield $indexDocument;
+                }
+
+                return;
+            }
+        } else {
+            $store = $this->getStore($storeName);
+
+            foreach ($store->documentsGenerator() as $documentJson) {
+                yield $this->attachObjectReferences($documentJson);;
+            }
+        }
+    }
+
+    public function canUseIndex(string $storeName, array $usedFields)
+    {
+        if (!isset($this->indexes[$storeName])) {
+            return false;
+        }
+
+        foreach ($this->indexes[$storeName] as $indexKey => $fields) {
+            $result = array_diff($usedFields, $fields);
+
+            if (!count($result)) {
+                return $indexKey;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Removes all documents from the store.
      *
      * @param string $storeName
@@ -212,17 +259,26 @@ class Database extends BaseDatabase
         }
     }
 
-    protected function loadIndex(string $storeName)
+    protected function loadIndex(string $storeName, $indexName = null)
     {
-        foreach ($this->indexes[$storeName] as $indexName => $fields) {
+        if (is_null($indexName)) {
+            foreach ($this->indexes[$storeName] as $name => $fields) {
+                $indexKey = $storeName . '_' . $name;
+
+                if (!$this->indexStore->has($indexKey)) {
+                    $this->rebuildIndex($storeName, $indexName, $fields);
+                }
+
+                $this->index[$storeName][$indexName] = $this->indexStore->read($indexKey, true);
+            }
+        } else {
             $indexKey = $storeName . '_' . $indexName;
 
             if (!$this->indexStore->has($indexKey)) {
-                $this->rebuildIndex($storeName, $indexName, $fields);
+                $this->rebuildIndex($storeName, $indexName, $this->indexes[$storeName][$indexName]);
             }
 
-            $index = $this->indexStore->read($indexKey, true);
-            $this->index[$storeName][$indexName] = $index;
+            $this->index[$storeName][$indexName] = $this->indexStore->read($indexKey, true);
         }
     }
 }

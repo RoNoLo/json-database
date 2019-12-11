@@ -200,12 +200,13 @@ class Database
      * Returns all documents for further processing.
      *
      * @param string|null $storeName
+     * @param array $usedFields
      *
      * @return \Generator
      * @throws DatabaseRuntimeException
      * @throws FileNotFoundException
      */
-    public function documentsGenerator(string $storeName = null): \Generator
+    public function documentsGenerator(string $storeName = null, array $usedFields = []): \Generator
     {
         $store = $this->getStore($storeName);
 
@@ -213,6 +214,11 @@ class Database
             yield $this->attachObjectReferences($documentJson);;
         }
     }
+
+    public function canUseIndex(string $storeName, array $usedFields) {
+        return false;
+    }
+
 
     /**
      * Returns the store by name.
