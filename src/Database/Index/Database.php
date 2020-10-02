@@ -226,12 +226,15 @@ class Database extends BaseDatabase
             return;
         }
 
+        // For an index we always need the full build document
+        $documentDeReferenced = $this->read($storeName, $id);
+
         // Okay we have an index. We have to extract the value
-        $jsonQuery = JsonQuery::fromData($document);
+        $jsonQuery = JsonQuery::fromData($documentDeReferenced);
 
         foreach ($this->indexSettings[$storeName] as $indexName => $fields) {
             foreach ($fields as $field) {
-                $this->index[$storeName][$indexName][$id][$field] = $jsonQuery->get($field);
+                $this->index[$storeName][$indexName][$id][$field] = $jsonQuery->query($field);
             }
         }
     }

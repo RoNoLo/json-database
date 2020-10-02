@@ -150,16 +150,16 @@
         },
         {
             "name": "ronolo/json-query",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RoNoLo/json-query.git",
-                "reference": "c3d1aecb5740df2321dded7fedde455ed4f3c87b"
+                "reference": "99864c8a9416377c5eb0426901b60ad0bc8675d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/json-query/zipball/c3d1aecb5740df2321dded7fedde455ed4f3c87b",
-                "reference": "c3d1aecb5740df2321dded7fedde455ed4f3c87b",
+                "url": "https://api.github.com/repos/RoNoLo/json-query/zipball/99864c8a9416377c5eb0426901b60ad0bc8675d1",
+                "reference": "99864c8a9416377c5eb0426901b60ad0bc8675d1",
                 "shasum": ""
             },
             "require": {
@@ -184,7 +184,7 @@
                     "name": "Ronald Locke"
                 }
             ],
-            "description": "A JSON data parser",
+            "description": "A JSON dot.notation parser to access values. Example: persons.2.hobby",
             "homepage": "https://github.com/ronolo/json-query",
             "keywords": [
                 "data",
@@ -192,20 +192,20 @@
                 "parser",
                 "query"
             ],
-            "time": "2020-10-01T19:19:41+00:00"
+            "time": "2020-10-02T20:32:06+00:00"
         },
         {
             "name": "ronolo/json-store",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RoNoLo/json-store.git",
-                "reference": "db244bb02cf32897640adac9e36c7e6cef40a30c"
+                "url": "git@github.com:RoNoLo/json-store.git",
+                "reference": "13897db89b1e77aef3a666a9678b25da36d36553"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/db244bb02cf32897640adac9e36c7e6cef40a30c",
-                "reference": "db244bb02cf32897640adac9e36c7e6cef40a30c",
+                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/13897db89b1e77aef3a666a9678b25da36d36553",
+                "reference": "13897db89b1e77aef3a666a9678b25da36d36553",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +250,7 @@
                 "json",
                 "nosql"
             ],
-            "time": "2020-10-02T07:48:32+00:00"
+            "time": "2020-10-02T20:38:19+00:00"
         }
     ],
     "packages-dev": [

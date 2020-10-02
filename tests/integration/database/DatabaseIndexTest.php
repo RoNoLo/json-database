@@ -21,7 +21,7 @@ class DatabaseIndexTest extends DatabaseTestBase
         $config->addStore('hobby', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/hobbies')))));
         $config->addStore('country', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/countries')))));
 
-        $config->setIndexStore(Store::create((new Store\Config())->setAdapter(new MemoryAdapter())));
+        $config->setIndexStore(Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/index'))));
 
         $config->addIndex('person', 'age', ['age']);
         $config->addIndex('person', 'sex', ['gender']);
@@ -40,7 +40,6 @@ class DatabaseIndexTest extends DatabaseTestBase
     {
         $this->db->truncateEverything();
     }
-
 
     public function testCanQueryWithUseOfIndex()
     {
