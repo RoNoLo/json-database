@@ -1,8 +1,8 @@
 {
-    "name": "ronolo/jsonstorage",
-    "description": "A lightweight, document database",
-    "keywords": ["flat", "file", "db", "document", "nosql", "json"],
-    "homepage": "http://github.com/ronolo/jsonstorage",
+    "name": "ronolo/json-database",
+    "description": "A lightweight JSON document database, which sits on top of ronolo/json-store and adds relations and caching of JSON documents.",
+    "keywords": ["file", "db", "document", "nosql", "json", "database", "store"],
+    "homepage": "http://github.com/ronolo/json-database",
     "license": "MIT",
     "authors": [
         {
@@ -12,9 +12,9 @@
     "require": {
         "php": ">= 7.2",
         "ext-json": "*",
-        "league/flysystem": "^1.0",
-        "ronolo/jsonquery": "^1.1",
-        "ronolo/json-store":"^0.9"
+        "league/flysystem": "^1.1",
+        "ronolo/json-query": "^1.2",
+        "ronolo/json-store":"^1.1"
     },
     "require-dev": {
         "ext-zlib": "*",
@@ -38,15 +38,5 @@
             "tests/src/",
             "tests/integration"
         ]
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url":  "https://github.com/ronolo/jsonquery.git"
-        },
-        {
-            "type": "vcs",
-            "url":  "https://github.com/ronolo/json-store.git"
-        }
-    ]
+    }
 }

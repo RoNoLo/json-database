@@ -1,0 +1,92 @@
+[
+  {
+    "index": 0,
+    "picture": "http://placehold.it/32x32",
+    "age": 32,
+    "name": "Talley Sampson",
+    "gender": "male",
+    "email": "talleysampson@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 1,
+    "picture": "http://placehold.it/32x32",
+    "age": 28,
+    "name": "Gamble Mcclain",
+    "gender": "male",
+    "email": "gamblemcclain@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 2,
+    "picture": "http://placehold.it/32x32",
+    "age": 21,
+    "name": "Charlene Figueroa",
+    "gender": "female",
+    "email": "charlenefigueroa@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 3,
+    "picture": "http://placehold.it/32x32",
+    "age": 29,
+    "name": "Salinas Henson",
+    "gender": "male",
+    "email": "salinashenson@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 4,
+    "picture": "http://placehold.it/32x32",
+    "age": 40,
+    "name": "Cathy Mayer",
+    "gender": "female",
+    "email": "cathymayer@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 5,
+    "picture": "http://placehold.it/32x32",
+    "age": 30,
+    "name": "Tabatha Obrien",
+    "gender": "female",
+    "email": "tabathaobrien@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 6,
+    "picture": "http://placehold.it/32x32",
+    "age": 20,
+    "name": "Aguilar Bennett",
+    "gender": "male",
+    "email": "aguilarbennett@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 7,
+    "picture": "http://placehold.it/32x32",
+    "age": 20,
+    "name": "Smith Harper",
+    "gender": "male",
+    "email": "smithharper@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 8,
+    "picture": "http://placehold.it/32x32",
+    "age": 39,
+    "name": "Orr Clayton",
+    "gender": "male",
+    "email": "orrclayton@flumbo.com",
+    "hobby": []
+  },
+  {
+    "index": 9,
+    "picture": "http://placehold.it/32x32",
+    "age": 34,
+    "name": "Jacklyn Reyes",
+    "gender": "female",
+    "email": "jacklynreyes@flumbo.com",
+    "hobby": []
+  }
+]

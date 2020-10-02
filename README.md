@@ -1,15 +1,10 @@
-# Json Database
+# Json-Database
 
-*Warning: Heavy development! Do not use below 1.0.0!*
+This is an on-top sitting _extension_ of ronolo/json-store which adds additional 
+database like features to the JSON document store. Please read https://github.com/RoNoLo/json-store/blob/master/README.md
+to learn what you can do with it. 
 
-A document store which uses any type of filesystem to store documents as JSON.
-It uses https://flysystem.thephpleague.com/ to abstract the storage space.
-
-It uses a NoSQL like query system for the documents and aims to use very less 
-memory (aka not loading all documents into memory to process them).
-
-This is an _extension_ of the https://github.com/RoNoLo/json-store to have relations
-between JSON documents.
+This _extension_ adds relation ships between JSON documents and indexing of fields.  
 
 ## Usage
 
@@ -82,6 +77,9 @@ $person4 = $database->put('person', [
     'name' => 'Katja',   
     'interests' => [$hobby3, $hobby1, $hobby2]
 ]);
+
+// Request of Katja
+$katja = $database->read('person', $person4);
 ``` 
 
 ## Goals

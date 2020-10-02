@@ -215,10 +215,24 @@ class Database
         }
     }
 
-    public function canUseIndex(string $storeName, array $usedFields) {
+    public function canUseIndex(string $storeName, array $usedFields)
+    {
         return false;
     }
 
+    public function idToReference(string $id, string $storeName)
+    {
+        return '$' . $storeName . ':' .$id;
+    }
+
+    public function referenceToId(string $reference)
+    {
+        if (preg_match('/"\$([a-z_]+):([0-9a-zA-Z]+)"/', $reference, $matches)) {
+            return $matches[2][0];
+        }
+
+        throw new \InvalidArgumentException("The given reference was not a valid 'reference string'.");
+    }
 
     /**
      * Returns the store by name.

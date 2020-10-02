@@ -2,6 +2,7 @@
 
 namespace RoNoLo\JsonStorage\Database;
 
+use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
 use RoNoLo\JsonStorage\Store;
 
 class Config
@@ -50,6 +51,8 @@ class Config
      */
     public function addStore(string $name, Store $store): Config
     {
+        $this->ensureValidName($name);
+
         $this->stores[$name] = $store;
 
         return $this;
@@ -86,5 +89,12 @@ class Config
     public function getIndexes(): array
     {
         return $this->indexes;
+    }
+
+    private function ensureValidName(string $name)
+    {
+        if (!preg_match('/[a-z_]+/', $name)) {
+            throw new DatabaseRuntimeException("The name has invalid characters. Only lowercase and underscore is allowed.");
+        }
     }
 }

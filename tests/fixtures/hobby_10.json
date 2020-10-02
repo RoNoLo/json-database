@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Swimming",
+    "age": "3 to 45",
+    "days": ["mo", "we", "sa"]
+  },
+  {
+    "name": "Hunting",
+    "age": "14 to 70",
+    "days": ["mo"]
+  },
+  {
+    "name": "Board Games",
+    "age": "3 to 99",
+    "days": ["th", "we", "su"]
+  },
+  {
+    "name": "Horse Riding",
+    "age": "6 to 35",
+    "days": ["we", "tu"]
+  },
+  {
+    "name": "Running",
+    "age": "6 to 14",
+    "days": ["mo", "we"]
+  },
+  {
+    "name": "Movies",
+    "age": "3 to 99",
+    "days": ["mo", "tu", "we", "th", "fr", "sa", "su"]
+  },
+  {
+    "name": "Cooking",
+    "age": "12 to 66",
+    "days": ["fr"]
+  },
+  {
+    "name": "Coding",
+    "age": "7 to 34",
+    "days": ["mo"]
+  },
+  {
+    "name": "Gardening",
+    "age": "3 to 12",
+    "days": ["mo", "we", "sa"]
+  },
+  {
+    "name": "Dancing",
+    "age": "2 to 99",
+    "days": ["tu", "fr", "sa"]
+  }
+]

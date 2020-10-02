@@ -21,7 +21,7 @@ class Database extends BaseDatabase
     protected $indexStore;
 
     /** @var array */
-    protected $indexes;
+    protected $indexSettings;
 
     public static function create(Config $config)
     {
@@ -33,12 +33,12 @@ class Database extends BaseDatabase
         parent::__construct($stores, $options);
 
         $this->indexStore = $indexStore;
-        $this->indexes = $indexes;
+        $this->indexSettings = $indexes;
     }
 
     public function __destruct()
     {
-        foreach ($this->indexes as $storeName => $indexMeta) {
+        foreach ($this->indexSettings as $storeName => $indexMeta) {
             foreach ($indexMeta as $indexName => $fields) {
                 $indexKey = $storeName . '_' . $indexName;
 
@@ -61,7 +61,7 @@ class Database extends BaseDatabase
     {
         $this->indexStore->truncate();
 
-        foreach ($this->indexes as $storeName => $indexMeta) {
+        foreach ($this->indexSettings as $storeName => $indexMeta) {
             foreach ($this->getStore($storeName)->documentsGenerator() as $documentJson) {
                 foreach ($indexMeta as $indexName => $fields) {
                     $documentJson = $this->attachObjectReferences($documentJson);
@@ -183,11 +183,11 @@ class Database extends BaseDatabase
 
     public function canUseIndex(string $storeName, array $usedFields)
     {
-        if (!isset($this->indexes[$storeName])) {
+        if (!isset($this->indexSettings[$storeName])) {
             return false;
         }
 
-        foreach ($this->indexes[$storeName] as $indexKey => $fields) {
+        foreach ($this->indexSettings[$storeName] as $indexKey => $fields) {
             $result = array_diff($usedFields, $fields);
 
             if (!count($result)) {
@@ -222,14 +222,14 @@ class Database extends BaseDatabase
     protected function addToIndexes(string $storeName, $document, string $id)
     {
         // Do we have an index definition?
-        if (!isset($this->indexes[$storeName])) {
+        if (!isset($this->indexSettings[$storeName])) {
             return;
         }
 
         // Okay we have an index. We have to extract the value
         $jsonQuery = JsonQuery::fromData($document);
 
-        foreach ($this->indexes[$storeName] as $indexName => $fields) {
+        foreach ($this->indexSettings[$storeName] as $indexName => $fields) {
             foreach ($fields as $field) {
                 $this->index[$storeName][$indexName][$id][$field] = $jsonQuery->get($field);
             }
@@ -250,7 +250,7 @@ class Database extends BaseDatabase
 
     protected function checkIndex(string $storeName)
     {
-        if (!isset($this->indexes[$storeName])) {
+        if (!isset($this->indexSettings[$storeName])) {
             return;
         }
 
@@ -262,11 +262,11 @@ class Database extends BaseDatabase
     protected function loadIndex(string $storeName, $indexName = null)
     {
         if (is_null($indexName)) {
-            foreach ($this->indexes[$storeName] as $name => $fields) {
+            foreach ($this->indexSettings[$storeName] as $name => $fields) {
                 $indexKey = $storeName . '_' . $name;
 
                 if (!$this->indexStore->has($indexKey)) {
-                    $this->rebuildIndex($storeName, $indexName, $fields);
+                    $this->rebuildIndex($storeName, $name, $fields);
                 }
 
                 $this->index[$storeName][$indexName] = $this->indexStore->read($indexKey, true);
@@ -275,7 +275,7 @@ class Database extends BaseDatabase
             $indexKey = $storeName . '_' . $indexName;
 
             if (!$this->indexStore->has($indexKey)) {
-                $this->rebuildIndex($storeName, $indexName, $this->indexes[$storeName][$indexName]);
+                $this->rebuildIndex($storeName, $indexName, $this->indexSettings[$storeName][$indexName]);
             }
 
             $this->index[$storeName][$indexName] = $this->indexStore->read($indexKey, true);
