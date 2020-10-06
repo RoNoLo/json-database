@@ -10,44 +10,14 @@ class Config
     /** @var Store[] */
     private $stores = [];
 
-    /** @var Store */
-    private $indexStore;
-
-    private $indexes = [];
-
     private $options = [];
-
-    /**
-     * @param Store $indexStore
-     *
-     * @return Config
-     */
-    public function setIndexStore(Store $indexStore): self
-    {
-        $this->indexStore = $indexStore;
-
-        return $this;
-    }
-
-    /**
-     * @param string $storeName
-     * @param string $indexName
-     * @param array $fields
-     *
-     * @return Config
-     */
-    public function addIndex(string $storeName, string $indexName, array $fields): Config
-    {
-        $this->indexes[$storeName][$indexName] = $fields;
-
-        return $this;
-    }
 
     /**
      * @param string $name
      * @param Store $store
      *
      * @return Config
+     * @throws DatabaseRuntimeException
      */
     public function addStore(string $name, Store $store): Config
     {
@@ -73,22 +43,6 @@ class Config
     public function getOptions(): array
     {
         return $this->options;
-    }
-
-    /**
-     * @return Store
-     */
-    public function getIndexStore(): Store
-    {
-        return $this->indexStore;
-    }
-
-    /**
-     * @return array
-     */
-    public function getIndexes(): array
-    {
-        return $this->indexes;
     }
 
     private function ensureValidName(string $name)

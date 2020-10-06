@@ -9,7 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 define('STORE_JSON_OPTIONS', JSON_PRETTY_PRINT);
 
-class DatabaseIndexTest extends DatabaseTestBase
+class DatabaseQueryTest extends DatabaseTestBase
 {
     protected $db;
 
@@ -18,27 +18,33 @@ class DatabaseIndexTest extends DatabaseTestBase
         $config = new Database\Config();
 
         $config->addStore('person', Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/person'))));
-        $config->addStore('hobby', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/hobbies')))));
-        $config->addStore('country', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/countries')))));
+        $config->addStore('hobby', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/hobby')))));
+        $config->addStore('country', Store::create(((new Store\Config())->setAdapter(new Local($this->datastorePath . '/country')))));
 
-        $config->setIndexStore(Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/index'))));
+        $this->db = Database::create($config);
 
-        $config->addIndex('person', 'age', ['age']);
-        $config->addIndex('person', 'sex', ['gender']);
-        $config->addIndex('person', 'hobby', ['hobby.name', 'hobby.days']);
-        $config->addIndex('person', 'country', ['country.code']);
-
-        $this->db = Database\Index\Database::create($config);
-
-//        $config->setOption('create_indexes', false);
         $this->fillDatabaseWithRelations();
-//        $this->db->rebuildIndexes();
-//        $config->setOption('create_indexes', true);
     }
 
     protected function tearDown(): void
     {
         $this->db->truncateEverything();
+
+        // Deleting left over root dirs
+        $filesystem = new Filesystem();
+
+        $dirs = [
+            'index',
+            'person',
+            'hobby',
+            'country'
+        ];
+
+        foreach ($dirs as $dir) {
+            if ($filesystem->exists($this->datastorePath . DIRECTORY_SEPARATOR . $dir)) {
+                $filesystem->remove($this->datastorePath . DIRECTORY_SEPARATOR . $dir);
+            }
+        }
     }
 
     public function testCanQueryWithUseOfIndex()
@@ -50,45 +56,25 @@ class DatabaseIndexTest extends DatabaseTestBase
             ->find([
                 "age" => 20
             ])
-            ->useIndex('age')
+            // ->useIndex('age')
             ->execute();
 
         $this->assertEquals(16, $result->count());
     }
-//
-//    public function testCanQueryWithoutUseOfIndex()
-//    {
-//        $query = new Query($this->db);
-//
-//        $result = $query
-//            ->from('person')
-//            ->find([
-//                "age" => 20
-//            ])
-//            ->execute();
-//
-//        $this->assertEquals(16, $result->count());
-//    }
-//
-//    protected function tearDown(): void
-//    {
-//        $this->db->truncateEverything();
-//
-//        // Deleting left over root dirs
-//        $filesystem = new Filesystem();
-//
-//        $dirs = [
-//            'index',
-//            'person',
-//            'hobby'
-//        ];
-//
-//        foreach ($dirs as $dir) {
-//            if ($filesystem->exists($this->datastorePath . DIRECTORY_SEPARATOR . $dir)) {
-//                $filesystem->remove($this->datastorePath . DIRECTORY_SEPARATOR . $dir);
-//            }
-//        }
-//    }
+
+    public function testCanQueryDataWithoutQuery()
+    {
+        $query = new Query($this->db);
+
+        $result = $query
+            ->from('hobby')
+            ->find([
+                "days" => ['$in' => "mo"]
+            ])
+            ->execute();
+
+        $this->assertEquals(16, $result->count());
+    }
 
     private function fillDatabaseWithRelations()
     {

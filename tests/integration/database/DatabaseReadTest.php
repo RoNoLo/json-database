@@ -3,14 +3,18 @@
 namespace RoNoLo\JsonStorage;
 
 use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 
-class DatabaseReferenceObjectsTest extends DatabaseTestBase
+class DatabaseReadTest extends DatabaseTestBase
 {
     public function testAddingPersonsWithHobbyReferencesAndReadingTheFullPersonObject()
     {
-        $db = new Database();
-        $db->addStore('person', new Store(new Local($this->datastorePath . '/person')));
-        $db->addStore('hobby', new Store(new Local($this->datastorePath . '/hobby')));
+        $config = new Database\Config();
+
+        $config->addStore('person', Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/person'))));
+        $config->addStore('hobby', Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/hobby'))));
+
+        $db = Database::create($config);
 
         $hobby1 = $db->put('hobby', [
             'name' => 'Music',
@@ -76,8 +80,12 @@ class DatabaseReferenceObjectsTest extends DatabaseTestBase
         $personD = $db->read('person', $person4);
         $this->assertCount(0, $personD->hobbies);
 
-        $db->truncate('hobby');
-        $db->truncate('person');
+        $db->truncateEverything();
+
+        $adapter = new Local($this->datastorePath);
+        $flysystem = new Filesystem($adapter);
+        $flysystem->deleteDir('person');
+        $flysystem->deleteDir('hobby');
     }
 }
 

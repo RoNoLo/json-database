@@ -196,16 +196,16 @@
         },
         {
             "name": "ronolo/json-store",
-            "version": "1.2.1",
+            "version": "1.2.5",
             "source": {
                 "type": "git",
-                "url": "git@github.com:RoNoLo/json-store.git",
-                "reference": "13897db89b1e77aef3a666a9678b25da36d36553"
+                "url": "https://github.com/RoNoLo/json-store.git",
+                "reference": "5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/13897db89b1e77aef3a666a9678b25da36d36553",
-                "reference": "13897db89b1e77aef3a666a9678b25da36d36553",
+                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e",
+                "reference": "5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +250,7 @@
                 "json",
                 "nosql"
             ],
-            "time": "2020-10-02T20:38:19+00:00"
+            "time": "2020-10-06T11:49:07+00:00"
         }
     ],
     "packages-dev": [
@@ -1750,16 +1750,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v4.4.14",
+            "version": "v4.4.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "0d386979828c15d37ff936bf9bae2ecbfa36d7dc"
+                "reference": "ebc51494739d3b081ea543ed7c462fa73a4f74db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/0d386979828c15d37ff936bf9bae2ecbfa36d7dc",
-                "reference": "0d386979828c15d37ff936bf9bae2ecbfa36d7dc",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/ebc51494739d3b081ea543ed7c462fa73a4f74db",
+                "reference": "ebc51494739d3b081ea543ed7c462fa73a4f74db",
                 "shasum": ""
             },
             "require": {
@@ -1810,7 +1810,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-09-02T16:08:58+00:00"
+            "time": "2020-09-27T13:54:16+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",

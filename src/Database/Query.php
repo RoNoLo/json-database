@@ -3,7 +3,7 @@
 namespace RoNoLo\JsonStorage\Database;
 
 use RoNoLo\JsonStorage\Database;
-use RoNoLo\JsonStorage\Database\Index\QueryFields;
+use RoNoLo\JsonStorage\Database\QueryFields;
 use RoNoLo\JsonStorage\Exception\QueryExecutionException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Query as AbstractQuery;
@@ -18,8 +18,6 @@ class Query extends AbstractQuery
 {
     /** @var Database */
     protected $database;
-
-    protected $useIndex = [];
 
     protected $usedFields = [];
 
@@ -64,23 +62,18 @@ class Query extends AbstractQuery
 
             $jsonQuery = JsonQuery::fromData($document);
 
-            if (!!$this->database->canUseIndex($this->storeName, $this->usedFields)) {
-                $foo = 1;
-            } else {
-                // No usable index found, we request all documents to perform the query.
-                if ($this->match($jsonQuery)) {
-                    if (!$this->sort) {
-                        $ids[$document->__id] = 1;
-                    } else {
-                        $sortField = key($this->sort);
-                        $sortValue = $jsonQuery->get($sortField);
+            if ($this->match($jsonQuery)) {
+                if (!$this->sort) {
+                    $ids[$document->__id] = 1;
+                } else {
+                    $sortField = key($this->sort);
+                    $sortValue = $jsonQuery->get($sortField);
 
-                        if (is_array($sortValue)) {
-                            throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
-                        }
-
-                        $ids[$document->__id] = $sortValue;
+                    if (is_array($sortValue)) {
+                        throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
                     }
+
+                    $ids[$document->__id] = $sortValue;
                 }
             }
         }
@@ -93,7 +86,7 @@ class Query extends AbstractQuery
         $total = count($ids);
 
         if (!count($ids)) {
-            return new Result($this->database, $this->store, $ids, $this->fields, $total, $assoc);
+            return new Result($this->database, $this->storeName, $ids, $this->fields, $total, $assoc);
         }
 
         // Check for sorting
@@ -108,7 +101,7 @@ class Query extends AbstractQuery
         // Check for 'skip'
         if ($this->skip > 0) {
             if ($this->skip > $total) {
-                return new Result($this->database, $this->store, $ids, $this->fields, $total, $assoc);
+                return new Result($this->database, $this->storeName, $ids, $this->fields, $total, $assoc);
             } else {
                 $ids = array_slice($ids, $this->skip);
             }
@@ -119,7 +112,7 @@ class Query extends AbstractQuery
             $ids = array_slice($ids, 0, $this->limit);
         }
 
-        return new Result($this->database, $this->store, $ids, $this->fields, $total, $assoc);
+        return new Result($this->database, $this->storeName, $ids, $this->fields, $total, $assoc);
     }
 
     protected function parseUsedFields(array $input)

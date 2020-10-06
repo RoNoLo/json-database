@@ -185,7 +185,7 @@ class Database
     }
 
     /**
-     * Truncates every store and index.
+     * Truncates every store.
      *
      * @throws DatabaseRuntimeException
      */
@@ -213,11 +213,6 @@ class Database
         foreach ($store->documentsGenerator() as $documentJson) {
             yield $this->attachObjectReferences($documentJson);;
         }
-    }
-
-    public function canUseIndex(string $storeName, array $usedFields)
-    {
-        return false;
     }
 
     public function idToReference(string $id, string $storeName)

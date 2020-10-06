@@ -1,6 +1,6 @@
 <?php
 
-namespace RoNoLo\JsonStorage\Database\Index;
+namespace RoNoLo\JsonStorage\Database;
 
 use RoNoLo\JsonStorage\TestBase;
 

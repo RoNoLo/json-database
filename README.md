@@ -1,21 +1,13 @@
 # Json-Database
 
 This is an on-top sitting _extension_ of ronolo/json-store which adds additional 
-database like features to the JSON document store. Please read https://github.com/RoNoLo/json-store/blob/master/README.md
-to learn what you can do with it. 
+database like features to the JSON document store. 
+Please read https://github.com/RoNoLo/json-store/blob/master/README.md to learn what 
+you can do with it. 
 
-This _extension_ adds relation ships between JSON documents and indexing of fields.  
+This _extension_ adds relation ships between JSON documents.  
 
 ## Usage
-
-When using the JSON storage as database, the usage will be a little more parameter
-heavy, but it will come with a few benefits. The major difference is referenced documents.
-
-There are two flavors of databases provided. The simple one adds just referenced documents
-support and the second one adds also index support for faster queries, if you still want 
-to use this instead of a full blown NoSQL database. 
-
-Simple:
 
 ```php
 $config = Database\Config();

@@ -1,9 +1,8 @@
 <?php
 
-namespace RoNoLo\JsonStorage\Database\Index;
+namespace RoNoLo\JsonStorage\Database;
 
 use RoNoLo\JsonStorage\Exception\QuerySyntaxException;
-use RoNoLo\JsonQuery\JsonQuery;
 
 class QueryFields
 {
