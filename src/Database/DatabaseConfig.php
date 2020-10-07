@@ -1,8 +1,8 @@
 <?php
 
-
 namespace RoNoLo\JsonStorage\Database;
 
+use RoNoLo\JsonStorage\Store;
 
 interface DatabaseConfig
 {
@@ -13,4 +13,6 @@ interface DatabaseConfig
     public function getOption(string $name);
 
     public function getOptions(): array;
+
+    public function getStores(): array;
 }

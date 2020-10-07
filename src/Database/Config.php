@@ -2,6 +2,7 @@
 
 namespace RoNoLo\JsonStorage\Database;
 
+use RoNoLo\JsonStorage\Database;
 use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
 use RoNoLo\JsonStorage\Store;
 

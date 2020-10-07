@@ -9,28 +9,37 @@ use RoNoLo\JsonStorage\Exception\{DatabaseRuntimeException,
 use League\Flysystem\FileNotFoundException;
 use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database\Config;
+use RoNoLo\JsonStorage\Database\DatabaseConfig;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
 
 class Database
 {
+    const REMOVE_REFERENCED_ID = 'remove_referenced_id';
+
     /** @var Store[] */
     protected $stores = [];
 
-    /** @var array */
+    /** @var DatabaseConfig */
+    protected $config;
+
+    /** @var Store */
     protected $options = [];
 
-    public static function create(Config $config)
+    public static function create(DatabaseConfig $config)
     {
-        return new static($config->getStores(), $config->getOptions());
+        return new static($config);
     }
 
-    protected function __construct($stores, $options = [])
+    protected function __construct(DatabaseConfig $config)
     {
-        $this->stores = $stores;
-        $this->options = [
-            // Remove the document ID from referenced documents.
-            'remove_referenced_id' => true,
-        ] + $options;
+        $this->config = $config;
+        $this->stores = $config->getStores();
+
+        try {
+            $this->config->getOption(self::REMOVE_REFERENCED_ID);
+        } catch (DatabaseRuntimeException $e) {
+            $this->config->setOption(Database::REMOVE_REFERENCED_ID, true);
+        }
     }
 
     /**
@@ -266,7 +275,7 @@ class Database
                             $refDocument = $refStore->read($matches[1][$match], true);
 
                             // Removing the object __id from referenced documents.
-                            if ($this->options['remove_referenced_id']) {
+                            if ($this->config->getOption(self::REMOVE_REFERENCED_ID)) {
                                 unset($refDocument['__id']);
                             }
 
