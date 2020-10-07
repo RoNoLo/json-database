@@ -56,7 +56,6 @@ class DatabaseQueryTest extends DatabaseTestBase
             ->find([
                 "age" => 20
             ])
-            // ->useIndex('age')
             ->execute();
 
         $this->assertEquals(16, $result->count());

@@ -14,7 +14,7 @@ use RoNoLo\JsonStorage\Database\DocumentIterator;
 
 class Database
 {
-    const REMOVE_REFERENCED_ID = 'remove_referenced_id';
+    const OPTION_REMOVE_REFERENCED_ID = 'remove_referenced_id';
 
     /** @var Store[] */
     protected $stores = [];
@@ -36,9 +36,9 @@ class Database
         $this->stores = $config->getStores();
 
         try {
-            $this->config->getOption(self::REMOVE_REFERENCED_ID);
+            $this->config->getOption(self::OPTION_REMOVE_REFERENCED_ID);
         } catch (DatabaseRuntimeException $e) {
-            $this->config->setOption(Database::REMOVE_REFERENCED_ID, true);
+            $this->config->setOption(Database::OPTION_REMOVE_REFERENCED_ID, true);
         }
     }
 
@@ -164,15 +164,19 @@ class Database
      * Removes many documents from the store.
      *
      * @param string $storeName
-     * @param array $ids
+     * @param array|Database\Result $ids
      *
      * @return void
      * @throws DatabaseRuntimeException
      * @throws DocumentNotFoundException
      * @throws DocumentNotStoredException
      */
-    public function removeMany(string $storeName, array $ids)
+    public function removeMany(string $storeName, $ids)
     {
+        if ($ids instanceof Database\Result) {
+            $ids = $ids->getIds();
+        }
+
         foreach ($ids as $id) {
             $this->remove($storeName, $id);
         }
@@ -275,7 +279,7 @@ class Database
                             $refDocument = $refStore->read($matches[1][$match], true);
 
                             // Removing the object __id from referenced documents.
-                            if ($this->config->getOption(self::REMOVE_REFERENCED_ID)) {
+                            if ($this->config->getOption(self::OPTION_REMOVE_REFERENCED_ID)) {
                                 unset($refDocument['__id']);
                             }
 
