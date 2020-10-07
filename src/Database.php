@@ -11,6 +11,7 @@ use RoNoLo\JsonQuery\JsonQuery;
 use RoNoLo\JsonStorage\Database\Config;
 use RoNoLo\JsonStorage\Database\DatabaseConfig;
 use RoNoLo\JsonStorage\Database\DocumentIterator;
+use RoNoLo\JsonStorage\Database\QueryCache;
 
 class Database
 {
@@ -22,8 +23,8 @@ class Database
     /** @var DatabaseConfig */
     protected $config;
 
-    /** @var Store */
-    protected $options = [];
+    /** @var QueryCache */
+    protected $queryCache = null;
 
     public static function create(DatabaseConfig $config)
     {
@@ -34,6 +35,10 @@ class Database
     {
         $this->config = $config;
         $this->stores = $config->getStores();
+
+        if (isset($this->stores[QueryCache::STORE_NAME])) {
+            $this->queryCache = new QueryCache($this);
+        }
 
         try {
             $this->config->getOption(self::OPTION_REMOVE_REFERENCED_ID);
@@ -150,8 +155,6 @@ class Database
      *
      * @return void
      * @throws DatabaseRuntimeException
-     * @throws DocumentNotFoundException
-     * @throws DocumentNotStoredException
      */
     public function remove(string $storeName, string $id)
     {
@@ -168,8 +171,6 @@ class Database
      *
      * @return void
      * @throws DatabaseRuntimeException
-     * @throws DocumentNotFoundException
-     * @throws DocumentNotStoredException
      */
     public function removeMany(string $storeName, $ids)
     {
@@ -207,6 +208,41 @@ class Database
         foreach ($this->stores as $storeName => $store) {
             $this->truncate($storeName);
         }
+    }
+
+    /**
+     * Does this database uses a query cache.
+     *
+     * @return bool
+     */
+    public function hasQueryCache()
+    {
+        return !is_null($this->queryCache);
+    }
+
+    /**
+     * Requests the QueryCache.
+     *
+     * @param string $storeName
+     * @param string $queryString
+     *
+     * @return array|false|null
+     */
+    public function findQueryCache(string $storeName, string $queryString)
+    {
+        return $this->queryCache->find($storeName, $queryString);
+    }
+
+    /**
+     * Writes to the QueryCache.
+     *
+     * @param $storeName
+     * @param $queryString
+     * @param $ids
+     */
+    public function putQueryCache($storeName, $queryString, $ids)
+    {
+        $this->queryCache->put($storeName, $queryString, $ids);
     }
 
     /**

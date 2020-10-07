@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ec2d43b9188795acad37df75c82ebbb",
+    "content-hash": "b1dba66a888fec93806ebd9b8d7059df",
     "packages": [
         {
             "name": "league/flysystem",
@@ -196,16 +196,16 @@
         },
         {
             "name": "ronolo/json-store",
-            "version": "1.2.5",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RoNoLo/json-store.git",
-                "reference": "5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e"
+                "reference": "952276b6828a4667bd8664ace65caf87647ac3f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e",
-                "reference": "5b9417f2b6adf08aad436aed6f05f53cbcf6ec4e",
+                "url": "https://api.github.com/repos/RoNoLo/json-store/zipball/952276b6828a4667bd8664ace65caf87647ac3f2",
+                "reference": "952276b6828a4667bd8664ace65caf87647ac3f2",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +250,7 @@
                 "json",
                 "nosql"
             ],
-            "time": "2020-10-06T11:49:07+00:00"
+            "time": "2020-10-07T07:13:45+00:00"
         }
     ],
     "packages-dev": [

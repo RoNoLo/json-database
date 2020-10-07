@@ -19,7 +19,14 @@ class Query extends AbstractQuery
     /** @var Database */
     protected $database;
 
+    /** @var array */
+    protected $findFields = [];
+
+    /** @var array */
     protected $usedFields = [];
+
+    /** @var null|string */
+    protected $queryFindString = null;
 
     /** @var string|null */
     protected $storeName = null;
@@ -40,7 +47,8 @@ class Query extends AbstractQuery
     {
         parent::find($input);
 
-        $this->parseUsedFields($input);
+        $this->queryFindString = json_encode($input);
+        $this->findFields = $this->usedFields = $this->parseUsedFields($input);
 
         return $this;
     }
@@ -57,6 +65,14 @@ class Query extends AbstractQuery
     public function execute($assoc = false)
     {
         $ids = [];
+        if ($this->database->hasQueryCache()) {
+            $ids = $this->database->findQueryCache($this->storeName, $this->queryFindString);
+
+            if (!is_null($ids)) {
+                return $this->postprocess($ids, $assoc, true);
+            }
+        }
+
         foreach ($this->database->documentsGenerator($this->storeName, $this->usedFields) as $documentJson) {
             $document = json_decode($documentJson);
 
@@ -81,12 +97,17 @@ class Query extends AbstractQuery
         return $this->postprocess($ids, $assoc);
     }
 
-    private function postprocess(array $ids = [], bool $assoc = false)
+    private function postprocess(array $ids = [], bool $assoc = false, bool $fromCache = false)
     {
         $total = count($ids);
 
         if (!count($ids)) {
             return new Result($this->database, $this->storeName, $ids, $this->fields, $total, $assoc);
+        }
+
+        // Query Cache
+        if (!$fromCache && $this->database->hasQueryCache()) {
+            $this->database->putQueryCache($this->storeName, $this->queryFindString, $ids);
         }
 
         // Check for sorting
@@ -117,8 +138,6 @@ class Query extends AbstractQuery
 
     protected function parseUsedFields(array $input)
     {
-        $usedFields = (new QueryFields())->parse($input);
-
-        $this->usedFields = array_merge($this->usedFields, $usedFields);
+        return (new QueryFields())->parse($input);
     }
 }

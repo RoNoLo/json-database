@@ -58,7 +58,7 @@ class DatabaseQueryTest extends DatabaseTestBase
             ])
             ->execute();
 
-        $this->assertEquals(16, $result->count());
+        $this->assertEquals(2, $result->count());
     }
 
     public function testCanQueryDataWithoutQuery()
@@ -95,7 +95,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $sampsonId = $this->db->put('person', $sampson);
 
-        $mcclain = $persons[0];
+        $mcclain = $persons[1];
         $mcclain->hobby = [
             $hobbyRefCodes[1],
             $hobbyRefCodes[4],
@@ -105,7 +105,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $mcclainId = $this->db->put('person', $mcclain);
 
-        $figueroa = $persons[0];
+        $figueroa = $persons[2];
         $figueroa->hobby = [
             $hobbyRefCodes[8],
         ];
@@ -113,7 +113,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $figueroaId = $this->db->put('person', $figueroa);
 
-        $henson = $persons[0];
+        $henson = $persons[3];
         $henson->hobby = [
             $hobbyRefCodes[1],
             $hobbyRefCodes[4],
@@ -125,7 +125,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $hensonId = $this->db->put('person', $henson);
 
-        $mayer = $persons[0];
+        $mayer = $persons[4];
         $mayer->hobby = [
             $hobbyRefCodes[6],
             $hobbyRefCodes[2],
@@ -135,13 +135,13 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $mayerId = $this->db->put('person', $mayer);
 
-        $obrien = $persons[0];
+        $obrien = $persons[5];
         $obrien->hobby = [];
         $obrien->country = $countryRefCodes[2];
 
         $obrienId = $this->db->put('person', $obrien);
 
-        $bennett = $persons[0];
+        $bennett = $persons[6];
         $bennett->hobby = [
             $hobbyRefCodes[4],
         ];
@@ -149,7 +149,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $bennettId = $this->db->put('person', $bennett);
 
-        $harper = $persons[0];
+        $harper = $persons[7];
         $harper->hobby = [
             $hobbyRefCodes[2],
             $hobbyRefCodes[4],
@@ -160,7 +160,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $harperId = $this->db->put('person', $harper);
 
-        $clayton = $persons[0];
+        $clayton = $persons[8];
         $clayton->hobby = [
             $hobbyRefCodes[1],
             $hobbyRefCodes[2],
@@ -170,7 +170,7 @@ class DatabaseQueryTest extends DatabaseTestBase
 
         $claytonId = $this->db->put('person', $clayton);
 
-        $reyes = $persons[0];
+        $reyes = $persons[9];
         $reyes->hobby = [
             $hobbyRefCodes[5],
             $hobbyRefCodes[7],

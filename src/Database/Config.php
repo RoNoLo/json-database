@@ -29,6 +29,18 @@ class Config implements DatabaseConfig
         return $this;
     }
 
+    /**
+     * @param Store $store
+     *
+     * @return Config
+     */
+    public function addQueryCache(Store $store): Config
+    {
+        $this->stores[QueryCache::STORE_NAME] = $store;
+
+        return $this;
+    }
+
     public function setOption(string $name, $value): Config
     {
         $this->options[$name] = $value;
