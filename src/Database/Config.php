@@ -5,7 +5,7 @@ namespace RoNoLo\JsonStorage\Database;
 use RoNoLo\JsonStorage\Exception\DatabaseRuntimeException;
 use RoNoLo\JsonStorage\Store;
 
-class Config
+class Config implements DatabaseConfig
 {
     /** @var Store[] */
     private $stores = [];
@@ -33,6 +33,15 @@ class Config
         $this->options[$name] = $value;
 
         return $this;
+    }
+
+    public function getOption(string $name)
+    {
+        if (!isset($this->options[$name])) {
+            throw new DatabaseRuntimeException(sprintf("The option %s was not defined.", $name));
+        }
+
+        return $this->options[$name];
     }
 
     public function getStores(): array

@@ -21,22 +21,6 @@ This will tell the database, that it knows 2 JSON stores under the hood and when
 a query against the database will happen the database will look for referenced documents
 put them in place and return the documents normally. 
 
-Indexed:
-
-```php
-$config = Database\Config();
-$config->addStore('person', (new Store\Config())->setAdapter(new Local('/foo/bar/persons')));
-$config->addStore('interests', (new Store\Config())->setAdapter(new Local('/foo/bar/interests')));
-$config->setIndexStore((new Store\Config())->setAdapter(new MemoryAdapter()));
-$config->addIndex('person', 'age', ['age', 'created']);
-
-$database = Database::create($config);
-```
-
-This database does the same as above, but has an extra store which only stores indicies of
-certain keys. whenever a query is fired it will fistly check if an index can be used to find
-documents, and if so everything is faster. 
-
 A Referenced document is one which lives in it own store, but is maybe shared by other
 store documents. Here an example how it looks under the hood.
 
@@ -70,7 +54,7 @@ $person4 = $database->put('person', [
     'interests' => [$hobby3, $hobby1, $hobby2]
 ]);
 
-// Request of Katja
+// Request of Katja which will return a JSON object with her 3 hobbies dereferenced.
 $katja = $database->read('person', $person4);
 ``` 
 
