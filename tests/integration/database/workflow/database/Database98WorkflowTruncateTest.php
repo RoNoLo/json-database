@@ -2,12 +2,12 @@
 
 namespace RoNoLo\JsonStorage;
 
-class Database08WorkflowTruncateTest extends DatabaseWorkflowTestBase
+class Database98WorkflowTruncateTest extends DatabaseWorkflowTestBase
 {
     public function testTruncateDatabase()
     {
         $this->db->truncateEverything();
 
-        $this->assertEquals(0, $this->store->count());
+        $this->assertEquals(0, $this->storePersons->count());
     }
 }

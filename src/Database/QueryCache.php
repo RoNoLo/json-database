@@ -94,6 +94,7 @@ class QueryCache
      *
      * @throws DatabaseRuntimeException
      * @throws DocumentNotStoredException
+     * @throws QueryExecutionException
      */
     public function put(string $storeName, array $queryFilters, array $ids)
     {

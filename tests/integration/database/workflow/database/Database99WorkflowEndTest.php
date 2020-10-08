@@ -15,8 +15,12 @@ class Database99WorkflowEndTest extends DatabaseWorkflowTestBase
 
         $this->assertFalse($flysystem->has($this->repoTestPath));
 
-        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'tmp.json')) {
-            unlink(__DIR__ . DIRECTORY_SEPARATOR . 'tmp.json');
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'tmp_persons.json')) {
+            unlink(__DIR__ . DIRECTORY_SEPARATOR . 'tmp_persons.json');
+        }
+
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'tmp_humans.json')) {
+            unlink(__DIR__ . DIRECTORY_SEPARATOR . 'tmp_humans.json');
         }
     }
 }

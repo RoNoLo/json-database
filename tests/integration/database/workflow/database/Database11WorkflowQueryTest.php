@@ -2,14 +2,17 @@
 
 namespace RoNoLo\JsonStorage;
 
-class Database07WorkflowQueryTest extends DatabaseWorkflowTestBase
+/**
+ * Test if these documents are removed.
+ */
+class Database10WorkflowQueryTest extends DatabaseWorkflowTestBase
 {
     public function testQueryAge20Database()
     {
         $query = new Database\Query($this->db);
 
         $result = $query
-            ->from('something')
+            ->from('persons')
             ->find([
                 "age" => 99
             ])

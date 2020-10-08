@@ -57,6 +57,7 @@ class Database
      * @return array Of IDs
      * @throws DatabaseRuntimeException
      * @throws DocumentNotStoredException
+     * @throws QueryExecutionException
      */
     public function putMany(string $storeName, array $documents, $refCode = false): array
     {
@@ -87,6 +88,7 @@ class Database
      * @return string
      * @throws DatabaseRuntimeException
      * @throws DocumentNotStoredException
+     * @throws QueryExecutionException
      */
     public function put(string $storeName, $document, $refCode = false): string
     {
@@ -159,6 +161,7 @@ class Database
      *
      * @return void
      * @throws DatabaseRuntimeException
+     * @throws QueryExecutionException
      */
     public function remove(string $storeName, string $id)
     {

@@ -11,7 +11,13 @@ abstract class DatabaseWorkflowTestBase extends TestBase
     protected $repoTestPath;
 
     /** @var Store */
-    protected $store;
+    protected $storePersons;
+
+    /** @var Store */
+    protected $storeHumans;
+
+    /** @var Store */
+    protected $storeInterests;
 
     /** @var Database */
     protected $db;
@@ -22,15 +28,15 @@ abstract class DatabaseWorkflowTestBase extends TestBase
 
         $this->repoTestPath = 'database_workflow';
 
-        $datastoreAdapter = new Local($this->datastorePath . '/' . $this->repoTestPath);
-
-        $storeConfig = new Store\Config();
-        $storeConfig->setAdapter($datastoreAdapter);
-
-        $this->store = Store::create($storeConfig);
-
         $dbConfig = new Database\Config();
-        $dbConfig->addStore('something', $this->store);
+
+        $this->storePersons = Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/' . $this->repoTestPath . '/persons')));
+        $this->storeHumans = Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/' . $this->repoTestPath . '/humans')));
+        $this->storeInterests = Store::create((new Store\Config())->setAdapter(new Local($this->datastorePath . '/' . $this->repoTestPath . '/interests')));
+
+        $dbConfig->addStore('persons', $this->storePersons);
+        $dbConfig->addStore('humans', $this->storeHumans);
+        $dbConfig->addStore('interests', $this->storeInterests);
 
         $this->db = Database::create($dbConfig);
     }
