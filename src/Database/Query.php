@@ -26,10 +26,13 @@ class Query extends AbstractQuery
     protected $usedFields = [];
 
     /** @var null|string */
-    protected $queryFindString = null;
+    protected $findFilters = null;
 
     /** @var string|null */
     protected $storeName = null;
+
+    /** @var bool */
+    protected $useQueryCache = true;
 
     public function __construct(Database $database)
     {
@@ -47,7 +50,7 @@ class Query extends AbstractQuery
     {
         parent::find($input);
 
-        $this->queryFindString = json_encode($input);
+        $this->findFilters = $input;
         $this->findFields = $this->usedFields = $this->parseUsedFields($input);
 
         return $this;
@@ -62,14 +65,21 @@ class Query extends AbstractQuery
         return $this;
     }
 
+    public function cache(bool $enable)
+    {
+        $this->useQueryCache = $enable;
+
+        return $this;
+    }
+
     public function execute($assoc = false)
     {
         $ids = [];
-        if ($this->database->hasQueryCache()) {
-            $ids = $this->database->findQueryCache($this->storeName, $this->queryFindString);
+        if ($this->useQueryCache && $this->database->hasQueryCache()) {
+            $cachedIds = $this->database->findQueryCache($this->storeName, $this->findFilters);
 
-            if (!is_null($ids)) {
-                return $this->postprocess($ids, $assoc, true);
+            if (!is_null($cachedIds) && $cachedIds !== false) {
+                return $this->postprocess($cachedIds, $assoc, true);
             }
         }
 
@@ -83,7 +93,7 @@ class Query extends AbstractQuery
                     $ids[$document->__id] = 1;
                 } else {
                     $sortField = key($this->sort);
-                    $sortValue = $jsonQuery->get($sortField);
+                    $sortValue = $jsonQuery->query($sortField);
 
                     if (is_array($sortValue)) {
                         throw new QueryExecutionException("The field to sort by returned more than one value from a document.");
@@ -107,7 +117,7 @@ class Query extends AbstractQuery
 
         // Query Cache
         if (!$fromCache && $this->database->hasQueryCache()) {
-            $this->database->putQueryCache($this->storeName, $this->queryFindString, $ids);
+            $this->database->putQueryCache($this->storeName, $this->findFilters, $ids);
         }
 
         // Check for sorting

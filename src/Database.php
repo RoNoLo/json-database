@@ -92,6 +92,10 @@ class Database
     {
         $store = $this->getStore($storeName);
 
+        if ($this->hasQueryCache()) {
+            $this->queryCache->truncate($storeName);
+        }
+
         $id = $store->put($document);
 
         return $refCode ? '$' . $storeName . ':' . $id : $id;
@@ -160,6 +164,10 @@ class Database
     {
         $store = $this->getStore($storeName);
 
+        if ($this->hasQueryCache()) {
+            $this->queryCache->truncate($storeName);
+        }
+
         $store->remove($id);
     }
 
@@ -224,25 +232,29 @@ class Database
      * Requests the QueryCache.
      *
      * @param string $storeName
-     * @param string $queryString
+     * @param array $query
      *
      * @return array|false|null
      */
-    public function findQueryCache(string $storeName, string $queryString)
+    public function findQueryCache(string $storeName, array $query)
     {
-        return $this->queryCache->find($storeName, $queryString);
+        if ($storeName == QueryCache::STORE_NAME) {
+            return false;
+        }
+
+        return $this->queryCache->find($storeName, $query);
     }
 
     /**
      * Writes to the QueryCache.
      *
      * @param $storeName
-     * @param $queryString
+     * @param $query
      * @param $ids
      */
-    public function putQueryCache($storeName, $queryString, $ids)
+    public function putQueryCache(string $storeName, array $query, array $ids)
     {
-        $this->queryCache->put($storeName, $queryString, $ids);
+        $this->queryCache->put($storeName, $query, $ids);
     }
 
     /**
