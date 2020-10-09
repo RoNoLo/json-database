@@ -7,7 +7,7 @@ namespace RoNoLo\JsonStorage;
  */
 class Database09WorkflowRemoveTest extends DatabaseWorkflowTestBase
 {
-    public function testQueryAge20Database()
+    public function testRemoveAge20DatabasePersons()
     {
         $json = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'tmp_persons.json');
         $data = json_decode($json, true);

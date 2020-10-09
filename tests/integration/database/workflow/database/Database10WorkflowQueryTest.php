@@ -7,7 +7,7 @@ namespace RoNoLo\JsonStorage;
  */
 class Database10WorkflowQueryTest extends DatabaseWorkflowTestBase
 {
-    public function testQueryAge20Database()
+    public function testQueryAge99DatabasePersons()
     {
         $query = new Database\Query($this->db);
 

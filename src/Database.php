@@ -182,6 +182,7 @@ class Database
      *
      * @return void
      * @throws DatabaseRuntimeException
+     * @throws QueryExecutionException
      */
     public function removeMany(string $storeName, $ids)
     {
