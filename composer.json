@@ -1,6 +1,6 @@
 {
     "name": "ronolo/json-database",
-    "description": "A lightweight JSON document database, which sits on top of ronolo/json-store and adds relations and caching of JSON documents.",
+    "description": "A lightweight JSON document database, which sits on top of ronolo/json-store and adds document relations and query caching.",
     "keywords": ["file", "db", "document", "nosql", "json", "database", "store"],
     "homepage": "http://github.com/ronolo/json-database",
     "license": "MIT",
