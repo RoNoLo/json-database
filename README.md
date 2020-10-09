@@ -56,6 +56,28 @@ $person4 = $database->put('person', [
 
 // Request of Katja which will return a JSON object with her 3 hobbies dereferenced.
 $katja = $database->read('person', $person4);
+```
+
+Katja as JSON:
+
+```json
+{
+    "name": "Katja",   
+    "interests": [
+        {
+            "name": "Movies", 
+            "stars": 5
+        },
+        {
+            "name": "Music", 
+            "stars": 4
+        },
+        {
+            "name": "Boxen", 
+            "stars": 3.5
+        }
+    ]   
+}
 ``` 
 
 ## Goals
